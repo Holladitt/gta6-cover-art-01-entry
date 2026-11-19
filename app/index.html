@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sunset State — GTA 6 Style Cover Art Maker</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #0d0d14; color: #f2ede8;
+    font-family: "Helvetica Neue", Arial, system-ui, sans-serif;
+  }
+  header {
+    display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+    padding: 14px 20px 10px;
+    border-bottom: 1px solid #26263a;
+  }
+  header h1 {
+    margin: 0; font-size: 22px; letter-spacing: 1px; font-weight: 900;
+    background: linear-gradient(90deg, #ff5ea8, #ff9a3d);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  header p { margin: 0; color: #9a93a8; font-size: 13px; }
+  main { display: flex; gap: 18px; padding: 16px 20px; align-items: flex-start; }
+  #stage { flex: 1 1 auto; min-width: 0; }
+  #preview {
+    display: block; width: 100%; max-width: 980px; height: auto;
+    background: #000; border: 1px solid #33334a; border-radius: 6px;
+    cursor: crosshair; touch-action: none;
+  }
+  #samples { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; max-width: 980px; }
+  #samples figure {
+    margin: 0; width: 104px; cursor: pointer; border: 2px solid transparent;
+    border-radius: 6px; overflow: hidden; background: #181822;
+  }
+  #samples figure.active { border-color: #ff5ea8; }
+  #samples img { display: block; width: 104px; height: 66px; object-fit: cover; }
+  #samples figcaption { font-size: 10px; padding: 3px 5px; color: #c9c2d4; text-transform: uppercase; letter-spacing: .5px; }
+  aside {
+    flex: 0 0 300px; background: #14141f; border: 1px solid #26263a;
+    border-radius: 8px; padding: 14px;
+  }
+  aside h2 { margin: 2px 0 10px; font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; color: #ff9a3d; }
+  aside label { display: block; font-size: 12px; color: #b7b0c4; margin: 10px 0 4px; }
+  aside input[type="text"], aside select {
+    width: 100%; padding: 8px 9px; border-radius: 6px; border: 1px solid #33334a;
+    background: #0d0d14; color: #f2ede8; font-size: 14px;
+  }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .row button, aside button {
+    flex: 1 1 auto; padding: 8px 10px; border-radius: 6px; cursor: pointer;
+    border: 1px solid #33334a; background: #1d1d2e; color: #f2ede8; font-size: 13px;
+  }
+  .row button.on { border-color: #ff5ea8; background: #2c1530; color: #ffb3d6; }
+  button.primary {
+    width: 100%; margin-top: 12px; padding: 11px; font-weight: 800; font-size: 15px;
+    border: none; border-radius: 8px; color: #1a0a12;
+    background: linear-gradient(90deg, #ff5ea8, #ff9a3d); cursor: pointer;
+  }
+  button.ghost { width: 100%; margin-top: 8px; background: transparent; }
+  input[type="range"] { width: 100%; accent-color: #ff5ea8; }
+  #status { font-size: 12px; color: #8f889e; margin-top: 12px; line-height: 1.5; }
+  #hint { font-size: 12px; color: #8f889e; margin: 8px 0 0; max-width: 980px; line-height: 1.5; }
+  footer { padding: 0 20px 18px; color: #6f6a80; font-size: 12px; }
+  kbd { background: #26263a; border-radius: 4px; padding: 1px 5px; font-size: 11px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>SUNSET STATE</h1>
+  <p>GTA 6-style cover art maker &mdash; your photo, your caption, one poster.</p>
+</header>
+<main>
+  <section id="stage">
+    <canvas id="preview" width="960" height="540"></canvas>
+    <p id="hint">Click a panel to select it, then drag it to pan and use the zoom slider.
+      Click a sample photo below to place it on the selected panel.</p>
+    <div id="samples"></div>
+  </section>
+  <aside>
+    <h2>Cover</h2>
+    <label for="titleInput">Title</label>
+    <input id="titleInput" type="text" value="SUNSET STATE" maxlength="24" autocomplete="off">
+    <label for="subInput">Subtitle (script)</label>
+    <input id="subInput" type="text" value="Neon Tide" maxlength="30" autocomplete="off">
+    <label>Title style</label>
+    <div class="row" id="variants"></div>
+    <label>Export size</label>
+    <div class="row" id="sizes"></div>
+    <label for="zoom">Zoom &mdash; selected panel: <span id="selName">Hero</span></label>
+    <input id="zoom" type="range" min="1" max="2" step="0.01" value="1">
+    <button class="ghost" id="surpriseBtn" type="button">Surprise Me</button>
+    <button class="primary" id="exportBtn" type="button">Export PNG</button>
+    <label for="upload">Upload your own photo</label>
+    <input id="upload" type="file" accept="image/*">
+    <p id="status">Loading sample photos&hellip;</p>
+  </aside>
+</main>
+<footer>
+  Photos never leave your machine &mdash; everything runs offline in this page.
+  All art is original; no Rockstar logos, artwork or fonts are used.
+</footer>
+<script>
+"use strict";
+
+/* ------------------------------------------------------------------ */
+/* Data: sample photos, title variants, cover sizes, panel layout.    */
+/* ------------------------------------------------------------------ */
+
+const SAMPLES = [
+  { id: "woman",  src: "samples/sample-woman.jpg",  label: "OCEAN DRIVE",    fx: 0.12, fy: 0.35 },
+  { id: "man",    src: "samples/sample-man.jpg",    label: "PALM BOULEVARD", fx: 0.50, fy: 0.42 },
+  { id: "car",    src: "samples/sample-car.jpg",    label: "SUNSET STRIP",   fx: 0.50, fy: 0.55 },
+  { id: "tower",  src: "samples/sample-tower.jpg",  label: "TOWER 2",        fx: 0.50, fy: 0.42 },
+  { id: "angler", src: "samples/sample-angler.jpg", label: "THE ANGLER",     fx: 0.50, fy: 0.38 },
+  { id: "road",   src: "samples/sample-road.jpg",   label: "MARINA DEL SOL", fx: 0.50, fy: 0.50 },
+  { id: "boat",   src: "samples/sample-boat.jpg",   label: "OPEN WATER",     fx: 0.50, fy: 0.45 },
+  { id: "motel",  src: "samples/sample-motel.jpg",  label: "NEON MOTEL",     fx: 0.50, fy: 0.35 },
+];
+
+const VARIANTS = [
+  { title: "SUNSET STATE", sub: "Neon Tide",      top: "#ff6ec7", bottom: "#ff8a3d" },
+  { title: "NEON COAST",   sub: "Vice Nights",    top: "#ff7ad9", bottom: "#ffb347" },
+  { title: "HEAT WAVE",    sub: "Endless Summer", top: "#ffd23d", bottom: "#ff5e3a" },
+];
+
+const SIZES = [
+  { id: "1920x1080", w: 1920, h: 1080, tag: "1920 × 1080" },
+  { id: "1080x1080", w: 1080, h: 1080, tag: "1080 × 1080" },
+  { id: "1080x1350", w: 1080, h: 1350, tag: "1080 × 1350" },
+  { id: "1200x1600", w: 1200, h: 1600, tag: "1200 × 1600" },
+];
+
+/* Panel slots in grid units: 4 columns, 3 photo rows, then a thin strip.
+   The hero photo is tall on the left, spanning the top two rows; the
+   motel photo spans the full width of the bottom row and carries the
+   big title on top of it, so no band of the cover is ever empty. */
+const SLOTS = [
+  { key: "hero",   col: 0, row: 0, cols: 1, rows: 2, sample: "woman",  name: "Hero" },
+  { key: "man",    col: 1, row: 0, cols: 1, rows: 1, sample: "man",    name: "Driver" },
+  { key: "road",   col: 2, row: 0, cols: 1, rows: 1, sample: "road",   name: "Coast road" },
+  { key: "angler", col: 3, row: 0, cols: 1, rows: 1, sample: "angler", name: "Angler" },
+  { key: "car",    col: 1, row: 1, cols: 1, rows: 1, sample: "car",    name: "Sports car" },
+  { key: "tower",  col: 2, row: 1, cols: 1, rows: 1, sample: "tower",  name: "Tower" },
+  { key: "boat",   col: 3, row: 1, cols: 1, rows: 1, sample: "boat",   name: "Speedboat" },
+  { key: "motel",  col: 0, row: 2, cols: 4, rows: 1, sample: "motel",  name: "Motel (title band)" },
+];
+
+const state = {
+  size: SIZES[0],
+  variant: 0,
+  title: VARIANTS[0].title,
+  sub: VARIANTS[0].sub,
+  selected: "hero",
+  activeSample: "woman",
+  adjust: {},   /* slot key -> { zoom, px, py } */
+  uploads: 0,
+};
+for (const s of SLOTS) state.adjust[s.key] = { zoom: 1, px: 0, py: 0 };
+
+const images = new Map();   /* sample id -> loaded HTMLImageElement */
+let gradeMode = "2d";       /* "webgl" once the shader path proves itself */
+
+/* ------------------------------------------------------------------ */
+/* Photo grade: a warm sunset / neon look. WebGL first, 2D fallback.  */
+/* The shader smooths flat areas while keeping edges (a small 3x3     */
+/* neighbourhood mean blended back toward the centre pixel where the  */
+/* local contrast is high), then warms the colour: red lifted, blue   */
+/* pulled down, saturation pushed up, a touch of orange in the dark.   */
+/* Vignette is drawn per panel later, so a cropped panel keeps its    */
+/* own darkened corners.                                               */
+/* ------------------------------------------------------------------ */
+
+const GL_VERT = [
+  "attribute vec2 aPos;",
+  "varying vec2 vUv;",
+  "void main(){ vUv = vec2(aPos.x * 0.5 + 0.5, 0.5 - aPos.y * 0.5);",
+  "  gl_Position = vec4(aPos, 0.0, 1.0); }",
+].join("\n");
+
+const GL_FRAG = [
+  "precision mediump float;",
+  "varying vec2 vUv;",
+  "uniform sampler2D uTex;",
+  "uniform vec2 uPx;",
+  "void main(){",
+  "  vec3 c = texture2D(uTex, vUv).rgb;",
+  "  vec3 m = vec3(0.0);",
+  "  for (int x = -1; x <= 1; x++)",
+  "    for (int y = -1; y <= 1; y++)",
+  "      m += texture2D(uTex, vUv + vec2(float(x), float(y)) * uPx).rgb;",
+  "  m /= 9.0;",
+  "  vec3 d = m - c;",
+  "  float keep = clamp(dot(d, d) * 60.0, 0.0, 1.0);",
+  "  vec3 g = mix(m, c, keep);",
+  "  g.r = pow(g.r, 0.96) * 1.05;",
+  "  g.b = pow(g.b, 1.06) * 0.90;",
+  "  float l = dot(g, vec3(0.299, 0.587, 0.114));",
+  "  g = mix(vec3(l), g, 1.16);",
+  "  g += vec3(0.025, 0.004, -0.018) * (1.0 - l);",
+  "  gl_FragColor = vec4(clamp(g, 0.0, 1.0), 1.0);",
+  "}",
+].join("\n");
+
+let glBox = null;   /* { gl, prog, tex, canvas } built lazily */
+
+function buildWebGLGrade() {
+  const canvas = document.createElement("canvas");
+  const gl = canvas.getContext("webgl", { preserveDrawingBuffer: true });
+  if (!gl) return null;
+  const compile = (type, src) => {
+    const sh = gl.createShader(type);
+    gl.shaderSource(sh, src);
+    gl.compileShader(sh);
+    if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) return null;
+    return sh;
+  };
+  const vs = compile(gl.VERTEX_SHADER, GL_VERT);
+  const fs = compile(gl.FRAGMENT_SHADER, GL_FRAG);
+  if (!vs || !fs) return null;
+  const prog = gl.createProgram();
+  gl.attachShader(prog, vs);
+  gl.attachShader(prog, fs);
+  gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return null;
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+  const tex = gl.createTexture();
+  return { gl, prog, tex, canvas };
+}
+
+/* The grade runs on a capped copy (720 px on the long side): the look
+   is a soft warm wash, so grading at half resolution and letting the
+   panel draw upscale it loses nothing visible and keeps software
+   WebGL (SwiftShader) fast. */
+function cappedSize(w, h, maxSide) {
+  if (Math.max(w, h) <= maxSide) return [w, h];
+  const s = maxSide / Math.max(w, h);
+  return [Math.round(w * s), Math.round(h * s)];
+}
+
+function gradePhotoWebGL(img) {
+  if (!glBox) glBox = buildWebGLGrade();
+  if (!glBox) return null;
+  const { gl, prog, tex, canvas } = glBox;
+  const w = img.naturalWidth, h = img.naturalHeight;
+  const [gw, gh] = cappedSize(w, h, 720);
+  canvas.width = gw; canvas.height = gh;
+  gl.viewport(0, 0, gw, gh);
+  gl.useProgram(prog);
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+  const loc = gl.getAttribLocation(prog, "aPos");
+  gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  gl.uniform1i(gl.getUniformLocation(prog, "uTex"), 0);
+  gl.uniform2f(gl.getUniformLocation(prog, "uPx"), 1 / w, 1 / h);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  const out = document.createElement("canvas");
+  out.width = gw; out.height = gh;
+  out.getContext("2d").drawImage(canvas, 0, 0);
+  return out;
+}
+
+/* Plain 2D grade used when WebGL is unavailable: same warm intent,
+   done with canvas filters and a soft orange-pink wash. */
+function gradePhoto2D(img) {
+  const out = document.createElement("canvas");
+  const [gw, gh] = cappedSize(img.naturalWidth, img.naturalHeight, 720);
+  out.width = gw; out.height = gh;
+  const c = out.getContext("2d");
+  c.filter = "saturate(1.22) contrast(1.06) sepia(0.20) brightness(1.03)";
+  c.drawImage(img, 0, 0, gw, gh);
+  c.filter = "none";
+  const wash = c.createLinearGradient(0, 0, 0, out.height);
+  wash.addColorStop(0, "rgba(255,120,60,0.10)");
+  wash.addColorStop(1, "rgba(255,60,140,0.10)");
+  c.fillStyle = wash;
+  c.fillRect(0, 0, out.width, out.height);
+  return out;
+}
+
+const gradedCache = new WeakMap();   /* image element -> graded canvas */
+
+function gradedPhoto(img) {
+  let g = gradedCache.get(img);
+  if (g) return g;
+  g = gradePhotoWebGL(img);
+  if (g) { gradeMode = "webgl"; }
+  else { g = gradePhoto2D(img); gradeMode = "2d"; }
+  gradedCache.set(img, g);
+  return g;
+}
+
+/* ------------------------------------------------------------------ */
+/* Cover drawing.                                                     */
+/* ------------------------------------------------------------------ */
+
+function layoutRects(W, H) {
+  const stripH = Math.round(H * 0.058);
+  const photoH = H - stripH;
+  const rowH = [Math.round(photoH * 0.36), Math.round(photoH * 0.32), 0];
+  rowH[2] = photoH - rowH[0] - rowH[1];
+  const rowY = [0, rowH[0], rowH[0] + rowH[1]];
+  const colW = W / 4;
+  const rects = {};
+  for (const s of SLOTS) {
+    rects[s.key] = {
+      x: Math.round(s.col * colW),
+      y: rowY[s.row],
+      w: Math.round(s.cols * colW),
+      h: rowH.slice(s.row, s.row + s.rows).reduce((a, b) => a + b, 0),
+    };
+  }
+  return { rects, stripH, photoH };
+}
+
+function sampleOf(id) {
+  return SAMPLES.find((s) => s.id === id) || SAMPLES[0];
+}
+
+/* Draw one photo into its panel: cover-fit around the photo's focus
+   point (so faces stay in frame), plus the user's pan and zoom.
+   The draw is clipped to the panel: a tall photo's overflow must
+   never paint over the neighbouring panels. */
+function drawPanelPhoto(ctx, img, rect, focus, adj) {
+  const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
+  const scale = Math.max(rect.w / iw, rect.h / ih) * adj.zoom;
+  const sw = iw * scale, sh = ih * scale;
+  let dx = rect.x + rect.w / 2 - focus.fx * sw + adj.px * rect.w;
+  let dy = rect.y + rect.h / 2 - focus.fy * sh + adj.py * rect.h;
+  dx = Math.min(rect.x, Math.max(rect.x + rect.w - sw, dx));
+  dy = Math.min(rect.y, Math.max(rect.y + rect.h - sh, dy));
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(rect.x, rect.y, rect.w, rect.h);
+  ctx.clip();
+  ctx.drawImage(img, dx, dy, sw, sh);
+  ctx.restore();
+}
+
+function drawPanelVignette(ctx, rect) {
+  const g = ctx.createRadialGradient(
+    rect.x + rect.w / 2, rect.y + rect.h / 2, Math.min(rect.w, rect.h) * 0.35,
+    rect.x + rect.w / 2, rect.y + rect.h / 2, Math.max(rect.w, rect.h) * 0.75,
+  );
+  g.addColorStop(0, "rgba(0,0,0,0)");
+  g.addColorStop(1, "rgba(0,0,0,0.26)");
+  ctx.fillStyle = g;
+  ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+function drawLabelChip(ctx, text, x, y, fontPx) {
+  ctx.font = "700 " + fontPx + "px 'Helvetica Neue', Arial, sans-serif";
+  const padX = Math.round(fontPx * 0.7), padY = Math.round(fontPx * 0.45);
+  const tw = ctx.measureText(text).width;
+  ctx.fillStyle = "rgba(8,8,16,0.62)";
+  roundRect(ctx, x, y, tw + padX * 2, fontPx + padY * 2, (fontPx + padY * 2) / 2);
+  ctx.fill();
+  ctx.fillStyle = "#ffffff";
+  ctx.textAlign = "left"; ctx.textBaseline = "middle";
+  ctx.fillText(text, x + padX, y + (fontPx + padY * 2) / 2 + 1);
+}
+
+function drawWantedChip(ctx, rect, fontPx) {
+  const text = "WANTED \u2605\u2605\u2605\u2605\u2605";
+  ctx.font = "800 " + fontPx + "px 'Helvetica Neue', Arial, sans-serif";
+  const padX = Math.round(fontPx * 0.7), padY = Math.round(fontPx * 0.45);
+  const tw = ctx.measureText(text).width;
+  const w = tw + padX * 2, h = fontPx + padY * 2;
+  const x = rect.x + rect.w - w - Math.round(fontPx * 0.6);
+  const y = rect.y + Math.round(fontPx * 0.6);
+  ctx.fillStyle = "rgba(10,8,4,0.78)";
+  roundRect(ctx, x, y, w, h, h / 2);
+  ctx.fill();
+  ctx.strokeStyle = "#ffcf4d"; ctx.lineWidth = Math.max(1.5, fontPx * 0.09);
+  roundRect(ctx, x, y, w, h, h / 2);
+  ctx.stroke();
+  ctx.fillStyle = "#ffcf4d";
+  ctx.textAlign = "left"; ctx.textBaseline = "middle";
+  ctx.fillText(text, x + padX, y + h / 2 + 1);
+}
+
+function drawEstSeal(ctx, cx, cy, r) {
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(-0.14);
+  ctx.fillStyle = "rgba(10,10,20,0.78)";
+  ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = "#e8c15a"; ctx.lineWidth = Math.max(2, r * 0.06);
+  ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.stroke();
+  ctx.lineWidth = Math.max(1, r * 0.03);
+  ctx.beginPath(); ctx.arc(0, 0, r * 0.82, 0, Math.PI * 2); ctx.stroke();
+  ctx.fillStyle = "#e8c15a";
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.font = "700 " + Math.round(r * 0.34) + "px 'Helvetica Neue', Arial, sans-serif";
+  ctx.fillText("EST", 0, -r * 0.26);
+  ctx.font = "900 " + Math.round(r * 0.52) + "px 'Helvetica Neue', Arial, sans-serif";
+  ctx.fillText("2026", 0, r * 0.24);
+  ctx.restore();
+}
+
+/* Big original block title: dark 3D extrude, warm gradient face,
+   dark outline. The letters are drawn with the system heavy sans,
+   never a game font. */
+function drawBlockTitle(ctx, text, cx, cy, size, topColor, bottomColor) {
+  ctx.font = "900 " + size + "px 'Arial Black', 'Helvetica Neue', Arial, sans-serif";
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  const steps = Math.max(4, Math.round(size * 0.055));
+  ctx.fillStyle = "rgba(24,6,22,0.92)";
+  for (let i = steps; i >= 1; i--) ctx.fillText(text, cx + i, cy + i * 1.25);
+  const g = ctx.createLinearGradient(0, cy - size * 0.55, 0, cy + size * 0.55);
+  g.addColorStop(0, topColor);
+  g.addColorStop(1, bottomColor);
+  ctx.fillStyle = g;
+  ctx.fillText(text, cx, cy);
+  ctx.lineWidth = Math.max(2, size * 0.035);
+  ctx.strokeStyle = "rgba(28,6,26,0.9)";
+  ctx.strokeText(text, cx, cy);
+  const sheenW = ctx.measureText(text).width;
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(cx - sheenW / 2, cy - size * 0.62, sheenW, size * 0.42);
+  ctx.clip();
+  ctx.fillStyle = "rgba(255,255,255,0.20)";
+  ctx.fillText(text, cx, cy);
+  ctx.restore();
+}
+
+function drawScriptSub(ctx, text, cx, cy, size, color) {
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(-0.035);
+  ctx.font = "italic 700 " + size + "px 'Brush Script MT', 'Segoe Script', 'Comic Sans MS', cursive";
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.shadowColor = "rgba(0,0,0,0.65)";
+  ctx.shadowBlur = Math.max(4, size * 0.12);
+  ctx.shadowOffsetY = Math.max(2, size * 0.05);
+  ctx.fillStyle = color;
+  ctx.fillText(text, 0, 0);
+  ctx.restore();
+}
+
+/* Deterministic little barcode for the bottom strip. */
+function drawBarcode(ctx, x, y, w, h) {
+  ctx.fillStyle = "#f2ede8";
+  ctx.fillRect(x - 6, y - 4, w + 12, h + 14);
+  let seed = 0;
+  for (const ch of state.title) seed = (seed * 31 + ch.charCodeAt(0)) >>> 0;
+  let bx = x;
+  ctx.fillStyle = "#111118";
+  while (bx < x + w) {
+    seed = (seed * 1103515245 + 12345) >>> 0;
+    const bw = 2 + (seed % 5);
+    if ((seed >> 7) % 3 !== 0) ctx.fillRect(bx, y, bw, h);
+    bx += bw + 2 + (seed % 3);
+  }
+  ctx.fillStyle = "#111118";
+  ctx.font = "600 " + Math.max(9, Math.round(h * 0.22)) + "px 'Helvetica Neue', Arial, sans-serif";
+  ctx.textAlign = "center"; ctx.textBaseline = "top";
+  ctx.fillText("0 12345 67890", x + w / 2, y + h + 2);
+}
+
+function drawCoverArt(ctx, W, H) {
+  const { rects, stripH } = layoutRects(W, H);
+  const chipPx = Math.max(13, Math.round(W * 0.0105));
+  const gap = Math.max(10, Math.round(W * 0.008));
+
+  ctx.fillStyle = "#0b0b12";
+  ctx.fillRect(0, 0, W, H);
+
+  for (const slot of SLOTS) {
+    const rect = rects[slot.key];
+    const sample = sampleOf(state.slots ? state.slots[slot.key] : slot.sample);
+    const img = images.get(sample.id);
+    if (img) {
+      drawPanelPhoto(ctx, gradedPhoto(img), rect, sample, state.adjust[slot.key]);
+    } else {
+      const g = ctx.createLinearGradient(rect.x, rect.y, rect.x, rect.y + rect.h);
+      g.addColorStop(0, "#3a2b4d"); g.addColorStop(1, "#1c1426");
+      ctx.fillStyle = g;
+      ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+    }
+    drawPanelVignette(ctx, rect);
+    ctx.strokeStyle = "rgba(0,0,0,0.4)";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(rect.x + 1, rect.y + 1, rect.w - 2, rect.h - 2);
+  }
+
+  /* Per-panel label chips. */
+  for (const slot of SLOTS) {
+    const rect = rects[slot.key];
+    const sample = sampleOf(state.slots[slot.key]);
+    drawLabelChip(ctx, sample.label, rect.x + gap, rect.y + gap, chipPx);
+  }
+  drawWantedChip(ctx, rects.angler, chipPx);
+  drawEstSeal(ctx, rects.hero.x + rects.hero.w - Math.round(W * 0.048),
+    rects.hero.y + rects.hero.h - Math.round(W * 0.048), Math.round(W * 0.036));
+
+  /* Title band: dark scrim over the motel photo, then the title. */
+  const band = rects.motel;
+  const scrim = ctx.createLinearGradient(0, band.y, 0, band.y + band.h);
+  scrim.addColorStop(0, "rgba(12,4,16,0.18)");
+  scrim.addColorStop(0.55, "rgba(12,4,16,0.52)");
+  scrim.addColorStop(1, "rgba(12,4,16,0.78)");
+  ctx.fillStyle = scrim;
+  ctx.fillRect(band.x, band.y, band.w, band.h);
+  drawLabelChip(ctx, "VOL. 06", band.x + band.w - Math.round(W * 0.085), band.y + gap, chipPx);
+
+  const variant = VARIANTS[state.variant];
+  let titleSize = Math.round(band.h * 0.58);
+  ctx.font = "900 " + titleSize + "px 'Arial Black', 'Helvetica Neue', Arial, sans-serif";
+  const maxTitleW = W * 0.86;
+  const tw = ctx.measureText(state.title).width;
+  if (tw > maxTitleW) titleSize = Math.floor(titleSize * maxTitleW / tw);
+  drawBlockTitle(ctx, state.title, W / 2, band.y + band.h * 0.44,
+    titleSize, variant.top, variant.bottom);
+  drawScriptSub(ctx, state.sub, W / 2, band.y + band.h * 0.82,
+    Math.round(titleSize * 0.34), "#ff8fc0");
+
+  /* Thin bottom strip: tagline left, barcode right. */
+  const stripY = H - stripH;
+  ctx.fillStyle = "#0b0b12";
+  ctx.fillRect(0, stripY, W, stripH);
+  ctx.fillStyle = "#f2ede8";
+  ctx.font = "800 " + Math.round(stripH * 0.40) + "px 'Helvetica Neue', Arial, sans-serif";
+  ctx.textAlign = "left"; ctx.textBaseline = "middle";
+  ctx.fillText("ONE COAST  \u2022  NO RULES  \u2022  COMING SOON",
+    Math.round(W * 0.02), stripY + stripH / 2);
+  const bw = Math.round(W * 0.075), bh = Math.round(stripH * 0.42);
+  drawBarcode(ctx, W - Math.round(W * 0.02) - bw, stripY + (stripH - bh) / 2 - 4, bw, bh);
+}
+
+/* ------------------------------------------------------------------ */
+/* Preview, editor wiring, export.                                     */
+/* ------------------------------------------------------------------ */
+
+const preview = document.getElementById("preview");
+const previewCtx = preview.getContext("2d");
+const statusEl = document.getElementById("status");
+const titleInput = document.getElementById("titleInput");
+const subInput = document.getElementById("subInput");
+const zoomInput = document.getElementById("zoom");
+const selNameEl = document.getElementById("selName");
+
+state.slots = {};
+for (const s of SLOTS) state.slots[s.key] = s.sample;
+
+function renderPreview() {
+  const W = state.size.w, H = state.size.h;
+  const dispW = Math.min(960, W);
+  const dispH = Math.round(dispW * H / W);
+  if (preview.width !== dispW || preview.height !== dispH) {
+    preview.width = dispW; preview.height = dispH;
+  }
+  drawCoverArt(previewCtx, dispW, dispH);
+  if (state.selected) {
+    const { rects } = layoutRects(dispW, dispH);
+    const r = rects[state.selected];
+    if (r) {
+      previewCtx.save();
+      previewCtx.strokeStyle = "#ff5ea8";
+      previewCtx.lineWidth = 3;
+      previewCtx.setLineDash([10, 6]);
+      previewCtx.strokeRect(r.x + 2, r.y + 2, r.w - 4, r.h - 4);
+      previewCtx.restore();
+    }
+  }
+}
+
+function renderExportCanvas() {
+  const W = state.size.w, H = state.size.h;
+  const canvas = document.createElement("canvas");
+  canvas.width = W; canvas.height = H;
+  drawCoverArt(canvas.getContext("2d"), W, H);
+  return canvas;
+}
+
+function refreshStatus() {
+  const v = VARIANTS[state.variant];
+  statusEl.textContent =
+    "Size " + state.size.tag + "  \u2022  Title \"" + state.title + "\" / \"" + state.sub +
+    "\"  \u2022  Grade: " + gradeMode.toUpperCase() + "  \u2022  " +
+    images.size + " of " + SAMPLES.length + " sample photos loaded.";
+}
+
+function renderAll() {
+  renderPreview();
+  refreshStatus();
+}
+
+function setVariant(i) {
+  state.variant = ((i % VARIANTS.length) + VARIANTS.length) % VARIANTS.length;
+  const v = VARIANTS[state.variant];
+  state.title = v.title;
+  state.sub = v.sub;
+  titleInput.value = v.title;
+  subInput.value = v.sub;
+  document.querySelectorAll("#variants button").forEach((b, j) =>
+    b.classList.toggle("on", j === state.variant));
+  renderAll();
+}
+
+function setSize(id) {
+  const s = SIZES.find((x) => x.id === id);
+  if (!s) return;
+  state.size = s;
+  document.querySelectorAll("#sizes button").forEach((b) =>
+    b.classList.toggle("on", b.dataset.size === id));
+  renderAll();
+}
+
+function selectSlot(key) {
+  state.selected = key;
+  const slot = SLOTS.find((s) => s.key === key);
+  selNameEl.textContent = slot ? slot.name : key;
+  zoomInput.value = String(state.adjust[key].zoom);
+  renderAll();
+}
+
+function surpriseCover() {
+  setVariant(Math.floor(Math.random() * VARIANTS.length));
+  const ids = SAMPLES.map((s) => s.id);
+  for (let i = ids.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [ids[i], ids[j]] = [ids[j], ids[i]];
+  }
+  SLOTS.forEach((slot, i) => { state.slots[slot.key] = ids[i]; });
+  renderAll();
+}
+
+function exportCoverPNG() {
+  const canvas = renderExportCanvas();
+  const name = state.title.toLowerCase().replace(/[^a-z0-9]+/g, "-") +
+    "-cover-" + state.size.id + ".png";
+  canvas.toBlob((blob) => {
+    if (!blob) return;
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  }, "image/png");
+}
+
+/* Build the control buttons and the sample strip. */
+VARIANTS.forEach((v, i) => {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.textContent = v.title;
+  b.addEventListener("click", () => setVariant(i));
+  document.getElementById("variants").appendChild(b);
+});
+SIZES.forEach((s) => {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.textContent = s.tag;
+  b.dataset.size = s.id;
+  b.addEventListener("click", () => setSize(s.id));
+  document.getElementById("sizes").appendChild(b);
+});
+
+function buildSamplesStrip() {
+  const wrap = document.getElementById("samples");
+  wrap.textContent = "";
+  for (const s of SAMPLES) {
+    const fig = document.createElement("figure");
+    fig.dataset.sample = s.id;
+    if (s.id === state.activeSample) fig.classList.add("active");
+    const img = document.createElement("img");
+    img.src = s.src;
+    img.alt = s.label;
+    const cap = document.createElement("figcaption");
+    cap.textContent = s.label;
+    fig.appendChild(img);
+    fig.appendChild(cap);
+    fig.addEventListener("click", () => {
+      state.activeSample = s.id;
+      state.slots[state.selected] = s.id;
+      buildSamplesStrip();
+      renderAll();
+    });
+    wrap.appendChild(fig);
+  }
+}
+
+titleInput.addEventListener("input", () => { state.title = titleInput.value; renderAll(); });
+subInput.addEventListener("input", () => { state.sub = subInput.value; renderAll(); });
+zoomInput.addEventListener("input", () => {
+  state.adjust[state.selected].zoom = Number(zoomInput.value);
+  renderAll();
+});
+document.getElementById("surpriseBtn").addEventListener("click", surpriseCover);
+document.getElementById("exportBtn").addEventListener("click", exportCoverPNG);
+
+document.getElementById("upload").addEventListener("change", (ev) => {
+  const file = ev.target.files && ev.target.files[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = () => {
+    state.uploads += 1;
+    const id = "upload" + state.uploads;
+    SAMPLES.push({ id, src: url, label: file.name.replace(/\.[^.]+$/, "").slice(0, 14).toUpperCase() || "YOUR PHOTO", fx: 0.5, fy: 0.5 });
+    images.set(id, img);
+    state.activeSample = id;
+    state.slots[state.selected] = id;
+    buildSamplesStrip();
+    renderAll();
+  };
+  img.src = url;
+});
+
+/* Panel picking and drag-to-pan on the preview canvas. */
+let drag = null;
+function previewPoint(ev) {
+  const r = preview.getBoundingClientRect();
+  return {
+    x: (ev.clientX - r.left) * preview.width / r.width,
+    y: (ev.clientY - r.top) * preview.height / r.height,
+  };
+}
+function slotAt(x, y) {
+  const { rects } = layoutRects(preview.width, preview.height);
+  for (const slot of SLOTS) {
+    const r = rects[slot.key];
+    if (x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h) return slot.key;
+  }
+  return null;
+}
+preview.addEventListener("pointerdown", (ev) => {
+  const p = previewPoint(ev);
+  const key = slotAt(p.x, p.y);
+  if (!key) return;
+  selectSlot(key);
+  drag = { key, x: p.x, y: p.y, moved: false };
+  preview.setPointerCapture(ev.pointerId);
+});
+preview.addEventListener("pointermove", (ev) => {
+  if (!drag) return;
+  const p = previewPoint(ev);
+  const { rects } = layoutRects(preview.width, preview.height);
+  const r = rects[drag.key];
+  const adj = state.adjust[drag.key];
+  adj.px = Math.max(-0.3, Math.min(0.3, adj.px + (p.x - drag.x) / r.w));
+  adj.py = Math.max(-0.3, Math.min(0.3, adj.py + (p.y - drag.y) / r.h));
+  if (Math.abs(p.x - drag.x) + Math.abs(p.y - drag.y) > 2) drag.moved = true;
+  drag.x = p.x; drag.y = p.y;
+  renderAll();
+});
+preview.addEventListener("pointerup", () => { drag = null; });
+
+/* ------------------------------------------------------------------ */
+/* Startup: preload the samples, honour ?variant= / ?size=, render.    */
+/* ------------------------------------------------------------------ */
+
+function loadImage(sample) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => { images.set(sample.id, img); resolve(true); };
+    img.onerror = () => resolve(false);
+    img.src = sample.src;
+  });
+}
+
+let readyResolve = null;
+window.__cover = {
+  ready: new Promise((r) => { readyResolve = r; }),
+  state,
+  get gradeMode() { return gradeMode; },
+  setVariant,
+  setSize,
+  surprise: surpriseCover,
+  exportDataURL() {
+    return new Promise((resolve) => {
+      renderExportCanvas().toBlob((blob) => {
+        if (!blob) { resolve(""); return; }
+        const fr = new FileReader();
+        fr.onload = () => resolve(String(fr.result));
+        fr.readAsDataURL(blob);
+      }, "image/png");
+    });
+  },
+};
+
+async function initCoverMaker() {
+  const params = new URLSearchParams(location.search);
+  const variantNames = { sunset: 0, coast: 1, heat: 2 };
+  const wantVariant = params.get("variant");
+  if (wantVariant && wantVariant in variantNames) setVariant(variantNames[wantVariant]);
+  if (params.get("size")) setSize(params.get("size"));
+  buildSamplesStrip();
+  setSize(state.size.id);
+  setVariant(state.variant);
+  selectSlot("hero");
+  await Promise.all(SAMPLES.map(loadImage));
+  renderAll();
+  if (readyResolve) readyResolve(true);
+}
+
+initCoverMaker();
+</script>
+</body>
+</html>

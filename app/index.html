@@ -3,819 +3,1407 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sunset State — GTA 6 Style Cover Art Maker</title>
+<title>Sunset State — Cover Studio</title>
 <style>
-  :root { color-scheme: dark; }
+  :root {
+    --bg: #12081d;
+    --panel: #1d0f2a;
+    --panel2: #251338;
+    --line: #3a2052;
+    --ink: #f5ead9;
+    --muted: #b9a3c9;
+    --pink: #ff2e88;
+    --pink2: #ff6ec7;
+    --orange: #ff9a3d;
+    --cyan: #35e0ff;
+    --gold: #f5c542;
+  }
   * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; }
   body {
-    margin: 0; background: #0d0d14; color: #f2ede8;
-    font-family: "Helvetica Neue", Arial, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    font: 13px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+    overflow: hidden;
   }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  input, select { font: inherit; color: var(--ink); }
+
+  /* ---------- header ---------- */
   header {
-    display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
-    padding: 14px 20px 10px;
-    border-bottom: 1px solid #26263a;
+    height: 54px; display: flex; align-items: center; gap: 14px;
+    padding: 0 14px; background: linear-gradient(90deg, #2a0f45, #3d0f3a);
+    border-bottom: 1px solid var(--line);
   }
-  header h1 {
-    margin: 0; font-size: 22px; letter-spacing: 1px; font-weight: 900;
-    background: linear-gradient(90deg, #ff5ea8, #ff9a3d);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
+  .logo { display: flex; align-items: center; gap: 9px; font-weight: 900; letter-spacing: .04em; }
+  .logo .mark {
+    width: 30px; height: 30px; border-radius: 7px; display: grid; place-items: center;
+    background: linear-gradient(135deg, var(--orange), var(--pink));
+    color: #fff; font-size: 14px; font-weight: 900;
   }
-  header p { margin: 0; color: #9a93a8; font-size: 13px; }
-  main { display: flex; gap: 18px; padding: 16px 20px; align-items: flex-start; }
-  #stage { flex: 1 1 auto; min-width: 0; }
-  #preview {
-    display: block; width: 100%; max-width: 980px; height: auto;
-    background: #000; border: 1px solid #33334a; border-radius: 6px;
-    cursor: crosshair; touch-action: none;
+  .logo .name { font-size: 16px; }
+  .logo .name em { font-style: normal; color: var(--pink2); }
+  .steps { display: flex; gap: 16px; margin-left: 8px; color: var(--muted); font-size: 12px; }
+  .steps b {
+    display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%;
+    background: var(--pink); color: #fff; font-size: 11px; margin-right: 5px;
   }
-  #samples { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; max-width: 980px; }
-  #samples figure {
-    margin: 0; width: 104px; cursor: pointer; border: 2px solid transparent;
-    border-radius: 6px; overflow: hidden; background: #181822;
+  .steps .on { color: var(--ink); }
+  header .spacer { flex: 1; }
+  .btn {
+    border: 1px solid var(--line); background: var(--panel2); border-radius: 8px;
+    padding: 8px 13px; font-weight: 700;
   }
-  #samples figure.active { border-color: #ff5ea8; }
-  #samples img { display: block; width: 104px; height: 66px; object-fit: cover; }
-  #samples figcaption { font-size: 10px; padding: 3px 5px; color: #c9c2d4; text-transform: uppercase; letter-spacing: .5px; }
-  aside {
-    flex: 0 0 300px; background: #14141f; border: 1px solid #26263a;
-    border-radius: 8px; padding: 14px;
+  .btn:hover { border-color: var(--pink); }
+  .btn.amber { background: linear-gradient(135deg, #ff9a3d, #ff6a00); border-color: transparent; color: #fff; }
+  .btn.rose { background: linear-gradient(135deg, #ff2e88, #c2185b); border-color: transparent; color: #fff; }
+
+  /* ---------- main grid ---------- */
+  main {
+    display: grid; grid-template-columns: 262px minmax(0, 1fr) 302px; gap: 10px;
+    height: calc(100vh - 54px - 88px); padding: 10px;
   }
-  aside h2 { margin: 2px 0 10px; font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; color: #ff9a3d; }
-  aside label { display: block; font-size: 12px; color: #b7b0c4; margin: 10px 0 4px; }
-  aside input[type="text"], aside select {
-    width: 100%; padding: 8px 9px; border-radius: 6px; border: 1px solid #33334a;
-    background: #0d0d14; color: #f2ede8; font-size: 14px;
+  aside, section { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px; overflow-y: auto; }
+  h2 { font-size: 11px; letter-spacing: .14em; color: var(--muted); margin: 0 0 6px; text-transform: uppercase; }
+  h2 .count { float: right; color: var(--ink); letter-spacing: 0; }
+  .hint { color: var(--muted); font-size: 12px; margin: 0 0 10px; }
+
+  /* photos column */
+  .thumbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .thumb {
+    position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; cursor: grab;
+    border: 2px solid transparent; background: #000; padding: 0;
   }
-  .row { display: flex; gap: 8px; flex-wrap: wrap; }
-  .row button, aside button {
-    flex: 1 1 auto; padding: 8px 10px; border-radius: 6px; cursor: pointer;
-    border: 1px solid #33334a; background: #1d1d2e; color: #f2ede8; font-size: 13px;
+  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .thumb.sel { border-color: var(--cyan); }
+  .thumb .n {
+    position: absolute; left: 4px; top: 4px; min-width: 18px; height: 18px; padding: 0 4px;
+    border-radius: 9px; background: rgba(10, 4, 18, .8); color: #fff;
+    font-size: 11px; font-weight: 800; display: grid; place-items: center;
   }
-  .row button.on { border-color: #ff5ea8; background: #2c1530; color: #ffb3d6; }
-  button.primary {
-    width: 100%; margin-top: 12px; padding: 11px; font-weight: 800; font-size: 15px;
-    border: none; border-radius: 8px; color: #1a0a12;
-    background: linear-gradient(90deg, #ff5ea8, #ff9a3d); cursor: pointer;
+  .thumb .x {
+    position: absolute; right: 3px; top: 3px; width: 17px; height: 17px; border-radius: 50%;
+    background: rgba(10, 4, 18, .8); color: #fff; border: 0; font-size: 11px; line-height: 1;
+    display: none;
   }
-  button.ghost { width: 100%; margin-top: 8px; background: transparent; }
-  input[type="range"] { width: 100%; accent-color: #ff5ea8; }
-  #status { font-size: 12px; color: #8f889e; margin-top: 12px; line-height: 1.5; }
-  #hint { font-size: 12px; color: #8f889e; margin: 8px 0 0; max-width: 980px; line-height: 1.5; }
-  footer { padding: 0 20px 18px; color: #6f6a80; font-size: 12px; }
-  kbd { background: #26263a; border-radius: 4px; padding: 1px 5px; font-size: 11px; }
+  .thumb:hover .x { display: grid; place-items: center; }
+  .colbtn { width: 100%; margin-top: 8px; }
+
+  /* stage column */
+  #stageCol { display: flex; flex-direction: column; overflow: hidden; }
+  .sizes { display: flex; gap: 8px; justify-content: center; margin-bottom: 8px; }
+  .size {
+    border: 1px solid var(--line); background: var(--panel2); border-radius: 9px;
+    padding: 6px 12px; text-align: center; line-height: 1.25;
+  }
+  .size b { display: block; font-size: 13px; }
+  .size span { font-size: 10px; color: var(--muted); letter-spacing: .08em; }
+  .size.sel { border-color: var(--pink); box-shadow: 0 0 0 1px var(--pink); }
+  .presets { display: flex; gap: 8px; justify-content: center; margin-bottom: 10px; }
+  .preset {
+    border: 1px solid var(--line); background: var(--panel2); border-radius: 999px;
+    padding: 6px 14px; font-weight: 800; font-size: 12px;
+  }
+  .preset.sel { background: linear-gradient(135deg, var(--orange), var(--pink)); border-color: transparent; color: #fff; }
+  .preview {
+    flex: 1; min-height: 0; display: grid; place-items: center; overflow: hidden;
+    background:
+      linear-gradient(45deg, #170a24 25%, transparent 25%, transparent 75%, #170a24 75%),
+      linear-gradient(45deg, #170a24 25%, #1d0f2a 25%, #1d0f2a 75%, #170a24 75%);
+    background-size: 24px 24px; background-position: 0 0, 12px 12px;
+    border: 1px solid var(--line); border-radius: 10px; padding: 8px;
+  }
+  #cover { max-width: 100%; max-height: 100%; width: auto; height: auto; box-shadow: 0 12px 40px rgba(0, 0, 0, .55); }
+  .exports { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
+  .status { text-align: center; color: var(--muted); font-size: 12px; margin-top: 7px; min-height: 16px; }
+  .status b { color: #8be89b; }
+
+  /* right column */
+  .laygrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin-bottom: 10px; }
+  .lay {
+    border: 1px solid var(--line); background: var(--panel2); border-radius: 8px;
+    padding: 5px 2px 4px; text-align: center; font-size: 10px; color: var(--muted);
+  }
+  .lay.sel { border-color: var(--pink); color: var(--ink); box-shadow: 0 0 0 1px var(--pink); }
+  .lay .mini {
+    display: grid; gap: 2px; height: 24px; margin-bottom: 4px; padding: 0 6px;
+  }
+  .lay .mini i { background: linear-gradient(135deg, #ff7a18, #ff2e88); border-radius: 1px; display: block; min-height: 0; }
+  .lay .mini i.alt { background: linear-gradient(135deg, #35e0ff, #7b5cff); }
+  .grades { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 8px; }
+  .grade {
+    border: 1px solid var(--line); background: var(--panel2); border-radius: 8px;
+    padding: 6px 8px; text-align: left; font-weight: 700; font-size: 12px;
+  }
+  .grade.sel { border-color: var(--pink); box-shadow: 0 0 0 1px var(--pink); }
+  .grade i { display: block; height: 4px; border-radius: 3px; margin-bottom: 4px; }
+  .slider { display: grid; grid-template-columns: 74px 1fr 34px; align-items: center; gap: 8px; margin: 4px 0; font-size: 12px; color: var(--muted); }
+  .slider output { text-align: right; color: var(--ink); font-variant-numeric: tabular-nums; }
+  input[type="range"] { width: 100%; accent-color: var(--pink); }
+  .check { display: flex; align-items: center; gap: 7px; margin: 5px 0; font-size: 12px; }
+  input[type="checkbox"] { accent-color: var(--pink); width: 15px; height: 15px; }
+  .field { margin: 6px 0; }
+  .field label { display: block; font-size: 11px; color: var(--muted); margin-bottom: 3px; letter-spacing: .06em; text-transform: uppercase; }
+  .field input, .field select {
+    width: 100%; background: #150a22; border: 1px solid var(--line);
+    border-radius: 7px; padding: 6px 8px; outline: none;
+  }
+  .field input:focus, .field select:focus { border-color: var(--pink); }
+  .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .toggles { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 10px; }
+
+  /* bottom panel bar */
+  #panelBar {
+    height: 88px; margin: 0 10px 10px; background: var(--panel); border: 1px solid var(--line);
+    border-radius: 12px; padding: 9px 12px; display: flex; gap: 14px; align-items: center; overflow-x: auto;
+  }
+  #panelBar .pnav { min-width: 92px; }
+  #panelBar .pnav b { display: block; color: var(--pink2); font-size: 12px; letter-spacing: .08em; }
+  #panelBar .pnav span { color: var(--muted); font-size: 11px; }
+  .pfield { min-width: 128px; }
+  .pfield label { display: block; font-size: 10px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 3px; }
+  .pfield input, .pfield select {
+    width: 100%; background: #150a22; border: 1px solid var(--line);
+    border-radius: 7px; padding: 6px 8px; outline: none;
+  }
+  .pfield input[type="range"] { padding: 0; }
+  .phint { min-width: 190px; color: var(--muted); font-size: 11px; line-height: 1.5; }
+
+  /* cover-only screenshot mode */
+  body.shot-cover { overflow: hidden; background: #000; }
+  body.shot-cover header, body.shot-cover main, body.shot-cover #panelBar { display: none; }
+  body.shot-cover #shotWrap { display: grid; place-items: center; width: 100vw; height: 100vh; background: #000; }
+  #shotWrap { display: none; }
+  body.shot-cover #shotCover { max-width: 100vw; max-height: 100vh; width: auto; height: auto; box-shadow: none; }
+  .dropzone { outline: 2px dashed var(--cyan); outline-offset: -6px; }
 </style>
 </head>
 <body>
 <header>
-  <h1>SUNSET STATE</h1>
-  <p>GTA 6-style cover art maker &mdash; your photo, your caption, one poster.</p>
+  <div class="logo"><span class="mark">SS</span><span class="name">SUNSET STATE <em>cover studio</em></span></div>
+  <div class="steps">
+    <span class="on"><b>1</b>Add photos</span>
+    <span><b>2</b>Pick a size</span>
+    <span><b>3</b>Export PNG</span>
+  </div>
+  <div class="spacer"></div>
+  <button class="btn amber" id="addPhotosBtn" type="button">+ Add photos</button>
+  <button class="btn rose" id="exportAllBtn" type="button">⇩ Export all 3 sizes</button>
 </header>
+
 <main>
-  <section id="stage">
-    <canvas id="preview" width="960" height="540"></canvas>
-    <p id="hint">Click a panel to select it, then drag it to pan and use the zoom slider.
-      Click a sample photo below to place it on the selected panel.</p>
-    <div id="samples"></div>
+  <aside id="photosCol" aria-label="Photos">
+    <h2>Photos <span class="count" id="photoCount">0 loaded</span></h2>
+    <p class="hint">Drop photos here or use Add photos. One photo fills every panel with different crops; several are spread across panels.</p>
+    <div class="thumbs" id="thumbs"></div>
+    <button class="btn colbtn" id="autoFillBtn" type="button">Auto fill panels</button>
+    <button class="btn colbtn" id="spreadBtn" type="button">Spread all photos across panels</button>
+  </aside>
+
+  <section id="stageCol" aria-label="Preview">
+    <div class="sizes" id="sizes">
+      <button class="size sel" type="button" data-size="1920x1080"><b>1920 × 1080</b><span>Landscape</span></button>
+      <button class="size" type="button" data-size="1080x1350"><b>1080 × 1350</b><span>Portrait</span></button>
+      <button class="size" type="button" data-size="1080x1080"><b>1080 × 1080</b><span>Square</span></button>
+    </div>
+    <div class="presets" id="presets">
+      <button class="preset sel" type="button" data-preset="sunset">Sunset State</button>
+      <button class="preset" type="button" data-preset="heat">Heat Wave</button>
+      <button class="preset" type="button" data-preset="night">Night Drive</button>
+    </div>
+    <div class="preview" id="previewBox"><canvas id="cover" width="1920" height="1080"></canvas></div>
+    <div class="exports">
+      <button class="btn amber" id="exportBtn" type="button">⇩ Export PNG 1920 × 1080</button>
+      <button class="btn rose" id="exportAllBtn2" type="button">⇩ Export all 3 sizes</button>
+    </div>
+    <div class="status" id="status">Pick a photo, pick a size, export your cover.</div>
   </section>
-  <aside>
-    <h2>Cover</h2>
-    <label for="titleInput">Title</label>
-    <input id="titleInput" type="text" value="SUNSET STATE" maxlength="24" autocomplete="off">
-    <label for="subInput">Subtitle (script)</label>
-    <input id="subInput" type="text" value="Neon Tide" maxlength="30" autocomplete="off">
-    <label>Title style</label>
-    <div class="row" id="variants"></div>
-    <label>Export size</label>
-    <div class="row" id="sizes"></div>
-    <label for="zoom">Zoom &mdash; selected panel: <span id="selName">Hero</span></label>
-    <input id="zoom" type="range" min="1" max="2" step="0.01" value="1">
-    <button class="ghost" id="surpriseBtn" type="button">Surprise Me</button>
-    <button class="primary" id="exportBtn" type="button">Export PNG</button>
-    <label for="upload">Upload your own photo</label>
-    <input id="upload" type="file" accept="image/*">
-    <p id="status">Loading sample photos&hellip;</p>
+
+  <aside id="rightCol" aria-label="Layout, grade and texts">
+    <h2>Layout</h2>
+    <div class="laygrid" id="layouts"></div>
+
+    <h2>Grade</h2>
+    <div class="grades" id="grades"></div>
+    <div class="slider"><span>Strength</span><input type="range" id="slStrength" min="0" max="1" step="0.01" value="0.9"><output id="outStrength">0.90</output></div>
+    <div class="slider"><span>Contrast</span><input type="range" id="slContrast" min="0.5" max="1.5" step="0.01" value="1"><output id="outContrast">1.00</output></div>
+    <div class="slider"><span>Saturation</span><input type="range" id="slSaturation" min="0" max="2" step="0.01" value="1"><output id="outSaturation">1.00</output></div>
+    <div class="slider"><span>Grain</span><input type="range" id="slGrain" min="0" max="1" step="0.01" value="0.28"><output id="outGrain">0.28</output></div>
+    <div class="slider"><span>Vignette</span><input type="range" id="slVignette" min="0" max="1" step="0.01" value="0.5"><output id="outVignette">0.50</output></div>
+    <label class="check"><input type="checkbox" id="ckHalftone"> Halftone print dots</label>
+    <label class="check"><input type="checkbox" id="ckSpeed"> Speed lines</label>
+
+    <h2 style="margin-top:10px">Texts</h2>
+    <div class="field"><label for="inTitle">Title</label><input id="inTitle" value="SUNSET STATE" maxlength="24"></div>
+    <div class="field"><label for="inTagline">Neon tagline</label><input id="inTagline" value="Neon Tide" maxlength="32"></div>
+    <div class="field"><label for="inKicker">Kicker line</label><input id="inKicker" value="A COAST THAT NEVER SLEEPS" maxlength="48"></div>
+    <div class="field"><label for="inStrip">Bottom strip</label><input id="inStrip" value="CHASE THE LIGHT • OWN THE NIGHT" maxlength="56"></div>
+    <div class="twocol">
+      <div class="field"><label for="inBadge">Badge</label><input id="inBadge" value="EST. 2026" maxlength="12"></div>
+      <div class="field"><label for="inVolume">Volume</label><input id="inVolume" value="VOL. 06" maxlength="12"></div>
+    </div>
+    <div class="twocol">
+      <div class="field"><label for="inRibbon">Ribbon</label><input id="inRibbon" value="COLLECTOR'S EDITION" maxlength="24"></div>
+      <div class="field"><label for="inHud">HUD word</label><input id="inHud" value="WANTED" maxlength="12"></div>
+    </div>
+    <div class="slider"><span>Stars</span><input type="range" id="slStars" min="0" max="5" step="1" value="5"><output id="outStars">5</output></div>
+
+    <h2 style="margin-top:10px">Stickers &amp; effects</h2>
+    <div class="toggles">
+      <label class="check"><input type="checkbox" id="tgLabels" checked> Location tags</label>
+      <label class="check"><input type="checkbox" id="tgBadge" checked> Badge</label>
+      <label class="check"><input type="checkbox" id="tgVolume" checked> Volume tag</label>
+      <label class="check"><input type="checkbox" id="tgRibbon" checked> Ribbon</label>
+      <label class="check"><input type="checkbox" id="tgHud" checked> WANTED chip</label>
+      <label class="check"><input type="checkbox" id="tgCatalog" checked> Catalog line</label>
+    </div>
   </aside>
 </main>
-<footer>
-  Photos never leave your machine &mdash; everything runs offline in this page.
-  All art is original; no Rockstar logos, artwork or fonts are used.
+
+<footer id="panelBar">
+  <div class="pnav"><b id="panelTitle">PANEL 1</b><span id="panelCount">1 of 7</span></div>
+  <div class="pfield"><label for="selPhoto">Photo</label><select id="selPhoto"></select></div>
+  <div class="pfield"><label for="slZoom">Zoom</label><input type="range" id="slZoom" min="1" max="2.2" step="0.01" value="1"></div>
+  <div class="pfield"><label for="selTheme">Grade</label><select id="selTheme"><option value="auto">Theme (auto)</option></select></div>
+  <div class="pfield"><label for="selSwap">Swap with</label><select id="selSwap"><option value="">—</option></select></div>
+  <div class="pfield"><label for="inPlace">Place</label><input id="inPlace" maxlength="24"></div>
+  <div class="pfield"><label for="inSub">Sub-line</label><input id="inSub" maxlength="40"></div>
+  <button class="btn" id="resetCropBtn" type="button">Reset crop</button>
+  <div class="phint">Click a panel to select it · drag to move the photo · scroll to zoom · double-click to re-center · drop a photo on a panel to replace it.</div>
 </footer>
+
+<div id="shotWrap"><canvas id="shotCover" width="1920" height="1080"></canvas></div>
+<input type="file" id="fileInput" accept="image/*" multiple hidden>
 <script>
-"use strict";
+'use strict';
+/* Sunset State Cover Studio — a cover maker that turns your own photos into
+   GTA-style multi-panel poster art and exports it as a PNG. Everything runs
+   offline: photos are read on this machine and never leave it. */
 
-/* ------------------------------------------------------------------ */
-/* Data: sample photos, title variants, cover sizes, panel layout.    */
-/* ------------------------------------------------------------------ */
-
+/* ---- sample photos (made with an image model, free to use) ---- */
 const SAMPLES = [
-  { id: "woman",  src: "samples/sample-woman.jpg",  label: "OCEAN DRIVE",    fx: 0.12, fy: 0.35 },
-  { id: "man",    src: "samples/sample-man.jpg",    label: "PALM BOULEVARD", fx: 0.50, fy: 0.42 },
-  { id: "car",    src: "samples/sample-car.jpg",    label: "SUNSET STRIP",   fx: 0.50, fy: 0.55 },
-  { id: "tower",  src: "samples/sample-tower.jpg",  label: "TOWER 2",        fx: 0.50, fy: 0.42 },
-  { id: "angler", src: "samples/sample-angler.jpg", label: "THE ANGLER",     fx: 0.50, fy: 0.38 },
-  { id: "road",   src: "samples/sample-road.jpg",   label: "MARINA DEL SOL", fx: 0.50, fy: 0.50 },
-  { id: "boat",   src: "samples/sample-boat.jpg",   label: "OPEN WATER",     fx: 0.50, fy: 0.45 },
-  { id: "motel",  src: "samples/sample-motel.jpg",  label: "NEON MOTEL",     fx: 0.50, fy: 0.35 },
+  { id: 'woman',  file: 'samples/sample-woman.jpg',  place: 'CORAL ROW',     time: '6:12 PM', sub: 'TOP DOWN',     focus: { fx: 0.33, fy: 0.58 } },
+  { id: 'man',    file: 'samples/sample-man.jpg',    place: 'NEON MILE',     time: '9:47 PM', sub: 'ENGINE HOT',   focus: { fx: 0.48, fy: 0.42 } },
+  { id: 'car',    file: 'samples/sample-car.jpg',    place: 'SUNSET KEYS',   time: '5:05 PM', sub: 'COAST RUN',    focus: { fx: 0.62, fy: 0.68 } },
+  { id: 'tower',  file: 'samples/sample-tower.jpg',  place: 'TIDEWATCH',     time: '6:10 PM', sub: 'TOWER WATCH',  focus: { fx: 0.43, fy: 0.42 } },
+  { id: 'angler', file: 'samples/sample-angler.jpg', place: 'REEF SIDE',     time: '5:30 AM', sub: 'FIRST CAST',   focus: { fx: 0.52, fy: 0.35 } },
+  { id: 'boat',   file: 'samples/sample-boat.jpg',   place: 'HARBOUR LIGHTS', time: '4:20 PM', sub: 'WAKE TRAIL',  focus: { fx: 0.42, fy: 0.65 } },
+  { id: 'motel',  file: 'samples/sample-motel.jpg',  place: 'PALM COURT',    time: '8:15 PM', sub: 'NEON HUM',     focus: { fx: 0.50, fy: 0.50 } },
+  { id: 'road',   file: 'samples/sample-road.jpg',   place: 'DUNE ROAD',     time: '7:05 PM', sub: 'OPEN ROAD',    focus: { fx: 0.68, fy: 0.55 } },
 ];
 
-const VARIANTS = [
-  { title: "SUNSET STATE", sub: "Neon Tide",      top: "#ff6ec7", bottom: "#ff8a3d" },
-  { title: "NEON COAST",   sub: "Vice Nights",    top: "#ff7ad9", bottom: "#ffb347" },
-  { title: "HEAT WAVE",    sub: "Endless Summer", top: "#ffd23d", bottom: "#ff5e3a" },
-];
-
-const SIZES = [
-  { id: "1920x1080", w: 1920, h: 1080, tag: "1920 × 1080" },
-  { id: "1080x1080", w: 1080, h: 1080, tag: "1080 × 1080" },
-  { id: "1080x1350", w: 1080, h: 1350, tag: "1080 × 1350" },
-  { id: "1200x1600", w: 1200, h: 1600, tag: "1200 × 1600" },
-];
-
-/* Panel slots in grid units: 4 columns, 3 photo rows, then a thin strip.
-   The hero photo is tall on the left, spanning the top two rows; the
-   motel photo spans the full width of the bottom row and carries the
-   big title on top of it, so no band of the cover is ever empty. */
-const SLOTS = [
-  { key: "hero",   col: 0, row: 0, cols: 1, rows: 2, sample: "woman",  name: "Hero" },
-  { key: "man",    col: 1, row: 0, cols: 1, rows: 1, sample: "man",    name: "Driver" },
-  { key: "road",   col: 2, row: 0, cols: 1, rows: 1, sample: "road",   name: "Coast road" },
-  { key: "angler", col: 3, row: 0, cols: 1, rows: 1, sample: "angler", name: "Angler" },
-  { key: "car",    col: 1, row: 1, cols: 1, rows: 1, sample: "car",    name: "Sports car" },
-  { key: "tower",  col: 2, row: 1, cols: 1, rows: 1, sample: "tower",  name: "Tower" },
-  { key: "boat",   col: 3, row: 1, cols: 1, rows: 1, sample: "boat",   name: "Speedboat" },
-  { key: "motel",  col: 0, row: 2, cols: 4, rows: 1, sample: "motel",  name: "Motel (title band)" },
-];
-
-const state = {
-  size: SIZES[0],
-  variant: 0,
-  title: VARIANTS[0].title,
-  sub: VARIANTS[0].sub,
-  selected: "hero",
-  activeSample: "woman",
-  adjust: {},   /* slot key -> { zoom, px, py } */
-  uploads: 0,
+/* ---- panel layouts: rects are fractions of cover width / height.
+   The photo area runs from y=0 to y=0.86; the title sits over its foot,
+   then a thin strip and a catalog line close the cover. ---- */
+const LAYOUTS = {
+  'hero-left': { label: 'Hero Left', panels: 7, rects: [
+    [0, 0, 0.335, 0.86],
+    [0.335, 0, 0.3325, 0.43], [0.6675, 0, 0.3325, 0.43],
+    [0.335, 0.43, 0.16625, 0.43], [0.50125, 0.43, 0.16625, 0.43],
+    [0.6675, 0.43, 0.16625, 0.43], [0.83375, 0.43, 0.16625, 0.43],
+  ] },
+  'hero-right': { label: 'Hero Right', panels: 7, rects: [
+    [0.665, 0, 0.335, 0.86],
+    [0, 0, 0.3325, 0.43], [0.3325, 0, 0.3325, 0.43],
+    [0, 0.43, 0.16625, 0.43], [0.16625, 0.43, 0.16625, 0.43],
+    [0.3325, 0.43, 0.16625, 0.43], [0.49875, 0.43, 0.16625, 0.43],
+  ] },
+  'grid3': { label: 'Grid 3×3', panels: 9, rects: [
+    [0, 0, 1 / 3, 0.86 / 3], [1 / 3, 0, 1 / 3, 0.86 / 3], [2 / 3, 0, 1 / 3, 0.86 / 3],
+    [0, 0.86 / 3, 1 / 3, 0.86 / 3], [1 / 3, 0.86 / 3, 1 / 3, 0.86 / 3], [2 / 3, 0.86 / 3, 1 / 3, 0.86 / 3],
+    [0, 2 * 0.86 / 3, 1 / 3, 0.86 / 3], [1 / 3, 2 * 0.86 / 3, 1 / 3, 0.86 / 3], [2 / 3, 2 * 0.86 / 3, 1 / 3, 0.86 / 3],
+  ] },
+  'center': { label: 'Center Stage', panels: 7, rects: [
+    [0, 0, 0.30, 0.26], [0, 0.26, 0.30, 0.26],
+    [0.30, 0, 0.40, 0.52],
+    [0.70, 0, 0.30, 0.26], [0.70, 0.26, 0.30, 0.26],
+    [0, 0.52, 0.50, 0.34], [0.50, 0.52, 0.50, 0.34],
+  ] },
+  'mosaic': { label: 'Mosaic', panels: 8, rects: [
+    [0, 0, 0.40, 0.34], [0.40, 0, 0.30, 0.34], [0.70, 0, 0.30, 0.34],
+    [0, 0.34, 0.55, 0.24], [0.55, 0.34, 0.45, 0.24],
+    [0, 0.58, 0.33, 0.28], [0.33, 0.58, 0.34, 0.28], [0.67, 0.58, 0.33, 0.28],
+  ] },
+  'panels1': { label: '1 panel', panels: 1, rects: [[0, 0, 1, 0.86]] },
+  'panels2': { label: '2 panels', panels: 2, rects: [[0, 0, 0.5, 0.86], [0.5, 0, 0.5, 0.86]] },
+  'panels3': { label: '3 panels', panels: 3, rects: [[0, 0, 1, 0.50], [0, 0.50, 0.5, 0.36], [0.5, 0.50, 0.5, 0.36]] },
+  'panels4': { label: '4 panels', panels: 4, rects: [
+    [0, 0, 0.5, 0.43], [0.5, 0, 0.5, 0.43], [0, 0.43, 0.5, 0.43], [0.5, 0.43, 0.5, 0.43],
+  ] },
 };
-for (const s of SLOTS) state.adjust[s.key] = { zoom: 1, px: 0, py: 0 };
 
-const images = new Map();   /* sample id -> loaded HTMLImageElement */
-let gradeMode = "2d";       /* "webgl" once the shader path proves itself */
+/* ---- colour grades: base filter values + a tint wash. ---- */
+const GRADES = {
+  vice:    { label: 'Vice Sunset',   sat: 1.32, con: 1.12, bri: 1.04, sepia: 0,    hue: 0,   tint: ['#ff7a18', '#ff2e88'], tintAlpha: 0.22, mode: 'overlay',   swatch: 'linear-gradient(135deg,#ffb347,#ff2e88)' },
+  neon:    { label: 'Neon Nights',   sat: 1.50, con: 1.16, bri: 1.00, sepia: 0,    hue: -12, tint: ['#2b6cff', '#c026ff'], tintAlpha: 0.26, mode: 'overlay',   swatch: 'linear-gradient(135deg,#2b6cff,#c026ff)' },
+  golden:  { label: 'Golden Hour',   sat: 1.40, con: 1.06, bri: 1.05, sepia: 0.35, hue: 0,   tint: ['#ffb347', '#ff8a00'], tintAlpha: 0.20, mode: 'soft-light', swatch: 'linear-gradient(135deg,#ffd98a,#ff8a00)' },
+  noir:    { label: 'Noir Heat',     sat: 0.55, con: 1.35, bri: 0.94, sepia: 0,    hue: 0,   tint: ['#3a0a1e', '#000000'], tintAlpha: 0.18, mode: 'multiply',   swatch: 'linear-gradient(135deg,#5a2a3a,#111)' },
+  comic:   { label: 'Comic Ink',     sat: 1.65, con: 1.32, bri: 1.02, sepia: 0,    hue: 0,   tint: ['#ff5e8a', '#2b6cff'], tintAlpha: 0.15, mode: 'overlay',   swatch: 'linear-gradient(135deg,#ff5e8a,#2b6cff)' },
+  natural: { label: 'Natural',       sat: 1.00, con: 1.00, bri: 1.00, sepia: 0,    hue: 0,   tint: null,                 tintAlpha: 0,    mode: 'source-over', swatch: 'linear-gradient(135deg,#e8e8e8,#9a9a9a)' },
+};
 
-/* ------------------------------------------------------------------ */
-/* Photo grade: a warm sunset / neon look. WebGL first, 2D fallback.  */
-/* The shader smooths flat areas while keeping edges (a small 3x3     */
-/* neighbourhood mean blended back toward the centre pixel where the  */
-/* local contrast is high), then warms the colour: red lifted, blue   */
-/* pulled down, saturation pushed up, a touch of orange in the dark.   */
-/* Vignette is drawn per panel later, so a cropped panel keeps its    */
-/* own darkened corners.                                               */
-/* ------------------------------------------------------------------ */
+/* ---- one-click cover presets (title, tagline, kicker, strip, layout, grade, size). ---- */
+const PRESETS = {
+  sunset: { title: 'SUNSET STATE', tagline: 'Neon Tide', kicker: 'A COAST THAT NEVER SLEEPS',
+    strip: 'CHASE THE LIGHT • OWN THE NIGHT', layout: 'hero-left', grade: 'vice', size: '1920x1080',
+    catalog: 'SUNSET STATE — A COVER STUDIO PICTURE — YOUR PHOTOS — GRADED BY HAND — CAT. SS-0626' },
+  heat: { title: 'HEAT WAVE', tagline: 'Coast to Coast', kicker: 'TOO HOT TO SLOW DOWN',
+    strip: 'ONE SUMMER • NO SHADE • ALL HEAT', layout: 'hero-right', grade: 'golden', size: '1080x1350',
+    catalog: 'HEAT WAVE — A COVER STUDIO PICTURE — YOUR PHOTOS — GRADED BY HAND — CAT. HW-0626' },
+  night: { title: 'NIGHT DRIVE', tagline: 'Neon Tide', kicker: 'THE CITY AFTER MIDNIGHT',
+    strip: 'NEON ON • ENGINE HOT • AFTER DARK', layout: 'mosaic', grade: 'neon', size: '1920x1080',
+    catalog: 'NIGHT DRIVE — A COVER STUDIO PICTURE — YOUR PHOTOS — GRADED BY HAND — CAT. ND-0626' },
+};
 
-const GL_VERT = [
-  "attribute vec2 aPos;",
-  "varying vec2 vUv;",
-  "void main(){ vUv = vec2(aPos.x * 0.5 + 0.5, 0.5 - aPos.y * 0.5);",
-  "  gl_Position = vec4(aPos, 0.0, 1.0); }",
-].join("\n");
+const SIZES = {
+  '1920x1080': { w: 1920, h: 1080, label: '1920 × 1080' },
+  '1080x1350': { w: 1080, h: 1350, label: '1080 × 1350' },
+  '1080x1080': { w: 1080, h: 1080, label: '1080 × 1080' },
+};
 
-const GL_FRAG = [
-  "precision mediump float;",
-  "varying vec2 vUv;",
-  "uniform sampler2D uTex;",
-  "uniform vec2 uPx;",
-  "void main(){",
-  "  vec3 c = texture2D(uTex, vUv).rgb;",
-  "  vec3 m = vec3(0.0);",
-  "  for (int x = -1; x <= 1; x++)",
-  "    for (int y = -1; y <= 1; y++)",
-  "      m += texture2D(uTex, vUv + vec2(float(x), float(y)) * uPx).rgb;",
-  "  m /= 9.0;",
-  "  vec3 d = m - c;",
-  "  float keep = clamp(dot(d, d) * 60.0, 0.0, 1.0);",
-  "  vec3 g = mix(m, c, keep);",
-  "  g.r = pow(g.r, 0.96) * 1.05;",
-  "  g.b = pow(g.b, 1.06) * 0.90;",
-  "  float l = dot(g, vec3(0.299, 0.587, 0.114));",
-  "  g = mix(vec3(l), g, 1.16);",
-  "  g += vec3(0.025, 0.004, -0.018) * (1.0 - l);",
-  "  gl_FragColor = vec4(clamp(g, 0.0, 1.0), 1.0);",
-  "}",
-].join("\n");
+/* ---- state ---- */
+const state = {
+  layout: 'hero-left',
+  grade: 'vice',
+  size: '1920x1080',
+  preset: 'sunset',
+  strength: 0.9, contrast: 1.0, saturation: 1.0, grain: 0.28, vignette: 0.5,
+  halftone: false, speedLines: false,
+  showLabels: true, showBadge: true, showVolume: true, showRibbon: true, showHud: true, showCatalog: true,
+  title: 'SUNSET STATE', tagline: 'Neon Tide', kicker: 'A COAST THAT NEVER SLEEPS',
+  strip: 'CHASE THE LIGHT • OWN THE NIGHT',
+  badge: 'EST. 2026', volume: 'VOL. 06', ribbon: "COLLECTOR'S EDITION", hud: 'WANTED', stars: 5,
+  catalog: 'SUNSET STATE — A COVER STUDIO PICTURE — YOUR PHOTOS — GRADED BY HAND — CAT. SS-0626',
+  selected: 0,
+};
 
-let glBox = null;   /* { gl, prog, tex, canvas } built lazily */
+/* photos: {id, label, file, img, focus, place, time, sub, uploaded} */
+const photos = [];
+/* slots: one per panel position (max 9), {photo, zoom, dx, dy, grade} */
+const slots = Array.from({ length: 9 }, () => ({ photo: 0, zoom: 1, dx: 0, dy: 0, grade: 'auto' }));
 
-function buildWebGLGrade() {
-  const canvas = document.createElement("canvas");
-  const gl = canvas.getContext("webgl", { preserveDrawingBuffer: true });
-  if (!gl) return null;
-  const compile = (type, src) => {
-    const sh = gl.createShader(type);
-    gl.shaderSource(sh, src);
-    gl.compileShader(sh);
-    if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) return null;
-    return sh;
-  };
-  const vs = compile(gl.VERTEX_SHADER, GL_VERT);
-  const fs = compile(gl.FRAGMENT_SHADER, GL_FRAG);
-  if (!vs || !fs) return null;
-  const prog = gl.createProgram();
-  gl.attachShader(prog, vs);
-  gl.attachShader(prog, fs);
-  gl.linkProgram(prog);
-  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return null;
-  const buf = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
-  const tex = gl.createTexture();
-  return { gl, prog, tex, canvas };
-}
+const $ = (id) => document.getElementById(id);
+const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+const lerp = (a, b, t) => a + (b - a) * t;
 
-/* The grade runs on a capped copy (720 px on the long side): the look
-   is a soft warm wash, so grading at half resolution and letting the
-   panel draw upscale it loses nothing visible and keeps software
-   WebGL (SwiftShader) fast. */
-function cappedSize(w, h, maxSide) {
-  if (Math.max(w, h) <= maxSide) return [w, h];
-  const s = maxSide / Math.max(w, h);
-  return [Math.round(w * s), Math.round(h * s)];
-}
+/* cover state exposed for automated checks (headless verification). */
+window.__cover = {
+  loaded: 0, total: SAMPLES.length, errors: [], ready: false, lastExportBytes: 0,
+  exportDataURL: (w, h) => exportDataURL(w, h),
+};
 
-function gradePhotoWebGL(img) {
-  if (!glBox) glBox = buildWebGLGrade();
-  if (!glBox) return null;
-  const { gl, prog, tex, canvas } = glBox;
-  const w = img.naturalWidth, h = img.naturalHeight;
-  const [gw, gh] = cappedSize(w, h, 720);
-  canvas.width = gw; canvas.height = gh;
-  gl.viewport(0, 0, gw, gh);
-  gl.useProgram(prog);
-  gl.activeTexture(gl.TEXTURE0);
-  gl.bindTexture(gl.TEXTURE_2D, tex);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-  const loc = gl.getAttribLocation(prog, "aPos");
-  gl.enableVertexAttribArray(loc);
-  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-  gl.uniform1i(gl.getUniformLocation(prog, "uTex"), 0);
-  gl.uniform2f(gl.getUniformLocation(prog, "uPx"), 1 / w, 1 / h);
-  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-  const out = document.createElement("canvas");
-  out.width = gw; out.height = gh;
-  out.getContext("2d").drawImage(canvas, 0, 0);
-  return out;
-}
-
-/* Plain 2D grade used when WebGL is unavailable: same warm intent,
-   done with canvas filters and a soft orange-pink wash. */
-function gradePhoto2D(img) {
-  const out = document.createElement("canvas");
-  const [gw, gh] = cappedSize(img.naturalWidth, img.naturalHeight, 720);
-  out.width = gw; out.height = gh;
-  const c = out.getContext("2d");
-  c.filter = "saturate(1.22) contrast(1.06) sepia(0.20) brightness(1.03)";
-  c.drawImage(img, 0, 0, gw, gh);
-  c.filter = "none";
-  const wash = c.createLinearGradient(0, 0, 0, out.height);
-  wash.addColorStop(0, "rgba(255,120,60,0.10)");
-  wash.addColorStop(1, "rgba(255,60,140,0.10)");
-  c.fillStyle = wash;
-  c.fillRect(0, 0, out.width, out.height);
-  return out;
-}
-
-const gradedCache = new WeakMap();   /* image element -> graded canvas */
-
-function gradedPhoto(img) {
-  let g = gradedCache.get(img);
-  if (g) return g;
-  g = gradePhotoWebGL(img);
-  if (g) { gradeMode = "webgl"; }
-  else { g = gradePhoto2D(img); gradeMode = "2d"; }
-  gradedCache.set(img, g);
-  return g;
-}
-
-/* ------------------------------------------------------------------ */
-/* Cover drawing.                                                     */
-/* ------------------------------------------------------------------ */
-
-function layoutRects(W, H) {
-  const stripH = Math.round(H * 0.058);
-  const photoH = H - stripH;
-  const rowH = [Math.round(photoH * 0.36), Math.round(photoH * 0.32), 0];
-  rowH[2] = photoH - rowH[0] - rowH[1];
-  const rowY = [0, rowH[0], rowH[0] + rowH[1]];
-  const colW = W / 4;
-  const rects = {};
-  for (const s of SLOTS) {
-    rects[s.key] = {
-      x: Math.round(s.col * colW),
-      y: rowY[s.row],
-      w: Math.round(s.cols * colW),
-      h: rowH.slice(s.row, s.row + s.rows).reduce((a, b) => a + b, 0),
+function loadSamples() {
+  return Promise.all(SAMPLES.map((s, i) => new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      photos[i] = { id: s.id, label: s.place, file: s.file, img, focus: { ...s.focus },
+        place: s.place, time: s.time, sub: s.sub, uploaded: false };
+      window.__cover.loaded++;
+      resolve(true);
     };
+    img.onerror = () => { window.__cover.errors.push(s.file); resolve(false); };
+    img.src = s.file;
+  })));
+}
+
+/* ================= cover renderer ================= */
+
+function panelRects() {
+  const L = LAYOUTS[state.layout];
+  return L.rects.map((r) => ({ x: r[0], y: r[1], w: r[2], h: r[3] }));
+}
+
+function gradeFilterString(gradeName, strength, contrastMul, satMul) {
+  const g = GRADES[gradeName];
+  const sat = lerp(1, g.sat, strength) * satMul;
+  const con = lerp(1, g.con, strength) * contrastMul;
+  const bri = lerp(1, g.bri, strength);
+  let f = `saturate(${sat.toFixed(2)}) contrast(${con.toFixed(2)}) brightness(${bri.toFixed(2)})`;
+  if (g.sepia) f += ` sepia(${(g.sepia * strength).toFixed(2)})`;
+  if (g.hue) f += ` hue-rotate(${(g.hue * strength).toFixed(0)}deg)`;
+  return f;
+}
+
+let noiseTile = null;
+function getNoiseTile() {
+  if (noiseTile) return noiseTile;
+  const c = document.createElement('canvas');
+  c.width = 128; c.height = 128;
+  const x = c.getContext('2d');
+  const d = x.createImageData(128, 128);
+  for (let i = 0; i < d.data.length; i += 4) {
+    const v = 100 + Math.floor(Math.random() * 155);
+    d.data[i] = v; d.data[i + 1] = v; d.data[i + 2] = v; d.data[i + 3] = 255;
   }
-  return { rects, stripH, photoH };
+  x.putImageData(d, 0, 0);
+  noiseTile = c;
+  return c;
 }
 
-function sampleOf(id) {
-  return SAMPLES.find((s) => s.id === id) || SAMPLES[0];
+let dotTile = null;
+function getDotTile() {
+  if (dotTile) return dotTile;
+  const c = document.createElement('canvas');
+  c.width = 14; c.height = 14;
+  const x = c.getContext('2d');
+  x.fillStyle = '#000';
+  x.beginPath(); x.arc(7, 7, 2.6, 0, Math.PI * 2); x.fill();
+  dotTile = c;
+  return c;
 }
 
-/* Draw one photo into its panel: cover-fit around the photo's focus
-   point (so faces stay in frame), plus the user's pan and zoom.
-   The draw is clipped to the panel: a tall photo's overflow must
-   never paint over the neighbouring panels. */
-function drawPanelPhoto(ctx, img, rect, focus, adj) {
-  const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
-  const scale = Math.max(rect.w / iw, rect.h / ih) * adj.zoom;
-  const sw = iw * scale, sh = ih * scale;
-  let dx = rect.x + rect.w / 2 - focus.fx * sw + adj.px * rect.w;
-  let dy = rect.y + rect.h / 2 - focus.fy * sh + adj.py * rect.h;
-  dx = Math.min(rect.x, Math.max(rect.x + rect.w - sw, dx));
-  dy = Math.min(rect.y, Math.max(rect.y + rect.h - sh, dy));
+function drawPhotoInto(ctx, img, rect, focus, zoom, dx, dy, filter) {
+  const pw = rect.w, ph = rect.h;
+  const iw = img.naturalWidth, ih = img.naturalHeight;
+  const scale = Math.max(pw / iw, ph / ih) * zoom;
+  const dw = iw * scale, dh = ih * scale;
+  const wantX = focus.fx * dw - pw / 2 + dx * pw;
+  const wantY = focus.fy * dh - ph / 2 + dy * ph;
+  const ox = clamp(wantX, 0, Math.max(0, dw - pw));
+  const oy = clamp(wantY, 0, Math.max(0, dh - ph));
   ctx.save();
   ctx.beginPath();
-  ctx.rect(rect.x, rect.y, rect.w, rect.h);
+  ctx.rect(rect.x, rect.y, pw, ph);
   ctx.clip();
-  ctx.drawImage(img, dx, dy, sw, sh);
+  ctx.filter = filter;
+  ctx.drawImage(img, rect.x - ox, rect.y - oy, dw, dh);
+  ctx.filter = 'none';
   ctx.restore();
 }
 
-function drawPanelVignette(ctx, rect) {
-  const g = ctx.createRadialGradient(
-    rect.x + rect.w / 2, rect.y + rect.h / 2, Math.min(rect.w, rect.h) * 0.35,
-    rect.x + rect.w / 2, rect.y + rect.h / 2, Math.max(rect.w, rect.h) * 0.75,
-  );
-  g.addColorStop(0, "rgba(0,0,0,0)");
-  g.addColorStop(1, "rgba(0,0,0,0.26)");
-  ctx.fillStyle = g;
-  ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+function drawStar(ctx, cx, cy, r, color) {
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  for (let i = 0; i < 10; i++) {
+    const a = -Math.PI / 2 + (i * Math.PI) / 5;
+    const rr = i % 2 === 0 ? r : r * 0.45;
+    const px = cx + Math.cos(a) * rr, py = cy + Math.sin(a) * rr;
+    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+  }
+  ctx.closePath();
+  ctx.fill();
 }
 
 function roundRect(ctx, x, y, w, h, r) {
+  const rr = Math.min(r, w / 2, h / 2);
   ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.arcTo(x + w, y, x + w, y + h, r);
-  ctx.arcTo(x + w, y + h, x, y + h, r);
-  ctx.arcTo(x, y + h, x, y, r);
-  ctx.arcTo(x, y, x + w, y, r);
+  ctx.moveTo(x + rr, y);
+  ctx.arcTo(x + w, y, x + w, y + h, rr);
+  ctx.arcTo(x + w, y + h, x, y + h, rr);
+  ctx.arcTo(x, y + h, x, y, rr);
+  ctx.arcTo(x, y, x + w, y, rr);
   ctx.closePath();
 }
 
-function drawLabelChip(ctx, text, x, y, fontPx) {
-  ctx.font = "700 " + fontPx + "px 'Helvetica Neue', Arial, sans-serif";
-  const padX = Math.round(fontPx * 0.7), padY = Math.round(fontPx * 0.45);
-  const tw = ctx.measureText(text).width;
-  ctx.fillStyle = "rgba(8,8,16,0.62)";
-  roundRect(ctx, x, y, tw + padX * 2, fontPx + padY * 2, (fontPx + padY * 2) / 2);
-  ctx.fill();
-  ctx.fillStyle = "#ffffff";
-  ctx.textAlign = "left"; ctx.textBaseline = "middle";
-  ctx.fillText(text, x + padX, y + (fontPx + padY * 2) / 2 + 1);
-}
-
-function drawWantedChip(ctx, rect, fontPx) {
-  const text = "WANTED \u2605\u2605\u2605\u2605\u2605";
-  ctx.font = "800 " + fontPx + "px 'Helvetica Neue', Arial, sans-serif";
-  const padX = Math.round(fontPx * 0.7), padY = Math.round(fontPx * 0.45);
-  const tw = ctx.measureText(text).width;
-  const w = tw + padX * 2, h = fontPx + padY * 2;
-  const x = rect.x + rect.w - w - Math.round(fontPx * 0.6);
-  const y = rect.y + Math.round(fontPx * 0.6);
-  ctx.fillStyle = "rgba(10,8,4,0.78)";
-  roundRect(ctx, x, y, w, h, h / 2);
-  ctx.fill();
-  ctx.strokeStyle = "#ffcf4d"; ctx.lineWidth = Math.max(1.5, fontPx * 0.09);
-  roundRect(ctx, x, y, w, h, h / 2);
-  ctx.stroke();
-  ctx.fillStyle = "#ffcf4d";
-  ctx.textAlign = "left"; ctx.textBaseline = "middle";
-  ctx.fillText(text, x + padX, y + h / 2 + 1);
-}
-
-function drawEstSeal(ctx, cx, cy, r) {
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.rotate(-0.14);
-  ctx.fillStyle = "rgba(10,10,20,0.78)";
-  ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill();
-  ctx.strokeStyle = "#e8c15a"; ctx.lineWidth = Math.max(2, r * 0.06);
-  ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.stroke();
-  ctx.lineWidth = Math.max(1, r * 0.03);
-  ctx.beginPath(); ctx.arc(0, 0, r * 0.82, 0, Math.PI * 2); ctx.stroke();
-  ctx.fillStyle = "#e8c15a";
-  ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  ctx.font = "700 " + Math.round(r * 0.34) + "px 'Helvetica Neue', Arial, sans-serif";
-  ctx.fillText("EST", 0, -r * 0.26);
-  ctx.font = "900 " + Math.round(r * 0.52) + "px 'Helvetica Neue', Arial, sans-serif";
-  ctx.fillText("2026", 0, r * 0.24);
-  ctx.restore();
-}
-
-/* Big original block title: dark 3D extrude, warm gradient face,
-   dark outline. The letters are drawn with the system heavy sans,
-   never a game font. */
-function drawBlockTitle(ctx, text, cx, cy, size, topColor, bottomColor) {
-  ctx.font = "900 " + size + "px 'Arial Black', 'Helvetica Neue', Arial, sans-serif";
-  ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  const steps = Math.max(4, Math.round(size * 0.055));
-  ctx.fillStyle = "rgba(24,6,22,0.92)";
-  for (let i = steps; i >= 1; i--) ctx.fillText(text, cx + i, cy + i * 1.25);
-  const g = ctx.createLinearGradient(0, cy - size * 0.55, 0, cy + size * 0.55);
-  g.addColorStop(0, topColor);
-  g.addColorStop(1, bottomColor);
-  ctx.fillStyle = g;
-  ctx.fillText(text, cx, cy);
-  ctx.lineWidth = Math.max(2, size * 0.035);
-  ctx.strokeStyle = "rgba(28,6,26,0.9)";
-  ctx.strokeText(text, cx, cy);
-  const sheenW = ctx.measureText(text).width;
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(cx - sheenW / 2, cy - size * 0.62, sheenW, size * 0.42);
-  ctx.clip();
-  ctx.fillStyle = "rgba(255,255,255,0.20)";
-  ctx.fillText(text, cx, cy);
-  ctx.restore();
-}
-
-function drawScriptSub(ctx, text, cx, cy, size, color) {
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.rotate(-0.035);
-  ctx.font = "italic 700 " + size + "px 'Brush Script MT', 'Segoe Script', 'Comic Sans MS', cursive";
-  ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  ctx.shadowColor = "rgba(0,0,0,0.65)";
-  ctx.shadowBlur = Math.max(4, size * 0.12);
-  ctx.shadowOffsetY = Math.max(2, size * 0.05);
+function drawPalm(ctx, x, y, s, color) {
+  ctx.strokeStyle = color;
   ctx.fillStyle = color;
-  ctx.fillText(text, 0, 0);
-  ctx.restore();
-}
-
-/* Deterministic little barcode for the bottom strip. */
-function drawBarcode(ctx, x, y, w, h) {
-  ctx.fillStyle = "#f2ede8";
-  ctx.fillRect(x - 6, y - 4, w + 12, h + 14);
-  let seed = 0;
-  for (const ch of state.title) seed = (seed * 31 + ch.charCodeAt(0)) >>> 0;
-  let bx = x;
-  ctx.fillStyle = "#111118";
-  while (bx < x + w) {
-    seed = (seed * 1103515245 + 12345) >>> 0;
-    const bw = 2 + (seed % 5);
-    if ((seed >> 7) % 3 !== 0) ctx.fillRect(bx, y, bw, h);
-    bx += bw + 2 + (seed % 3);
+  ctx.lineWidth = Math.max(1.5, s * 0.05);
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.quadraticCurveTo(x + s * 0.08, y - s * 0.55, x + s * 0.18, y - s * 0.95);
+  ctx.stroke();
+  const topX = x + s * 0.18, topY = y - s * 0.95;
+  ctx.lineWidth = Math.max(1, s * 0.035);
+  for (const a of [-1.35, -0.7, -0.1, 0.55, 1.15]) {
+    ctx.beginPath();
+    ctx.moveTo(topX, topY);
+    ctx.quadraticCurveTo(
+      topX + Math.sin(a) * s * 0.32, topY - s * 0.22 + Math.cos(a) * s * 0.1,
+      topX + Math.sin(a) * s * 0.52, topY + s * 0.12,
+    );
+    ctx.stroke();
   }
-  ctx.fillStyle = "#111118";
-  ctx.font = "600 " + Math.max(9, Math.round(h * 0.22)) + "px 'Helvetica Neue', Arial, sans-serif";
-  ctx.textAlign = "center"; ctx.textBaseline = "top";
-  ctx.fillText("0 12345 67890", x + w / 2, y + h + 2);
 }
 
-function drawCoverArt(ctx, W, H) {
-  const { rects, stripH } = layoutRects(W, H);
-  const chipPx = Math.max(13, Math.round(W * 0.0105));
-  const gap = Math.max(10, Math.round(W * 0.008));
+function drawLabelChip(ctx, rect, photo, W) {
+  const pad = Math.max(5, W * 0.005);
+  const placeSize = clamp(W * 0.015, 12, 28);
+  const subSize = clamp(W * 0.010, 9, 18);
+  ctx.font = `800 ${placeSize}px "Arial Black", Arial, sans-serif`;
+  const line1 = photo.place.toUpperCase();
+  const w1 = ctx.measureText(line1).width;
+  ctx.font = `700 ${subSize}px Arial, sans-serif`;
+  const line2 = `${photo.time} — ${photo.sub}`;
+  const w2 = ctx.measureText(line2).width;
+  const cw = Math.max(w1, w2) + pad * 2;
+  const ch = placeSize + subSize + pad * 2 + 3;
+  const cx = rect.x + Math.max(5, W * 0.005);
+  const cy = rect.y + Math.max(5, W * 0.005);
+  ctx.fillStyle = 'rgba(8, 4, 16, 0.82)';
+  roundRect(ctx, cx, cy, cw, ch, Math.max(3, W * 0.002));
+  ctx.fill();
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = '#fff';
+  ctx.font = `800 ${placeSize}px "Arial Black", Arial, sans-serif`;
+  ctx.fillText(line1, cx + pad, cy + pad + placeSize * 0.92);
+  ctx.fillStyle = '#ffb3d9';
+  ctx.font = `700 ${subSize}px Arial, sans-serif`;
+  ctx.fillText(line2, cx + pad, cy + pad + placeSize + subSize * 0.95);
+}
 
-  ctx.fillStyle = "#0b0b12";
+function drawCover(ctx, W, H) {
+  const gap = Math.max(3, Math.round(W * 0.004));
+  const photoH = 0.86 * H;
+  ctx.fillStyle = '#14061f';
   ctx.fillRect(0, 0, W, H);
 
-  for (const slot of SLOTS) {
-    const rect = rects[slot.key];
-    const sample = sampleOf(state.slots ? state.slots[slot.key] : slot.sample);
-    const img = images.get(sample.id);
-    if (img) {
-      drawPanelPhoto(ctx, gradedPhoto(img), rect, sample, state.adjust[slot.key]);
-    } else {
-      const g = ctx.createLinearGradient(rect.x, rect.y, rect.x, rect.y + rect.h);
-      g.addColorStop(0, "#3a2b4d"); g.addColorStop(1, "#1c1426");
-      ctx.fillStyle = g;
+  /* ---- photo panels ---- */
+  const rects = panelRects();
+  const filter = gradeFilterString(state.grade, state.strength, state.contrast, state.saturation);
+  rects.forEach((r, i) => {
+    const slot = slots[i];
+    const photo = photos[slot.photo];
+    if (!photo || !photo.img) return;
+    const rect = { x: r.x * W + gap / 2, y: r.y * H + gap / 2, w: r.w * W - gap, h: r.h * H - gap };
+    const useGrade = slot.grade === 'auto' ? state.grade : slot.grade;
+    const f = useGrade === state.grade
+      ? filter
+      : gradeFilterString(useGrade, state.strength, state.contrast, state.saturation);
+    drawPhotoInto(ctx, photo.img, rect, photo.focus, slot.zoom, slot.dx, slot.dy, f);
+    const gg = GRADES[useGrade];
+    if (gg.tint) {
+      const tint = ctx.createLinearGradient(rect.x, rect.y, rect.x, rect.y + rect.h);
+      tint.addColorStop(0, gg.tint[0]);
+      tint.addColorStop(1, gg.tint[1]);
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(rect.x, rect.y, rect.w, rect.h);
+      ctx.clip();
+      ctx.globalCompositeOperation = gg.mode;
+      ctx.globalAlpha = gg.tintAlpha * state.strength;
+      ctx.fillStyle = tint;
       ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+      ctx.restore();
     }
-    drawPanelVignette(ctx, rect);
-    ctx.strokeStyle = "rgba(0,0,0,0.4)";
-    ctx.lineWidth = 2;
-    ctx.strokeRect(rect.x + 1, rect.y + 1, rect.w - 2, rect.h - 2);
+  });
+
+  /* ---- film effects over the photo area ---- */
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, 0, W, photoH);
+  ctx.clip();
+  if (state.grain > 0.01) {
+    ctx.globalAlpha = state.grain * 0.16;
+    const pat = ctx.createPattern(getNoiseTile(), 'repeat');
+    ctx.fillStyle = pat;
+    ctx.fillRect(0, 0, W, photoH);
+    ctx.globalAlpha = 1;
   }
-
-  /* Per-panel label chips. */
-  for (const slot of SLOTS) {
-    const rect = rects[slot.key];
-    const sample = sampleOf(state.slots[slot.key]);
-    drawLabelChip(ctx, sample.label, rect.x + gap, rect.y + gap, chipPx);
+  if (state.halftone) {
+    ctx.globalAlpha = 0.10;
+    const pat = ctx.createPattern(getDotTile(), 'repeat');
+    ctx.fillStyle = pat;
+    ctx.fillRect(0, 0, W, photoH);
+    ctx.globalAlpha = 1;
   }
-  drawWantedChip(ctx, rects.angler, chipPx);
-  drawEstSeal(ctx, rects.hero.x + rects.hero.w - Math.round(W * 0.048),
-    rects.hero.y + rects.hero.h - Math.round(W * 0.048), Math.round(W * 0.036));
-
-  /* Title band: dark scrim over the motel photo, then the title. */
-  const band = rects.motel;
-  const scrim = ctx.createLinearGradient(0, band.y, 0, band.y + band.h);
-  scrim.addColorStop(0, "rgba(12,4,16,0.18)");
-  scrim.addColorStop(0.55, "rgba(12,4,16,0.52)");
-  scrim.addColorStop(1, "rgba(12,4,16,0.78)");
-  ctx.fillStyle = scrim;
-  ctx.fillRect(band.x, band.y, band.w, band.h);
-  drawLabelChip(ctx, "VOL. 06", band.x + band.w - Math.round(W * 0.085), band.y + gap, chipPx);
-
-  const variant = VARIANTS[state.variant];
-  let titleSize = Math.round(band.h * 0.58);
-  ctx.font = "900 " + titleSize + "px 'Arial Black', 'Helvetica Neue', Arial, sans-serif";
-  const maxTitleW = W * 0.86;
-  const tw = ctx.measureText(state.title).width;
-  if (tw > maxTitleW) titleSize = Math.floor(titleSize * maxTitleW / tw);
-  drawBlockTitle(ctx, state.title, W / 2, band.y + band.h * 0.44,
-    titleSize, variant.top, variant.bottom);
-  drawScriptSub(ctx, state.sub, W / 2, band.y + band.h * 0.82,
-    Math.round(titleSize * 0.34), "#ff8fc0");
-
-  /* Thin bottom strip: tagline left, barcode right. */
-  const stripY = H - stripH;
-  ctx.fillStyle = "#0b0b12";
-  ctx.fillRect(0, stripY, W, stripH);
-  ctx.fillStyle = "#f2ede8";
-  ctx.font = "800 " + Math.round(stripH * 0.40) + "px 'Helvetica Neue', Arial, sans-serif";
-  ctx.textAlign = "left"; ctx.textBaseline = "middle";
-  ctx.fillText("ONE COAST  \u2022  NO RULES  \u2022  COMING SOON",
-    Math.round(W * 0.02), stripY + stripH / 2);
-  const bw = Math.round(W * 0.075), bh = Math.round(stripH * 0.42);
-  drawBarcode(ctx, W - Math.round(W * 0.02) - bw, stripY + (stripH - bh) / 2 - 4, bw, bh);
-}
-
-/* ------------------------------------------------------------------ */
-/* Preview, editor wiring, export.                                     */
-/* ------------------------------------------------------------------ */
-
-const preview = document.getElementById("preview");
-const previewCtx = preview.getContext("2d");
-const statusEl = document.getElementById("status");
-const titleInput = document.getElementById("titleInput");
-const subInput = document.getElementById("subInput");
-const zoomInput = document.getElementById("zoom");
-const selNameEl = document.getElementById("selName");
-
-state.slots = {};
-for (const s of SLOTS) state.slots[s.key] = s.sample;
-
-function renderPreview() {
-  const W = state.size.w, H = state.size.h;
-  const dispW = Math.min(960, W);
-  const dispH = Math.round(dispW * H / W);
-  if (preview.width !== dispW || preview.height !== dispH) {
-    preview.width = dispW; preview.height = dispH;
-  }
-  drawCoverArt(previewCtx, dispW, dispH);
-  if (state.selected) {
-    const { rects } = layoutRects(dispW, dispH);
-    const r = rects[state.selected];
-    if (r) {
-      previewCtx.save();
-      previewCtx.strokeStyle = "#ff5ea8";
-      previewCtx.lineWidth = 3;
-      previewCtx.setLineDash([10, 6]);
-      previewCtx.strokeRect(r.x + 2, r.y + 2, r.w - 4, r.h - 4);
-      previewCtx.restore();
+  if (state.speedLines) {
+    ctx.strokeStyle = 'rgba(255,255,255,0.13)';
+    ctx.lineWidth = Math.max(2, W * 0.002);
+    for (let i = 0; i < 12; i++) {
+      const x0 = (i / 12) * W * 1.2 - W * 0.1;
+      ctx.beginPath();
+      ctx.moveTo(x0, -10);
+      ctx.lineTo(x0 + W * 0.12, photoH * 0.5);
+      ctx.stroke();
     }
   }
-}
-
-function renderExportCanvas() {
-  const W = state.size.w, H = state.size.h;
-  const canvas = document.createElement("canvas");
-  canvas.width = W; canvas.height = H;
-  drawCoverArt(canvas.getContext("2d"), W, H);
-  return canvas;
-}
-
-function refreshStatus() {
-  const v = VARIANTS[state.variant];
-  statusEl.textContent =
-    "Size " + state.size.tag + "  \u2022  Title \"" + state.title + "\" / \"" + state.sub +
-    "\"  \u2022  Grade: " + gradeMode.toUpperCase() + "  \u2022  " +
-    images.size + " of " + SAMPLES.length + " sample photos loaded.";
-}
-
-function renderAll() {
-  renderPreview();
-  refreshStatus();
-}
-
-function setVariant(i) {
-  state.variant = ((i % VARIANTS.length) + VARIANTS.length) % VARIANTS.length;
-  const v = VARIANTS[state.variant];
-  state.title = v.title;
-  state.sub = v.sub;
-  titleInput.value = v.title;
-  subInput.value = v.sub;
-  document.querySelectorAll("#variants button").forEach((b, j) =>
-    b.classList.toggle("on", j === state.variant));
-  renderAll();
-}
-
-function setSize(id) {
-  const s = SIZES.find((x) => x.id === id);
-  if (!s) return;
-  state.size = s;
-  document.querySelectorAll("#sizes button").forEach((b) =>
-    b.classList.toggle("on", b.dataset.size === id));
-  renderAll();
-}
-
-function selectSlot(key) {
-  state.selected = key;
-  const slot = SLOTS.find((s) => s.key === key);
-  selNameEl.textContent = slot ? slot.name : key;
-  zoomInput.value = String(state.adjust[key].zoom);
-  renderAll();
-}
-
-function surpriseCover() {
-  setVariant(Math.floor(Math.random() * VARIANTS.length));
-  const ids = SAMPLES.map((s) => s.id);
-  for (let i = ids.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [ids[i], ids[j]] = [ids[j], ids[i]];
+  if (state.vignette > 0.01) {
+    const vg = ctx.createRadialGradient(W / 2, photoH / 2, Math.min(W, photoH) * 0.35, W / 2, photoH / 2, Math.max(W, photoH) * 0.72);
+    vg.addColorStop(0, 'rgba(10,0,20,0)');
+    vg.addColorStop(1, `rgba(10,0,20,${(state.vignette * 0.55).toFixed(2)})`);
+    ctx.fillStyle = vg;
+    ctx.fillRect(0, 0, W, photoH);
   }
-  SLOTS.forEach((slot, i) => { state.slots[slot.key] = ids[i]; });
-  renderAll();
-}
+  ctx.restore();
 
-function exportCoverPNG() {
-  const canvas = renderExportCanvas();
-  const name = state.title.toLowerCase().replace(/[^a-z0-9]+/g, "-") +
-    "-cover-" + state.size.id + ".png";
-  canvas.toBlob((blob) => {
-    if (!blob) return;
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = name;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
-  }, "image/png");
-}
-
-/* Build the control buttons and the sample strip. */
-VARIANTS.forEach((v, i) => {
-  const b = document.createElement("button");
-  b.type = "button";
-  b.textContent = v.title;
-  b.addEventListener("click", () => setVariant(i));
-  document.getElementById("variants").appendChild(b);
-});
-SIZES.forEach((s) => {
-  const b = document.createElement("button");
-  b.type = "button";
-  b.textContent = s.tag;
-  b.dataset.size = s.id;
-  b.addEventListener("click", () => setSize(s.id));
-  document.getElementById("sizes").appendChild(b);
-});
-
-function buildSamplesStrip() {
-  const wrap = document.getElementById("samples");
-  wrap.textContent = "";
-  for (const s of SAMPLES) {
-    const fig = document.createElement("figure");
-    fig.dataset.sample = s.id;
-    if (s.id === state.activeSample) fig.classList.add("active");
-    const img = document.createElement("img");
-    img.src = s.src;
-    img.alt = s.label;
-    const cap = document.createElement("figcaption");
-    cap.textContent = s.label;
-    fig.appendChild(img);
-    fig.appendChild(cap);
-    fig.addEventListener("click", () => {
-      state.activeSample = s.id;
-      state.slots[state.selected] = s.id;
-      buildSamplesStrip();
-      renderAll();
+  /* ---- per-panel label chips ---- */
+  if (state.showLabels) {
+    rects.forEach((r, i) => {
+      const photo = photos[slots[i].photo];
+      if (!photo) return;
+      const rect = { x: r.x * W + gap / 2, y: r.y * H + gap / 2, w: r.w * W - gap, h: r.h * H - gap };
+      drawLabelChip(ctx, rect, photo, W);
     });
-    wrap.appendChild(fig);
   }
-}
 
-titleInput.addEventListener("input", () => { state.title = titleInput.value; renderAll(); });
-subInput.addEventListener("input", () => { state.sub = subInput.value; renderAll(); });
-zoomInput.addEventListener("input", () => {
-  state.adjust[state.selected].zoom = Number(zoomInput.value);
-  renderAll();
-});
-document.getElementById("surpriseBtn").addEventListener("click", surpriseCover);
-document.getElementById("exportBtn").addEventListener("click", exportCoverPNG);
-
-document.getElementById("upload").addEventListener("change", (ev) => {
-  const file = ev.target.files && ev.target.files[0];
-  if (!file) return;
-  const url = URL.createObjectURL(file);
-  const img = new Image();
-  img.onload = () => {
-    state.uploads += 1;
-    const id = "upload" + state.uploads;
-    SAMPLES.push({ id, src: url, label: file.name.replace(/\.[^.]+$/, "").slice(0, 14).toUpperCase() || "YOUR PHOTO", fx: 0.5, fy: 0.5 });
-    images.set(id, img);
-    state.activeSample = id;
-    state.slots[state.selected] = id;
-    buildSamplesStrip();
-    renderAll();
-  };
-  img.src = url;
-});
-
-/* Panel picking and drag-to-pan on the preview canvas. */
-let drag = null;
-function previewPoint(ev) {
-  const r = preview.getBoundingClientRect();
-  return {
-    x: (ev.clientX - r.left) * preview.width / r.width,
-    y: (ev.clientY - r.top) * preview.height / r.height,
-  };
-}
-function slotAt(x, y) {
-  const { rects } = layoutRects(preview.width, preview.height);
-  for (const slot of SLOTS) {
-    const r = rects[slot.key];
-    if (x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h) return slot.key;
+  /* ---- WANTED chip, top right of the photo area ---- */
+  if (state.showHud) {
+    const chipH = clamp(H * 0.038, 20, 44);
+    ctx.font = `800 ${chipH * 0.52}px "Arial Black", Arial, sans-serif`;
+    const wordW = ctx.measureText(state.hud.toUpperCase()).width;
+    const starR = chipH * 0.26;
+    const cw = wordW + state.stars * starR * 2.4 + chipH * 0.9;
+    const cx = W - cw - W * 0.008;
+    const cy = H * 0.058;
+    ctx.fillStyle = 'rgba(8,4,16,0.88)';
+    roundRect(ctx, cx, cy, cw, chipH, chipH / 2);
+    ctx.fill();
+    ctx.strokeStyle = '#f5c542';
+    ctx.lineWidth = Math.max(1.5, W * 0.0012);
+    roundRect(ctx, cx, cy, cw, chipH, chipH / 2);
+    ctx.stroke();
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(state.hud.toUpperCase(), cx + chipH * 0.45, cy + chipH / 2 + 1);
+    for (let i = 0; i < state.stars; i++) {
+      drawStar(ctx, cx + chipH * 0.45 + wordW + 8 + i * starR * 2.4 + starR, cy + chipH / 2, starR, '#f5c542');
+    }
   }
-  return null;
+
+  /* ---- scrim + giant title on the photos ---- */
+  const scrim = ctx.createLinearGradient(0, H * 0.62, 0, H * 0.905);
+  scrim.addColorStop(0, 'rgba(16,4,28,0)');
+  scrim.addColorStop(1, 'rgba(16,4,28,0.62)');
+  ctx.fillStyle = scrim;
+  ctx.fillRect(0, H * 0.62, W, H * 0.285);
+
+  const title = state.title.toUpperCase();
+  let titleSize = Math.min(W * 0.19, H * 0.145);
+  ctx.font = `900 ${titleSize}px "Arial Black", "Helvetica Neue", Arial, sans-serif`;
+  const maxTitleW = W * 0.94;
+  const measured = ctx.measureText(title).width;
+  if (measured > maxTitleW) titleSize *= maxTitleW / measured;
+  ctx.font = `900 ${titleSize}px "Arial Black", "Helvetica Neue", Arial, sans-serif`;
+  const titleY = H * 0.815;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.lineJoin = 'round';
+  ctx.fillStyle = '#2b0a3d';
+  for (let i = 7; i >= 1; i--) {
+    ctx.fillText(title, W / 2 + i * titleSize * 0.012, titleY + i * titleSize * 0.016);
+  }
+  ctx.strokeStyle = '#1c0626';
+  ctx.lineWidth = titleSize * 0.07;
+  ctx.strokeText(title, W / 2, titleY);
+  const grad = ctx.createLinearGradient(0, titleY - titleSize, 0, titleY);
+  grad.addColorStop(0, '#fff6d8');
+  grad.addColorStop(0.45, '#ffb347');
+  grad.addColorStop(1, '#ff5e8a');
+  ctx.fillStyle = grad;
+  ctx.fillText(title, W / 2, titleY);
+  ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+  ctx.lineWidth = Math.max(1.5, titleSize * 0.012);
+  ctx.strokeText(title, W / 2, titleY);
+
+  /* kicker pill with stars, just above the title */
+  const kickSize = clamp(W * 0.015, 12, 28);
+  ctx.font = `italic 800 ${kickSize}px Arial, sans-serif`;
+  const kickW = ctx.measureText(state.kicker.toUpperCase()).width;
+  const starR2 = kickSize * 0.5;
+  const pillW = kickW + 5 * starR2 * 2.2 + kickSize * 1.4;
+  const pillH = kickSize * 1.9;
+  const pillX = W / 2 - pillW / 2;
+  const pillY = titleY - titleSize * 0.78 - pillH;
+  ctx.fillStyle = 'rgba(10,4,18,0.78)';
+  roundRect(ctx, pillX, pillY, pillW, pillH, pillH / 2);
+  ctx.fill();
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  for (let i = 0; i < 5; i++) {
+    drawStar(ctx, pillX + kickSize * 0.8 + i * starR2 * 2.2 + starR2, pillY + pillH / 2, starR2, '#f5c542');
+  }
+  ctx.fillStyle = '#fff';
+  ctx.fillText(state.kicker.toUpperCase(), pillX + kickSize * 0.8 + 5 * starR2 * 2.2 + 4, pillY + pillH / 2 + 1);
+
+  /* pink script subtitle, overlapping the title's lower edge */
+  const subSize = W * 0.048;
+  ctx.save();
+  ctx.translate(W / 2 + W * 0.10, H * 0.878);
+  ctx.rotate(-0.035);
+  ctx.font = `italic 700 ${subSize}px "Brush Script MT", "Segoe Script", "Snell Roundhand", cursive`;
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#ff6ec7';
+  ctx.shadowColor = '#a3006b';
+  ctx.shadowBlur = subSize * 0.25;
+  ctx.fillText(state.tagline, 0, 0);
+  ctx.restore();
+
+  /* EST badge, left of the title */
+  if (state.showBadge) {
+    const br = W * 0.033;
+    const bcx = W * 0.068, bcy = H * 0.79;
+    ctx.beginPath();
+    ctx.arc(bcx, bcy, br, 0, Math.PI * 2);
+    ctx.fillStyle = '#1c0626';
+    ctx.fill();
+    ctx.lineWidth = Math.max(2, W * 0.002);
+    ctx.strokeStyle = '#f5c542';
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(bcx, bcy, br * 0.78, 0, Math.PI * 2);
+    ctx.setLineDash([3, 3]);
+    ctx.lineWidth = Math.max(1, W * 0.001);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#f5c542';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const badgeParts = state.badge.split(/\s+/);
+    ctx.font = `800 ${br * 0.34}px Arial, sans-serif`;
+    ctx.fillText(badgeParts[0] || 'EST.', bcx, bcy - br * 0.28);
+    ctx.font = `900 ${br * 0.52}px "Arial Black", Arial, sans-serif`;
+    ctx.fillText(badgeParts[1] || '2026', bcx, bcy + br * 0.28);
+  }
+
+  /* VOL tag, top right of the title band */
+  if (state.showVolume) {
+    const vSize = clamp(W * 0.015, 11, 26);
+    ctx.font = `800 ${vSize}px Arial, sans-serif`;
+    const vw = ctx.measureText(state.volume.toUpperCase()).width + vSize * 1.4;
+    const vh = vSize * 1.9;
+    const vx = W * 0.965 - vw, vy = H * 0.60;
+    ctx.fillStyle = 'rgba(8,4,16,0.85)';
+    roundRect(ctx, vx, vy, vw, vh, 4);
+    ctx.fill();
+    ctx.strokeStyle = '#35e0ff';
+    ctx.lineWidth = Math.max(1.5, W * 0.0012);
+    roundRect(ctx, vx, vy, vw, vh, 4);
+    ctx.stroke();
+    ctx.fillStyle = '#35e0ff';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(state.volume.toUpperCase(), vx + vw / 2, vy + vh / 2 + 1);
+  }
+
+  /* COLLECTOR'S EDITION ribbon */
+  if (state.showRibbon) {
+    const rSize = clamp(W * 0.013, 10, 24);
+    ctx.save();
+    ctx.translate(W * 0.885, H * 0.665);
+    ctx.rotate(-0.10);
+    ctx.font = `800 ${rSize}px Arial, sans-serif`;
+    const rw = ctx.measureText(state.ribbon.toUpperCase()).width + rSize * 2.2;
+    const rh = rSize * 2.1;
+    ctx.fillStyle = '#ff2e88';
+    ctx.beginPath();
+    ctx.moveTo(-rw / 2, -rh / 2);
+    ctx.lineTo(rw / 2, -rh / 2);
+    ctx.lineTo(rw / 2 + rh * 0.4, 0);
+    ctx.lineTo(rw / 2, rh / 2);
+    ctx.lineTo(-rw / 2, rh / 2);
+    ctx.lineTo(-rw / 2 - rh * 0.4, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(state.ribbon.toUpperCase(), 0, 1);
+    ctx.restore();
+  }
+
+  /* ---- bottom strip with palms + punchy line ---- */
+  const stripY = H * 0.905, stripH = H * 0.053;
+  const stripGrad = ctx.createLinearGradient(0, stripY, W, stripY);
+  stripGrad.addColorStop(0, '#4a0e6e');
+  stripGrad.addColorStop(0.5, '#c2185b');
+  stripGrad.addColorStop(1, '#4a0e6e');
+  ctx.fillStyle = stripGrad;
+  ctx.fillRect(0, stripY, W, stripH);
+  ctx.fillStyle = 'rgba(20,4,32,0.85)';
+  drawPalm(ctx, W * 0.03, stripY + stripH * 0.92, stripH * 0.85, 'rgba(20,4,32,0.85)');
+  drawPalm(ctx, W * 0.06, stripY + stripH * 0.95, stripH * 0.7, 'rgba(20,4,32,0.85)');
+  drawPalm(ctx, W * 0.97, stripY + stripH * 0.92, stripH * 0.85, 'rgba(20,4,32,0.85)');
+  drawPalm(ctx, W * 0.94, stripY + stripH * 0.95, stripH * 0.7, 'rgba(20,4,32,0.85)');
+  ctx.fillStyle = '#ffe9c9';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  const stripSize = clamp(W * 0.02, 13, 38);
+  ctx.font = `800 ${stripSize}px "Arial Black", Arial, sans-serif`;
+  try { ctx.letterSpacing = `${Math.max(2, stripSize * 0.18)}px`; } catch (e) { /* older canvas: ignore */ }
+  ctx.fillText(state.strip.toUpperCase(), W / 2, stripY + stripH / 2 + 1);
+  try { ctx.letterSpacing = '0px'; } catch (e) { /* ignore */ }
+
+  /* ---- catalog line + barcode ---- */
+  if (state.showCatalog) {
+    const catSize = clamp(W * 0.008, 8, 15);
+    ctx.fillStyle = '#e8dcc8';
+    ctx.font = `700 ${catSize}px Arial, sans-serif`;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(state.catalog.toUpperCase(), W * 0.012, H * 0.979);
+    const bw = [2, 1, 3, 1, 1, 2, 1, 4, 1, 2, 2, 1, 3, 1, 1, 2, 1, 1, 3, 2, 1, 4, 1, 2];
+    let bx = W * 0.965;
+    const bh = H * 0.028, by = H * 0.965;
+    const totalW = bw.reduce((a, b) => a + b, 0) * (W * 0.0011) + 6;
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(bx - 3, by, totalW, bh);
+    ctx.fillStyle = '#111';
+    for (const wdt of bw) {
+      if (wdt > 1) ctx.fillRect(bx, by + 1, wdt * W * 0.0011, bh - 2);
+      bx += wdt * W * 0.0011 + W * 0.0011;
+    }
+  }
+
+  /* ---- outer frame ---- */
+  ctx.strokeStyle = '#14061f';
+  ctx.lineWidth = Math.max(4, W * 0.005);
+  ctx.strokeRect(0, 0, W, H);
 }
-preview.addEventListener("pointerdown", (ev) => {
-  const p = previewPoint(ev);
-  const key = slotAt(p.x, p.y);
-  if (!key) return;
-  selectSlot(key);
-  drag = { key, x: p.x, y: p.y, moved: false };
-  preview.setPointerCapture(ev.pointerId);
-});
-preview.addEventListener("pointermove", (ev) => {
-  if (!drag) return;
-  const p = previewPoint(ev);
-  const { rects } = layoutRects(preview.width, preview.height);
-  const r = rects[drag.key];
-  const adj = state.adjust[drag.key];
-  adj.px = Math.max(-0.3, Math.min(0.3, adj.px + (p.x - drag.x) / r.w));
-  adj.py = Math.max(-0.3, Math.min(0.3, adj.py + (p.y - drag.y) / r.h));
-  if (Math.abs(p.x - drag.x) + Math.abs(p.y - drag.y) > 2) drag.moved = true;
-  drag.x = p.x; drag.y = p.y;
-  renderAll();
-});
-preview.addEventListener("pointerup", () => { drag = null; });
 
-/* ------------------------------------------------------------------ */
-/* Startup: preload the samples, honour ?variant= / ?size=, render.    */
-/* ------------------------------------------------------------------ */
+/* ================= editor wiring ================= */
 
-function loadImage(sample) {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => { images.set(sample.id, img); resolve(true); };
-    img.onerror = () => resolve(false);
-    img.src = sample.src;
+const coverCanvas = $('cover');
+const shotCanvas = $('shotCover');
+let renderQueued = false;
+
+function requestRender() {
+  if (renderQueued) return;
+  renderQueued = true;
+  requestAnimationFrame(() => {
+    renderQueued = false;
+    render();
   });
 }
 
-let readyResolve = null;
-window.__cover = {
-  ready: new Promise((r) => { readyResolve = r; }),
-  state,
-  get gradeMode() { return gradeMode; },
-  setVariant,
-  setSize,
-  surprise: surpriseCover,
-  exportDataURL() {
-    return new Promise((resolve) => {
-      renderExportCanvas().toBlob((blob) => {
-        if (!blob) { resolve(""); return; }
-        const fr = new FileReader();
-        fr.onload = () => resolve(String(fr.result));
-        fr.readAsDataURL(blob);
-      }, "image/png");
-    });
-  },
-};
-
-async function initCoverMaker() {
-  const params = new URLSearchParams(location.search);
-  const variantNames = { sunset: 0, coast: 1, heat: 2 };
-  const wantVariant = params.get("variant");
-  if (wantVariant && wantVariant in variantNames) setVariant(variantNames[wantVariant]);
-  if (params.get("size")) setSize(params.get("size"));
-  buildSamplesStrip();
-  setSize(state.size.id);
-  setVariant(state.variant);
-  selectSlot("hero");
-  await Promise.all(SAMPLES.map(loadImage));
-  renderAll();
-  if (readyResolve) readyResolve(true);
+function render() {
+  const s = SIZES[state.size];
+  if (coverCanvas.width !== s.w || coverCanvas.height !== s.h) {
+    coverCanvas.width = s.w;
+    coverCanvas.height = s.h;
+  }
+  const ctx = coverCanvas.getContext('2d');
+  drawCover(ctx, s.w, s.h);
+  if (document.body.classList.contains('shot-cover')) {
+    if (shotCanvas.width !== s.w || shotCanvas.height !== s.h) {
+      shotCanvas.width = s.w;
+      shotCanvas.height = s.h;
+    }
+    drawCover(shotCanvas.getContext('2d'), s.w, s.h);
+  }
 }
 
-initCoverMaker();
+function slugify(text) {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'cover';
+}
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+
+function exportCanvas(w, h) {
+  const c = document.createElement('canvas');
+  c.width = w;
+  c.height = h;
+  drawCover(c.getContext('2d'), w, h);
+  return c;
+}
+
+function exportPNG(w, h) {
+  return new Promise((resolve) => {
+    const c = exportCanvas(w, h);
+    c.toBlob((blob) => {
+      const name = `${slugify(state.title)}-${w}x${h}.png`;
+      downloadBlob(blob, name);
+      window.__cover.lastExportBytes = blob ? blob.size : 0;
+      $('status').innerHTML = `<b>saved</b> ${name}`;
+      resolve(blob ? blob.size : 0);
+    }, 'image/png');
+  });
+}
+
+function exportDataURL(w, h) {
+  return new Promise((resolve) => {
+    const c = exportCanvas(w, h);
+    c.toBlob((blob) => {
+      if (!blob) { resolve(''); return; }
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ''));
+      reader.onerror = () => resolve('');
+      reader.readAsDataURL(blob);
+    }, 'image/png');
+  });
+}
+
+async function exportAllSizes() {
+  let total = 0;
+  for (const key of Object.keys(SIZES)) {
+    const s = SIZES[key];
+    total += await exportPNG(s.w, s.h);
+  }
+  $('status').innerHTML = `<b>saved</b> all 3 sizes (${total.toLocaleString()} bytes)`;
+}
+
+/* ---- layout + grade buttons ---- */
+function buildLayoutButtons() {
+  const box = $('layouts');
+  box.innerHTML = '';
+  for (const [key, L] of Object.entries(LAYOUTS)) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'lay' + (key === state.layout ? ' sel' : '');
+    b.dataset.layout = key;
+    const mini = document.createElement('span');
+    mini.className = 'mini';
+    mini.style.position = 'relative';
+    L.rects.forEach((r, i) => {
+      const cell = document.createElement('i');
+      cell.className = i % 2 ? 'alt' : '';
+      cell.style.position = 'absolute';
+      cell.style.left = `${r[0] * 100}%`;
+      cell.style.top = `${(r[1] / 0.86) * 100}%`;
+      cell.style.width = `${r[2] * 100}%`;
+      cell.style.height = `${(r[3] / 0.86) * 100}%`;
+      mini.appendChild(cell);
+    });
+    b.appendChild(mini);
+    b.appendChild(document.createTextNode(L.label));
+    b.addEventListener('click', () => {
+      state.layout = key;
+      state.selected = 0;
+      buildLayoutButtons();
+      syncPanelBar();
+      requestRender();
+    });
+    box.appendChild(b);
+  }
+}
+
+function buildGradeButtons() {
+  const box = $('grades');
+  box.innerHTML = '';
+  for (const [key, g] of Object.entries(GRADES)) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'grade' + (key === state.grade ? ' sel' : '');
+    b.dataset.grade = key;
+    const sw = document.createElement('i');
+    sw.style.background = g.swatch;
+    b.appendChild(sw);
+    b.appendChild(document.createTextNode(g.label));
+    b.addEventListener('click', () => {
+      state.grade = key;
+      buildGradeButtons();
+      requestRender();
+    });
+    box.appendChild(b);
+  }
+}
+
+/* ---- photo thumbnails ---- */
+function buildThumbs() {
+  const box = $('thumbs');
+  box.innerHTML = '';
+  $('photoCount').textContent = `${photos.length} loaded`;
+  photos.forEach((p, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'thumb' + (slots[state.selected] && slots[state.selected].photo === i ? ' sel' : '');
+    b.draggable = true;
+    b.title = p.label;
+    const img = document.createElement('img');
+    img.src = p.img.src;
+    img.alt = p.label;
+    img.draggable = false;
+    const n = document.createElement('span');
+    n.className = 'n';
+    n.textContent = String(i + 1);
+    b.appendChild(img);
+    b.appendChild(n);
+    if (p.uploaded) {
+      const x = document.createElement('span');
+      x.className = 'x';
+      x.textContent = '×';
+      x.title = 'Remove photo';
+      x.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        removePhoto(i);
+      });
+      b.appendChild(x);
+    }
+    b.addEventListener('click', () => {
+      slots[state.selected].photo = i;
+      buildThumbs();
+      syncPanelBar();
+      requestRender();
+    });
+    b.addEventListener('dragstart', (ev) => {
+      ev.dataTransfer.setData('text/photo-index', String(i));
+    });
+    box.appendChild(b);
+  });
+  syncPhotoSelects();
+}
+
+function removePhoto(i) {
+  const removed = photos.splice(i, 1)[0];
+  if (removed && removed.uploaded) URL.revokeObjectURL(removed.img.src);
+  slots.forEach((s) => {
+    if (s.photo === i) s.photo = 0;
+    else if (s.photo > i) s.photo--;
+  });
+  buildThumbs();
+  syncPanelBar();
+  requestRender();
+}
+
+function syncPhotoSelects() {
+  const sel = $('selPhoto');
+  const cur = slots[state.selected] ? slots[state.selected].photo : 0;
+  sel.innerHTML = '';
+  photos.forEach((p, i) => {
+    const o = document.createElement('option');
+    o.value = String(i);
+    o.textContent = `${i + 1}. ${p.label}`;
+    sel.appendChild(o);
+  });
+  sel.value = String(cur);
+  const swap = $('selSwap');
+  swap.innerHTML = '<option value="">—</option>';
+  panelRects().forEach((_, i) => {
+    if (i === state.selected) return;
+    const o = document.createElement('option');
+    o.value = String(i);
+    o.textContent = `Panel ${i + 1}`;
+    swap.appendChild(o);
+  });
+}
+
+/* ---- panel assignment ---- */
+function assignSlots() {
+  const n = photos.length;
+  if (n === 0) return;
+  for (let i = 0; i < 9; i++) {
+    slots[i].photo = i % n;
+    if (n === 1) {
+      slots[i].zoom = 1 + (i % 3) * 0.15;
+      slots[i].dx = ((i % 3) - 1) * 0.12;
+      slots[i].dy = ((i % 2) - 0.5) * 0.08;
+    } else {
+      slots[i].zoom = 1;
+      slots[i].dx = 0;
+      slots[i].dy = 0;
+    }
+  }
+  state.selected = 0;
+  buildThumbs();
+  syncPanelBar();
+  requestRender();
+}
+
+/* ---- panel bar ---- */
+function syncPanelBar() {
+  const count = panelRects().length;
+  state.selected = clamp(state.selected, 0, count - 1);
+  const slot = slots[state.selected];
+  const photo = photos[slot.photo];
+  $('panelTitle').textContent = `PANEL ${state.selected + 1}`;
+  $('panelCount').textContent = `${state.selected + 1} of ${count}`;
+  $('slZoom').value = String(slot.zoom);
+  $('selTheme').value = slot.grade;
+  $('inPlace').value = photo ? photo.place : '';
+  $('inSub').value = photo ? `${photo.time} — ${photo.sub}` : '';
+  syncPhotoSelects();
+  buildThumbs();
+}
+
+/* ---- canvas pointer: select, pan, zoom, drop ---- */
+function canvasPoint(ev) {
+  const r = coverCanvas.getBoundingClientRect();
+  const x = ((ev.clientX - r.left) / r.width) * coverCanvas.width;
+  const y = ((ev.clientY - r.top) / r.height) * coverCanvas.height;
+  return { x, y };
+}
+
+function hitPanel(px, py) {
+  const rects = panelRects();
+  const W = coverCanvas.width, H = coverCanvas.height;
+  for (let i = 0; i < rects.length; i++) {
+    const r = rects[i];
+    if (px >= r.x * W && px <= (r.x + r.w) * W && py >= r.y * H && py <= (r.y + r.h) * H) return i;
+  }
+  return -1;
+}
+
+let drag = null;
+coverCanvas.addEventListener('pointerdown', (ev) => {
+  const p = canvasPoint(ev);
+  const hit = hitPanel(p.x, p.y);
+  if (hit < 0) return;
+  state.selected = hit;
+  syncPanelBar();
+  const slot = slots[hit];
+  drag = { x: p.x, y: p.y, dx: slot.dx, dy: slot.dy };
+  coverCanvas.setPointerCapture(ev.pointerId);
+});
+coverCanvas.addEventListener('pointermove', (ev) => {
+  if (!drag) return;
+  const p = canvasPoint(ev);
+  const rects = panelRects();
+  const r = rects[state.selected];
+  const slot = slots[state.selected];
+  slot.dx = clamp(drag.dx + (p.x - drag.x) / (r.w * coverCanvas.width), -0.6, 0.6);
+  slot.dy = clamp(drag.dy + (p.y - drag.y) / (r.h * coverCanvas.height), -0.6, 0.6);
+  requestRender();
+});
+coverCanvas.addEventListener('pointerup', () => { drag = null; });
+coverCanvas.addEventListener('wheel', (ev) => {
+  ev.preventDefault();
+  const p = canvasPoint(ev);
+  const hit = hitPanel(p.x, p.y);
+  const idx = hit < 0 ? state.selected : hit;
+  if (hit >= 0) { state.selected = hit; syncPanelBar(); }
+  const slot = slots[idx];
+  slot.zoom = clamp(slot.zoom * Math.exp(-ev.deltaY * 0.0012), 1, 2.2);
+  $('slZoom').value = String(slot.zoom);
+  requestRender();
+}, { passive: false });
+coverCanvas.addEventListener('dblclick', (ev) => {
+  const p = canvasPoint(ev);
+  const hit = hitPanel(p.x, p.y);
+  if (hit < 0) return;
+  slots[hit].zoom = 1;
+  slots[hit].dx = 0;
+  slots[hit].dy = 0;
+  $('slZoom').value = '1';
+  requestRender();
+});
+coverCanvas.addEventListener('dragover', (ev) => ev.preventDefault());
+coverCanvas.addEventListener('drop', (ev) => {
+  ev.preventDefault();
+  const idx = ev.dataTransfer.getData('text/photo-index');
+  if (idx === '') return;
+  const p = canvasPoint(ev);
+  const hit = hitPanel(p.x, p.y);
+  if (hit < 0) return;
+  slots[hit].photo = Number(idx);
+  state.selected = hit;
+  buildThumbs();
+  syncPanelBar();
+  requestRender();
+});
+
+/* ---- uploads ---- */
+function addPhotoFiles(files) {
+  let added = 0;
+  for (const file of files) {
+    if (!file.type.startsWith('image/')) continue;
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      photos.push({
+        id: `up${Date.now()}_${added}`,
+        label: 'NEW SPOT',
+        file: url,
+        img,
+        focus: { fx: 0.5, fy: 0.5 },
+        place: 'NEW SPOT',
+        time: '—',
+        sub: 'YOUR SHOT',
+        uploaded: true,
+      });
+      window.__cover.total = photos.length;
+      window.__cover.loaded = photos.length;
+      buildThumbs();
+      requestRender();
+    };
+    img.src = url;
+    added++;
+  }
+  if (added > 0) $('status').textContent = `Added ${added} photo${added > 1 ? 's' : ''} — photos stay on this machine.`;
+}
+
+$('fileInput').addEventListener('change', (ev) => {
+  addPhotoFiles(ev.target.files);
+  ev.target.value = '';
+});
+$('addPhotosBtn').addEventListener('click', () => $('fileInput').click());
+document.addEventListener('dragover', (ev) => {
+  ev.preventDefault();
+  document.body.classList.add('dropzone');
+});
+document.addEventListener('dragleave', (ev) => {
+  if (ev.target === document.body) document.body.classList.remove('dropzone');
+});
+document.addEventListener('drop', (ev) => {
+  ev.preventDefault();
+  document.body.classList.remove('dropzone');
+  if (ev.dataTransfer && ev.dataTransfer.files && ev.dataTransfer.files.length > 0) {
+    addPhotoFiles(ev.dataTransfer.files);
+  }
+});
+
+/* ---- presets, sizes, export buttons ---- */
+function applyPreset(name) {
+  const p = PRESETS[name];
+  if (!p) return;
+  state.preset = name;
+  state.title = p.title;
+  state.tagline = p.tagline;
+  state.kicker = p.kicker;
+  state.strip = p.strip;
+  state.catalog = p.catalog;
+  state.layout = p.layout;
+  state.grade = p.grade;
+  state.size = p.size;
+  $('inTitle').value = p.title;
+  $('inTagline').value = p.tagline;
+  $('inKicker').value = p.kicker;
+  $('inStrip').value = p.strip;
+  document.querySelectorAll('#presets .preset').forEach((b) => b.classList.toggle('sel', b.dataset.preset === name));
+  document.querySelectorAll('#sizes .size').forEach((b) => b.classList.toggle('sel', b.dataset.size === p.size));
+  $('exportBtn').textContent = `⇩ Export PNG ${SIZES[p.size].label}`;
+  buildLayoutButtons();
+  buildGradeButtons();
+  syncPanelBar();
+  requestRender();
+}
+
+document.querySelectorAll('#presets .preset').forEach((b) => {
+  b.addEventListener('click', () => applyPreset(b.dataset.preset));
+});
+document.querySelectorAll('#sizes .size').forEach((b) => {
+  b.addEventListener('click', () => {
+    state.size = b.dataset.size;
+    document.querySelectorAll('#sizes .size').forEach((x) => x.classList.toggle('sel', x === b));
+    $('exportBtn').textContent = `⇩ Export PNG ${SIZES[state.size].label}`;
+    requestRender();
+  });
+});
+$('exportBtn').addEventListener('click', () => {
+  const s = SIZES[state.size];
+  exportPNG(s.w, s.h);
+});
+$('exportAllBtn').addEventListener('click', exportAllSizes);
+$('exportAllBtn2').addEventListener('click', exportAllSizes);
+$('autoFillBtn').addEventListener('click', assignSlots);
+$('spreadBtn').addEventListener('click', assignSlots);
+
+/* ---- grade sliders + toggles ---- */
+function bindSlider(id, outId, fn) {
+  const el = $(id);
+  const out = $(outId);
+  el.addEventListener('input', () => {
+    const v = Number(el.value);
+    out.textContent = v.toFixed(2);
+    fn(v);
+    requestRender();
+  });
+}
+bindSlider('slStrength', 'outStrength', (v) => { state.strength = v; });
+bindSlider('slContrast', 'outContrast', (v) => { state.contrast = v; });
+bindSlider('slSaturation', 'outSaturation', (v) => { state.saturation = v; });
+bindSlider('slGrain', 'outGrain', (v) => { state.grain = v; });
+bindSlider('slVignette', 'outVignette', (v) => { state.vignette = v; });
+$('ckHalftone').addEventListener('change', (ev) => { state.halftone = ev.target.checked; requestRender(); });
+$('ckSpeed').addEventListener('change', (ev) => { state.speedLines = ev.target.checked; requestRender(); });
+
+/* ---- text fields ---- */
+function bindText(id, fn) {
+  $(id).addEventListener('input', (ev) => { fn(ev.target.value); requestRender(); });
+}
+bindText('inTitle', (v) => { state.title = v.toUpperCase(); });
+bindText('inTagline', (v) => { state.tagline = v; });
+bindText('inKicker', (v) => { state.kicker = v; });
+bindText('inStrip', (v) => { state.strip = v; });
+bindText('inBadge', (v) => { state.badge = v; });
+bindText('inVolume', (v) => { state.volume = v; });
+bindText('inRibbon', (v) => { state.ribbon = v; });
+bindText('inHud', (v) => { state.hud = v; });
+$('slStars').addEventListener('input', (ev) => {
+  state.stars = Number(ev.target.value);
+  $('outStars').textContent = String(state.stars);
+  requestRender();
+});
+
+/* ---- stickers toggles ---- */
+const TOGGLES = [
+  ['tgLabels', 'showLabels'], ['tgBadge', 'showBadge'], ['tgVolume', 'showVolume'],
+  ['tgRibbon', 'showRibbon'], ['tgHud', 'showHud'], ['tgCatalog', 'showCatalog'],
+];
+for (const [id, key] of TOGGLES) {
+  $(id).addEventListener('change', (ev) => { state[key] = ev.target.checked; requestRender(); });
+}
+
+/* ---- panel bar fields ---- */
+$('selPhoto').addEventListener('change', (ev) => {
+  slots[state.selected].photo = Number(ev.target.value);
+  buildThumbs();
+  requestRender();
+});
+$('slZoom').addEventListener('input', (ev) => {
+  slots[state.selected].zoom = Number(ev.target.value);
+  requestRender();
+});
+const themeSel = $('selTheme');
+for (const [key, g] of Object.entries(GRADES)) {
+  const o = document.createElement('option');
+  o.value = key;
+  o.textContent = g.label;
+  themeSel.appendChild(o);
+}
+themeSel.addEventListener('change', (ev) => {
+  slots[state.selected].grade = ev.target.value;
+  requestRender();
+});
+$('selSwap').addEventListener('change', (ev) => {
+  if (ev.target.value === '') return;
+  const other = Number(ev.target.value);
+  const a = slots[state.selected], b = slots[other];
+  const tmp = { photo: a.photo, zoom: a.zoom, dx: a.dx, dy: a.dy, grade: a.grade };
+  Object.assign(a, { photo: b.photo, zoom: b.zoom, dx: b.dx, dy: b.dy, grade: b.grade });
+  Object.assign(b, tmp);
+  ev.target.value = '';
+  buildThumbs();
+  syncPanelBar();
+  requestRender();
+});
+$('inPlace').addEventListener('input', (ev) => {
+  const photo = photos[slots[state.selected].photo];
+  if (photo) { photo.place = ev.target.value.toUpperCase(); requestRender(); }
+});
+$('inSub').addEventListener('input', (ev) => {
+  const photo = photos[slots[state.selected].photo];
+  if (!photo) return;
+  const parts = ev.target.value.split('—');
+  if (parts.length >= 2) {
+    photo.time = parts[0].trim();
+    photo.sub = parts.slice(1).join('—').trim().toUpperCase();
+  } else {
+    photo.sub = ev.target.value.toUpperCase();
+  }
+  requestRender();
+});
+$('resetCropBtn').addEventListener('click', () => {
+  const slot = slots[state.selected];
+  slot.zoom = 1;
+  slot.dx = 0;
+  slot.dy = 0;
+  $('slZoom').value = '1';
+  requestRender();
+});
+
+/* ---- init: query params (?shot=cover|editor&preset=sunset|heat|night&size=WxH) ---- */
+async function init() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('shot') === 'cover') document.body.classList.add('shot-cover');
+  await loadSamples();
+  assignSlots();
+  buildLayoutButtons();
+  buildGradeButtons();
+  const preset = params.get('preset');
+  if (preset && PRESETS[preset]) applyPreset(preset);
+  const size = params.get('size');
+  if (size && SIZES[size]) {
+    state.size = size;
+    document.querySelectorAll('#sizes .size').forEach((b) => b.classList.toggle('sel', b.dataset.size === size));
+    $('exportBtn').textContent = `⇩ Export PNG ${SIZES[size].label}`;
+  }
+  syncPanelBar();
+  render();
+  window.__cover.ready = true;
+}
+
+init();
 </script>
 </body>
 </html>

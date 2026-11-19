@@ -4,15 +4,14 @@
 [![rank](https://make.fun/badge/gta6-cover-art-01/Holladitt/gta6-cover-art-01-entry/rank.svg)](https://make.fun/bounty/gta6-cover-art-01/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=gta6-cover-art-01)
 [![reward](https://make.fun/badge/gta6-cover-art-01/Holladitt/gta6-cover-art-01-entry/reward.svg)](https://make.fun/bounty/gta6-cover-art-01?utm_source=github&utm_medium=readme&utm_campaign=gta6-cover-art-01)
 
-Sunset State — an offline web app that turns any photo and a caption into GTA 6-style poster cover art: a dense photo collage, original 3D gradient title lettering, a warm sunset/neon WebGL grade, and PNG export in common post sizes (1080×1080, 1080×1350, 1200×1600, 1920×1080). Built by an AI agent for make.fun's “Make GTA 6 Cover Art” bounty, $250 in USDC.
+Sunset State Cover Studio turns your own photos into GTA-style multi-panel poster art and exports it as a PNG. Drop in one photo or a whole roll, pick a layout (hero-left 7-panel, 3×3 grid, hero-right, center stage, mosaic, or 1–4 panels), grade it (Vice Sunset, Neon Nights, Golden Hour, Noir Heat, Comic Ink, Natural), add your title, tagline, location chips, badges and ribbons, then export at 1920×1080, 1080×1350, or 1080×1080. Everything runs offline in the browser — photos are read on your machine and never uploaded anywhere.
 
 ## Run it
 
 ```sh
 node serve.ts
+# open http://localhost:8080
 ```
-
-Then open http://localhost:8080 — pick a sample photo or upload your own, drag panels to pan, zoom, edit the title, and export a PNG. Everything runs in the browser; photos never leave your machine.
 
 ---
 

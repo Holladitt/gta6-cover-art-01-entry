@@ -1,65 +1,44 @@
-// A tiny static file server for trying app/ locally (Node 22,
-// standard library only): `node serve.ts` puts app/ on
-// http://localhost:8080. It only serves files inside app/, sends the
-// MIME types an offline web app needs, and does nothing else: a
-// development convenience, not a server for the internet.
+// Serves the app/ directory over HTTP for local development.
+// Usage: node serve.ts [--port 8092]   (default port 8080, binds 127.0.0.1)
+import { createServer } from "node:http";
+import { readFile } from "node:fs/promises";
+import { join, extname, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
-import { createReadStream, statSync } from 'node:fs';
-import { createServer } from 'node:http';
-import { extname, join, normalize, resolve, sep } from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-const root = resolve(fileURLToPath(new URL('./app', import.meta.url)));
+const here = dirname(fileURLToPath(import.meta.url));
+const root = join(here, "app");
 const args = process.argv.slice(2);
-const portIndex = args.indexOf('--port');
+const portIndex = args.indexOf("--port");
 const requested = portIndex === -1 ? 8080 : Number(args[portIndex + 1]);
 const port = Number.isInteger(requested) && requested > 0 && requested < 65536 ? requested : 8080;
 
-const MIME = {
-  '.html': 'text/html; charset=utf-8',
-  '.js': 'text/javascript; charset=utf-8',
-  '.mjs': 'text/javascript; charset=utf-8',
-  '.css': 'text/css; charset=utf-8',
-  '.json': 'application/json; charset=utf-8',
-  '.png': 'image/png',
-  '.jpg': 'image/jpeg',
-  '.jpeg': 'image/jpeg',
-  '.gif': 'image/gif',
-  '.webp': 'image/webp',
-  '.svg': 'image/svg+xml',
-  '.ico': 'image/x-icon',
+const types = {
+  ".html": "text/html",
+  ".css": "text/css",
+  ".js": "text/javascript",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".png": "image/png",
+  ".svg": "image/svg+xml",
+  ".json": "application/json",
 };
 
-createServer((request, response) => {
-  const url = new URL(request.url ?? '/', 'http://localhost');
-  let pathname;
+createServer(async (req, res) => {
+  const path = decodeURIComponent(new URL(req.url, "http://localhost").pathname);
+  const file = join(root, path === "/" ? "index.html" : path);
+  if (!file.startsWith(root)) {
+    res.writeHead(403);
+    res.end();
+    return;
+  }
   try {
-    pathname = decodeURIComponent(url.pathname);
+    const data = await readFile(file);
+    res.writeHead(200, { "content-type": types[extname(file)] || "application/octet-stream" });
+    res.end(data);
   } catch {
-    response.writeHead(400).end('bad request');
-    return;
+    res.writeHead(404);
+    res.end("not found");
   }
-  if (pathname.endsWith('/')) pathname += 'index.html';
-  const file = resolve(join(root, normalize(pathname)));
-  if (file !== root && !file.startsWith(root + sep)) {
-    response.writeHead(403).end('forbidden');
-    return;
-  }
-  let size;
-  try {
-    const stats = statSync(file);
-    if (!stats.isFile()) throw new Error('not a file');
-    size = stats.size;
-  } catch {
-    response.writeHead(404).end('not found');
-    return;
-  }
-  response.writeHead(200, {
-    'content-type': MIME[extname(file).toLowerCase()] ?? 'application/octet-stream',
-    'content-length': size,
-    'cache-control': 'no-store',
-  });
-  createReadStream(file).pipe(response);
-}).listen(port, '127.0.0.1', () => {
+}).listen(port, "127.0.0.1", () => {
   console.log(`app/ is on http://localhost:${port}`);
 });

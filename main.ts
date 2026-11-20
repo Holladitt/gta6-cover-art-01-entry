@@ -1,61 +1,59 @@
-// Sunset State entrypoint: hand the app in to the grader's output directory.
+// Sunset State (gta6-cover-art-01, v9): the entrypoint.
+// It hands the app in: copies this repository's app/ and screenshots/ into the
+// grader's output directory and writes /output/dossier.json with the vendored
+// make.fun library. It never writes anything inside this repository itself.
 //
-// Writes ONLY to the output directory (MAKEFUN_OUTPUT_DIR, else /output).
-// It never creates, writes or copies anything inside the repository itself:
-// the grader runs this in a read-only checkout, so any write under the repo
-// would fail the run. The output directory is cleared of a stale handover
-// first, so two runs write the same bytes.
-import { buildDossier } from "./vendor/makefun-app.ts";
-import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { dirname, join, relative, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+//   MAKEFUN_OUTPUT_DIR=/tmp/sunset-out node main.ts
+//
+// Outside the grader MAKEFUN_OUTPUT_DIR stands in for /output. If the output
+// directory ever resolves inside this repository, the run refuses loudly
+// instead of writing there: the grader runs this repository read-only, so a
+// write under it would fail the run anyway.
 
-const repoRoot = dirname(fileURLToPath(import.meta.url));
-const outDir = resolve(process.env.MAKEFUN_OUTPUT_DIR || "/output");
+import { cpSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { join, resolve, sep } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { buildDossier } from './vendor/makefun-app.ts';
 
-// Safety net for the round-6 fix: the output directory must never live inside
-// the repository itself. The grader runs the repo read-only, so a write under
-// it would crash the run; refuse loudly instead of ever writing there.
-const relToRepo = relative(repoRoot, outDir);
-if (relToRepo === "" || (!relToRepo.startsWith("..") && !relToRepo.startsWith("/"))) {
-  throw new Error("MAKEFUN_OUTPUT_DIR must be outside the repository, got: " + outDir);
-}
+const repoRoot = resolve(fileURLToPath(new URL('.', import.meta.url)));
+const outDir = resolve(process.env.MAKEFUN_OUTPUT_DIR ?? '/output');
 
-function countFiles(dir: string): number {
-  let n = 0;
-  for (const e of readdirSync(dir, { withFileTypes: true })) {
-    n += e.isDirectory() ? countFiles(join(dir, e.name)) : 1;
-  }
-  return n;
+if (outDir === repoRoot || outDir.startsWith(repoRoot + sep)) {
+  console.error('REFUSING: output directory ' + outDir + ' is inside the repository ' + repoRoot);
+  console.error('Set MAKEFUN_OUTPUT_DIR to a directory outside the repository (the grader uses /output).');
+  process.exit(1);
 }
 
 mkdirSync(outDir, { recursive: true });
-// Clear a stale handover from an earlier run in this output directory.
-for (const name of ["app", "screenshots", "dossier.json"]) {
-  const p = join(outDir, name);
-  if (existsSync(p)) rmSync(p, { recursive: true, force: true });
+
+// Clear only the three entries this program owns, so a stale local run can
+// never leak an old cover, screenshot or dossier into a fresh output.
+for (const owned of ['app', 'screenshots', 'dossier.json']) {
+  const target = join(outDir, owned);
+  if (existsSync(target)) rmSync(target, { recursive: true, force: true });
 }
 
-cpSync(join(repoRoot, "app"), join(outDir, "app"), { recursive: true });
-cpSync(join(repoRoot, "screenshots"), join(outDir, "screenshots"), { recursive: true });
-
-const dossier = buildDossier(outDir, {
-  text_max_bytes: 163840,
-  screenshots: { max: 4, max_bytes: 262144 },
-  app_max_files: 993,
-  app_max_bytes: 50331648,
-});
-writeFileSync(join(outDir, "dossier.json"), dossier);
-// Self-check: the dossier must round-trip with its 4 screenshots and source
-// outline, otherwise the handover is corrupt.
-const parsed = JSON.parse(readFileSync(join(outDir, "dossier.json"), "utf8"));
-if (!Array.isArray(parsed.images) || parsed.images.length !== 4) {
-  throw new Error("dossier.json does not list 4 screenshots");
+cpSync(join(repoRoot, 'app'), join(outDir, 'app'), { recursive: true });
+if (existsSync(join(repoRoot, 'screenshots'))) {
+  cpSync(join(repoRoot, 'screenshots'), join(outDir, 'screenshots'), { recursive: true });
 }
-if (typeof parsed.text !== "string" || parsed.text.length === 0) {
-  throw new Error("dossier.json has no source outline");
-}
-console.log(`dossier.json: ${dossier.length} bytes, ${parsed.images.length} screenshots, outline ${parsed.text.length} chars`);
 
-const entries = countFiles(join(outDir, "app")) + countFiles(join(outDir, "screenshots")) + 1;
-console.log(`handed in ${entries} entries`);
+// The scorer's own caps: only text_max_bytes shapes the bytes; the others
+// refuse an entry the scorer would refuse (more than 4 screenshots or one
+// over 256 KiB; more than 993 files in app/ or 48 MiB of app files in all,
+// or a path under app/ over 1000 bytes).
+writeFileSync(
+  join(outDir, 'dossier.json'),
+  buildDossier(outDir, {
+    text_max_bytes: 163840,
+    screenshots: { max: 4, max_bytes: 262144 },
+    app_max_files: 993,
+    app_max_bytes: 50331648,
+    app_path_max_bytes: 1000,
+  }),
+);
+
+console.log('Sunset State handed in:');
+console.log('  app/         -> ' + join(outDir, 'app'));
+console.log('  screenshots/ -> ' + join(outDir, 'screenshots'));
+console.log('  dossier.json -> ' + join(outDir, 'dossier.json'));

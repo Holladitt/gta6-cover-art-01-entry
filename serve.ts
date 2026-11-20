@@ -1,38 +1,31 @@
-// Sunset State — tiny offline dev server for app/ (Node 22, no dependencies).
-// Serves the studio at http://localhost:8095 so it can be opened in a browser.
+// Tiny static server for local development: serves app/ on http://localhost:8080.
+// Serves files only; it never writes anything.
 import { createServer } from "node:http";
-import { createReadStream, existsSync, statSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { dirname, extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), "app");
-const PORT = Number(process.env.PORT || 8095);
-const TYPES: Record<string, string> = {
-  ".html": "text/html; charset=utf-8",
-  ".js": "text/javascript; charset=utf-8",
-  ".mjs": "text/javascript; charset=utf-8",
-  ".css": "text/css; charset=utf-8",
-  ".json": "application/json; charset=utf-8",
+const root = join(dirname(fileURLToPath(import.meta.url)), "app");
+const types: Record<string, string> = {
+  ".html": "text/html",
+  ".js": "text/javascript",
+  ".mjs": "text/javascript",
+  ".css": "text/css",
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
   ".png": "image/png",
-  ".svg": "image/svg+xml",
-  ".webp": "image/webp",
+  ".json": "application/json",
 };
+const port = Number(process.env.PORT || 8080);
 
-const server = createServer((req, res) => {
-  const raw = decodeURIComponent(new URL(req.url || "/", "http://localhost").pathname);
-  const rel = raw === "/" ? "index.html" : raw.replace(/^\/+/, "");
-  const file = join(ROOT, rel);
-  if (!file.startsWith(ROOT) || !existsSync(file) || !statSync(file).isFile()) {
-    res.writeHead(404, { "content-type": "text/plain" });
-    res.end("not found\n");
+createServer((req, res) => {
+  const path = decodeURIComponent(new URL(req.url || "/", "http://x").pathname);
+  const file = join(root, path === "/" ? "index.html" : path);
+  if (!file.startsWith(root) || !existsSync(file) || !statSync(file).isFile()) {
+    res.writeHead(404);
+    res.end("not found");
     return;
   }
-  res.writeHead(200, { "content-type": TYPES[extname(file)] || "application/octet-stream" });
-  createReadStream(file).pipe(res);
-});
-
-server.listen(PORT, () => {
-  console.log(`Sunset State studio at http://localhost:${PORT}/ (serving ${ROOT})`);
-});
+  res.writeHead(200, { "content-type": types[extname(file)] || "application/octet-stream" });
+  res.end(readFileSync(file));
+}).listen(port, () => console.log(`serving app/ at http://localhost:${port}`));

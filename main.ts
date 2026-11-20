@@ -1,61 +1,61 @@
-// Sunset State — entrypoint (Node 22, no build step).
-// Hands the working app and its screenshots to the output directory and
-// writes the dossier the scorer compares against buildDossier's own output.
-import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+// Sunset State entrypoint: hand the app in to the grader's output directory.
+//
+// Writes ONLY to the output directory (MAKEFUN_OUTPUT_DIR, else /output).
+// It never creates, writes or copies anything inside the repository itself:
+// the grader runs this in a read-only checkout, so any write under the repo
+// would fail the run. The output directory is cleared of a stale handover
+// first, so two runs write the same bytes.
 import { buildDossier } from "./vendor/makefun-app.ts";
+import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { dirname, join, relative, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const HERE = dirname(fileURLToPath(import.meta.url));
-const CAPS = {
+const repoRoot = dirname(fileURLToPath(import.meta.url));
+const outDir = resolve(process.env.MAKEFUN_OUTPUT_DIR || "/output");
+
+// Safety net for the round-6 fix: the output directory must never live inside
+// the repository itself. The grader runs the repo read-only, so a write under
+// it would crash the run; refuse loudly instead of ever writing there.
+const relToRepo = relative(repoRoot, outDir);
+if (relToRepo === "" || (!relToRepo.startsWith("..") && !relToRepo.startsWith("/"))) {
+  throw new Error("MAKEFUN_OUTPUT_DIR must be outside the repository, got: " + outDir);
+}
+
+function countFiles(dir: string): number {
+  let n = 0;
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    n += e.isDirectory() ? countFiles(join(dir, e.name)) : 1;
+  }
+  return n;
+}
+
+mkdirSync(outDir, { recursive: true });
+// Clear a stale handover from an earlier run in this output directory.
+for (const name of ["app", "screenshots", "dossier.json"]) {
+  const p = join(outDir, name);
+  if (existsSync(p)) rmSync(p, { recursive: true, force: true });
+}
+
+cpSync(join(repoRoot, "app"), join(outDir, "app"), { recursive: true });
+cpSync(join(repoRoot, "screenshots"), join(outDir, "screenshots"), { recursive: true });
+
+const dossier = buildDossier(outDir, {
   text_max_bytes: 163840,
   screenshots: { max: 4, max_bytes: 262144 },
   app_max_files: 993,
   app_max_bytes: 50331648,
-};
+});
+writeFileSync(join(outDir, "dossier.json"), dossier);
+// Self-check: the dossier must round-trip with its 4 screenshots and source
+// outline, otherwise the handover is corrupt.
+const parsed = JSON.parse(readFileSync(join(outDir, "dossier.json"), "utf8"));
+if (!Array.isArray(parsed.images) || parsed.images.length !== 4) {
+  throw new Error("dossier.json does not list 4 screenshots");
+}
+if (typeof parsed.text !== "string" || parsed.text.length === 0) {
+  throw new Error("dossier.json has no source outline");
+}
+console.log(`dossier.json: ${dossier.length} bytes, ${parsed.images.length} screenshots, outline ${parsed.text.length} chars`);
 
-function writableDir(path: string): boolean {
-  try { mkdirSync(path, { recursive: true }); return true; } catch { return false; }
-}
-function countEntries(dir: string): number {
-  let n = 0;
-  for (const name of readdirSync(dir)) {
-    const p = join(dir, name);
-    n += 1;
-    if (statSync(p).isDirectory()) n += countEntries(p);
-  }
-  return n;
-}
-function handIn(target: string): { entries: number; shots: number; dossierBytes: number } {
-  mkdirSync(target, { recursive: true });
-  for (const sub of ["app", "screenshots"]) {
-    const src = join(HERE, sub);
-    const dst = join(target, sub);
-    if (existsSync(dst)) cpSync(src, dst, { recursive: true, force: true });
-    else cpSync(src, dst, { recursive: true });
-  }
-  const dossier = buildDossier(target, CAPS);
-  writeFileSync(join(target, "dossier.json"), dossier);
-  /* The scorer requires dossier.json to equal a fresh buildDossier run over
-     the same directory — verify the round-trip here instead of at submit. */
-  const written = readFileSync(join(target, "dossier.json"));
-  if (!written.equals(buildDossier(target, CAPS)))
-    throw new Error(`dossier.json round-trip mismatch in ${target}`);
-  const shots = readdirSync(join(target, "screenshots"))
-    .filter((f) => /\.(png|jpe?g)$/i.test(f));
-  return { entries: countEntries(target), shots: shots.length, dossierBytes: written.length };
-}
-function selfCheck(target: string, shots: number): void {
-  if (!existsSync(join(target, "dossier.json"))) throw new Error(`dossier.json missing in ${target}`);
-  if (!existsSync(join(target, "app", "index.html"))) throw new Error(`app/index.html missing in ${target}`);
-  if (shots < 3 || shots > 4) throw new Error(`expected 3-4 screenshots, found ${shots}`);
-}
-
-const primary = writableDir("/output") ? "/output" : join(HERE, "out");
-const result = handIn(primary);
-selfCheck(primary, result.shots);
-if (resolve(primary) !== resolve(join(HERE, "out"))) {
-  const mirror = handIn(join(HERE, "out"));
-  selfCheck(join(HERE, "out"), mirror.shots);
-}
-console.log(`handed in ${result.entries} entries (${result.shots} screenshots) to ${primary}`);
+const entries = countFiles(join(outDir, "app")) + countFiles(join(outDir, "screenshots")) + 1;
+console.log(`handed in ${entries} entries`);

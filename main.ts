@@ -1,47 +1,61 @@
-// Sunset State — entry hand-in (Node 22, standard library only).
-// Takes the finished app and its screenshots from beside this file,
-// places them in the grader's output directory, and writes the dossier
-// the judge reads, using the vendored make.fun library.
-//
-// Local check: mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
-
-import { cpSync, existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+// Sunset State — entrypoint (Node 22, no build step).
+// Hands the working app and its screenshots to the output directory and
+// writes the dossier the scorer compares against buildDossier's own output.
+import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildDossier } from "./vendor/makefun-app.ts";
 
-const repoRoot = dirname(fileURLToPath(import.meta.url));
-const destDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
-
-// Caps from the scorer's gate: the text budget shapes the bytes, and the
-// rest refuse an entry the scorer would refuse (more than 4 screenshots or
-// one over 256 KiB; more than 993 files or 48 MiB under app/; any app path
-// over 1000 bytes).
-const dossierLimits = {
+const HERE = dirname(fileURLToPath(import.meta.url));
+const CAPS = {
   text_max_bytes: 163840,
   screenshots: { max: 4, max_bytes: 262144 },
   app_max_files: 993,
   app_max_bytes: 50331648,
-  app_path_max_bytes: 1000,
 };
 
-mkdirSync(destDir, { recursive: true });
-cpSync(join(repoRoot, "app"), join(destDir, "app"), { recursive: true });
-
-const shotTarget = join(destDir, "screenshots");
-mkdirSync(shotTarget, { recursive: true });
-if (existsSync(join(repoRoot, "screenshots"))) {
-  cpSync(join(repoRoot, "screenshots"), shotTarget, { recursive: true });
+function writableDir(path: string): boolean {
+  try { mkdirSync(path, { recursive: true }); return true; } catch { return false; }
+}
+function countEntries(dir: string): number {
+  let n = 0;
+  for (const name of readdirSync(dir)) {
+    const p = join(dir, name);
+    n += 1;
+    if (statSync(p).isDirectory()) n += countEntries(p);
+  }
+  return n;
+}
+function handIn(target: string): { entries: number; shots: number; dossierBytes: number } {
+  mkdirSync(target, { recursive: true });
+  for (const sub of ["app", "screenshots"]) {
+    const src = join(HERE, sub);
+    const dst = join(target, sub);
+    if (existsSync(dst)) cpSync(src, dst, { recursive: true, force: true });
+    else cpSync(src, dst, { recursive: true });
+  }
+  const dossier = buildDossier(target, CAPS);
+  writeFileSync(join(target, "dossier.json"), dossier);
+  /* The scorer requires dossier.json to equal a fresh buildDossier run over
+     the same directory — verify the round-trip here instead of at submit. */
+  const written = readFileSync(join(target, "dossier.json"));
+  if (!written.equals(buildDossier(target, CAPS)))
+    throw new Error(`dossier.json round-trip mismatch in ${target}`);
+  const shots = readdirSync(join(target, "screenshots"))
+    .filter((f) => /\.(png|jpe?g)$/i.test(f));
+  return { entries: countEntries(target), shots: shots.length, dossierBytes: written.length };
+}
+function selfCheck(target: string, shots: number): void {
+  if (!existsSync(join(target, "dossier.json"))) throw new Error(`dossier.json missing in ${target}`);
+  if (!existsSync(join(target, "app", "index.html"))) throw new Error(`app/index.html missing in ${target}`);
+  if (shots < 3 || shots > 4) throw new Error(`expected 3-4 screenshots, found ${shots}`);
 }
 
-writeFileSync(join(destDir, "dossier.json"), buildDossier(destDir, dossierLimits));
-
-// Self-check: confirm the hand-in actually landed before reporting success.
-const handedIn = readdirSync(destDir, { recursive: true });
-const shotCount = existsSync(shotTarget)
-  ? readdirSync(shotTarget).filter((f) => /\.(png|jpe?g)$/i.test(f)).length
-  : 0;
-if (!existsSync(join(destDir, "dossier.json")) || shotCount === 0) {
-  throw new Error("hand-in incomplete: dossier.json or screenshots missing from " + destDir);
+const primary = writableDir("/output") ? "/output" : join(HERE, "out");
+const result = handIn(primary);
+selfCheck(primary, result.shots);
+if (resolve(primary) !== resolve(join(HERE, "out"))) {
+  const mirror = handIn(join(HERE, "out"));
+  selfCheck(join(HERE, "out"), mirror.shots);
 }
-console.log(`handed in ${handedIn.length} entries (${shotCount} screenshots) to ${destDir}`);
+console.log(`handed in ${result.entries} entries (${result.shots} screenshots) to ${primary}`);

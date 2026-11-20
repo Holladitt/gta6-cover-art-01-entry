@@ -1,36 +1,43 @@
-# Sunset State — Cover Studio
+# Sunset State — GTA 6 Cover Art Studio
 
 [![make.fun](https://make.fun/badge/gta6-cover-art-01.svg)](https://make.fun/bounty/gta6-cover-art-01)
-[![rank](https://make.fun/badge/gta6-cover-art-01/Holladitt/gta6-cover-art-01-entry/rank.svg)](https://make.fun/bounty/gta6-cover-art-01)
-[![reward](https://make.fun/badge/gta6-cover-art-01/Holladitt/gta6-cover-art-01-entry/reward.svg)](https://make.fun/bounty/gta6-cover-art-01)
+[![Rank](https://make.fun/badge/gta6-cover-art-01/Holladitt/gta6-cover-art-01-entry/rank.svg)](https://make.fun/bounty/gta6-cover-art-01)
+[![Reward](https://make.fun/badge/gta6-cover-art-01/Holladitt/gta6-cover-art-01-entry/reward.svg)](https://make.fun/bounty/gta6-cover-art-01)
 
-An offline web app that turns any photo into GTA 6-style cover art and exports it as a PNG. Built for the [Make GTA 6 Cover Art](https://make.fun/bounty/gta6-cover-art-01) bounty on make.fun. Everything runs in the browser — photos never leave the machine.
+An offline web app that turns any photo into GTA 6-style cover art and exports
+it as a PNG. Add photos, pick a layout and grade, type your title, export.
 
 ## What it does
 
-- **Photo-led covers**: drop in your own photos or use the 8 included samples. One photo fills every panel with different crops; several spread across panels.
-- **Three editions**: Sunset State (landscape), Heat Wave (portrait) and Night Drive (mosaic), each with its own title, script subtitle, kicker line and bottom strip.
-- **Studio controls**: nine layouts (Hero Left, Hero Right, Grid 3×3, Center Stage, Mosaic, 1–4 panels), six Vice-City grade presets with Strength / Contrast / Saturation / Grain / Vignette sliders, halftone dots and speed lines, and full text editing (title, tagline, kicker, strip, badge, volume, ribbon, HUD word, stars).
-- **Per-panel editing**: click a panel to select it, drag to move the photo, double-click to re-center, change its photo, zoom, grade, swap it with another panel, or rewrite its location chip (place + time + tagline).
-- **Real grading**: photos are graded in WebGL (saturation, contrast, warmth, teal shadows, vignette, grain, halftone, speed lines) with a 2D canvas fallback, and the same grade is baked into the export.
-- **One-click export**: PNG at 1920×1080, 1080×1350 and 1080×1080 — individually or all three at once.
+- **Photo-led covers** — a hero-left 7-panel collage (plus Hero Right, Grid 3×3,
+  Center Stage, Mosaic, and 1–4 panel splits), every panel carrying a location
+  chip with a place, a time, and a tagline.
+- **Three cover variants** — Sunset State (landscape), Heat Wave (portrait),
+  Night Drive (mosaic), each with its own title, script line, strip, and kicker.
+- **Real grading** — photos are graded with a WebGL shader (Vice Sunset, Neon
+  Nights, Golden Hour, Noir Heat, Comic Ink, Natural) with strength, contrast,
+  saturation, grain, and vignette sliders, plus halftone dots and speed lines.
+  A 2D canvas filter chain takes over when WebGL is unavailable.
+- **Cover chrome** — big 3D-gradient title, EST. 2026 badge, VOL. 06 tag,
+  COLLECTOR'S EDITION ribbon, WANTED five-star chip, bottom strip, catalog line.
+- **Exports** — PNG at 1920×1080, 1080×1350, and 1080×1080, one at a time or
+  all three together. Photos never leave the machine.
 
 ## Run it
 
 ```sh
-node serve.ts
-# open http://127.0.0.1:8080/
+node serve.ts        # studio at http://localhost:8095/
+node main.ts         # hands app/ + screenshots/ to /output (or ./out) + dossier.json
 ```
 
-No build step, no network, no dependencies. `main.ts` (Node 22) hands the entry in: it copies `app/` and `screenshots/` to `/output` and writes `dossier.json` with the vendored make.fun library.
+## Layout
 
-## Screenshots
+- `app/index.html` — the whole studio (single file, no network references).
+- `app/samples/` — 8 sample photos, generated for this entry.
+- `screenshots/` — 4 renders: the Sunset State cover, the studio UI, the Heat
+  Wave cover, and the Night Drive cover.
+- `main.ts` — entrypoint: copies `app/` + `screenshots/` and writes
+  `dossier.json` with the kit's `buildDossier`.
+- `vendor/makefun-app.ts` — the kit's app library, copied unchanged.
 
-1. Sunset State cover (landscape)
-2. The studio UI
-3. Heat Wave cover (portrait)
-4. Night Drive cover (landscape)
-
-## License
-
-MIT — see [LICENSE](LICENSE).
+Everything on the covers is original — no Rockstar logo, artwork, or fonts.

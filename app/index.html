@@ -1,1062 +1,1197 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sunset State — Cover Studio</title>
+<title>Sunset State — GTA 6 Cover Art Studio</title>
 <style>
   :root{
-    --ink:#f4eefc; --ink-dim:#b9a8d6; --ink-faint:#7d6b9e;
-    --bg:#14092b; --bg-soft:#1d0f38; --panel:#221244; --panel-2:#2a1750;
-    --line:#3a2364; --line-soft:#2c1a4e;
-    --pink:#ff2e88; --pink-soft:#ff7ab8; --amber:#ffb020; --cyan:#22d3ee;
-    --violet:#8b5cf6; --good:#34d399;
-    --radius:14px; --radius-sm:9px;
+    --ink:#f5eefc; --ink-dim:#c9b8e0; --ink-faint:#8f7bb0;
+    --bg:#14082a; --bg2:#1d0d38; --panel:#241040; --panel2:#2c1250;
+    --line:#3d2066; --line-soft:#341a56;
+    --pink:#ff4fa3; --pink2:#ff7ab8; --orange:#ff8a2a; --gold:#ffc93c;
+    --teal:#22d3ee; --violet:#a855f7; --lime:#a3e635;
+    --radius:14px; --shadow:0 10px 30px rgba(0,0,0,.45);
   }
-  *{box-sizing:border-box; margin:0; padding:0}
-  html,body{height:100%}
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
   body{
-    background:radial-gradient(1200px 700px at 70% -10%, #3b1a6e 0%, var(--bg) 55%) fixed, var(--bg);
-    color:var(--ink); font:14px/1.45 "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
-    overflow:hidden;
+    background:radial-gradient(1200px 700px at 70% -10%, #3b1470 0%, var(--bg) 55%) fixed, var(--bg);
+    color:var(--ink); font:15px/1.45 "Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+    min-height:100vh;
   }
-  button{font:inherit; color:inherit; background:none; border:0; cursor:pointer}
-  input,select{font:inherit; color:var(--ink)}
-  ::-webkit-scrollbar{width:9px; height:9px}
-  ::-webkit-scrollbar-thumb{background:#3a2364; border-radius:6px}
-  ::-webkit-scrollbar-track{background:transparent}
+  button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+  input,select{font:inherit;color:var(--ink)}
+  ::selection{background:var(--pink);color:#fff}
 
-  /* ---------- shell ---------- */
-  .studio{display:grid; grid-template-rows:56px 1fr 118px; height:100vh}
-  .topbar{
-    display:flex; align-items:center; gap:18px; padding:0 16px;
-    background:linear-gradient(180deg,#241147,#1a0c33); border-bottom:1px solid var(--line);
+  /* ---------- top bar ---------- */
+  .masthead{
+    display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+    padding:12px 20px;border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,rgba(59,20,112,.55),rgba(20,8,42,.2));
+    position:sticky;top:0;z-index:30;backdrop-filter:blur(6px);
   }
-  .brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.4px; white-space:nowrap}
-  .brand .mark{
-    width:30px; height:30px; border-radius:9px; display:grid; place-items:center;
-    background:linear-gradient(135deg,var(--pink),#ff7a18); font-size:13px; font-weight:900; color:#fff;
-    box-shadow:0 0 0 2px rgba(255,46,136,.35), 0 4px 14px rgba(255,46,136,.4);
+  .brand{display:flex;align-items:center;gap:10px;min-width:0}
+  .brand .monogram{
+    width:38px;height:38px;border-radius:11px;flex:0 0 auto;display:grid;place-items:center;
+    font-weight:900;font-size:17px;letter-spacing:.02em;color:#fff;
+    background:linear-gradient(135deg,var(--pink),var(--orange));
+    box-shadow:0 4px 14px rgba(255,79,163,.5);
   }
-  .brand small{display:block; font-size:10px; font-weight:600; letter-spacing:2.5px; color:var(--ink-dim); text-transform:uppercase}
-  .brand b{color:var(--pink-soft)}
-  .steps{display:flex; gap:8px; margin-left:8px}
+  .brand .name{font-weight:900;font-size:17px;letter-spacing:.06em;white-space:nowrap}
+  .brand .name em{font-style:normal;color:var(--pink2)}
+  .brand .sub{font-size:11px;letter-spacing:.28em;color:var(--ink-dim);text-transform:uppercase}
+  .steps{display:flex;gap:8px;flex-wrap:wrap;margin-left:6px}
   .steps span{
-    font-size:12px; color:var(--ink-dim); background:var(--panel); border:1px solid var(--line-soft);
-    padding:6px 10px; border-radius:99px; white-space:nowrap;
+    font-size:12px;color:var(--ink-dim);border:1px solid var(--line);
+    padding:5px 10px;border-radius:999px;background:rgba(255,255,255,.03);white-space:nowrap;
   }
-  .steps b{display:inline-grid; place-items:center; width:17px; height:17px; margin-right:6px;
-    border-radius:50%; background:var(--pink); color:#fff; font-size:11px; vertical-align:1px}
-  .topbar .spacer{flex:1}
+  .steps b{display:inline-grid;place-items:center;width:17px;height:17px;border-radius:50%;
+    background:var(--pink);color:#fff;font-size:11px;margin-right:5px}
+  .masthead .spacer{flex:1}
   .btn{
-    padding:9px 14px; border-radius:10px; font-weight:700; font-size:13px; white-space:nowrap;
-    background:linear-gradient(135deg,#ff2e88,#ff7a18); color:#fff;
-    box-shadow:0 4px 16px rgba(255,46,136,.35);
+    padding:9px 16px;border-radius:999px;font-weight:700;font-size:14px;
+    border:1px solid var(--line);background:rgba(255,255,255,.05);transition:.15s;
   }
-  .btn:hover{filter:brightness(1.12)}
-  .btn.ghost{background:var(--panel); color:var(--ink); border:1px solid var(--line); box-shadow:none}
-  .btn.ghost:hover{border-color:var(--pink)}
+  .btn:hover{border-color:var(--pink);transform:translateY(-1px)}
+  .btn.hot{background:linear-gradient(135deg,var(--pink),var(--orange));border-color:transparent;color:#fff;
+    box-shadow:0 6px 18px rgba(255,79,163,.4)}
+  .btn.hot:hover{filter:brightness(1.08)}
 
-  .workbench{display:grid; grid-template-columns:218px 1fr 288px; gap:12px; padding:12px; min-height:0}
-  .rail{
-    background:var(--panel); border:1px solid var(--line-soft); border-radius:var(--radius);
-    padding:12px; overflow-y:auto; min-height:0;
+  /* ---------- studio grid ---------- */
+  .studio{
+    display:grid;grid-template-columns:216px minmax(0,1fr) 300px;gap:16px;
+    padding:16px 20px 8px;align-items:start;
   }
-  .rail h2, .rail h3{
-    font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--ink-dim);
-    margin:2px 0 10px; display:flex; justify-content:space-between; align-items:center;
+  .card{background:linear-gradient(180deg,var(--panel),var(--bg2));
+    border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .card h2{
+    margin:0;padding:12px 14px 8px;font-size:11px;letter-spacing:.24em;
+    text-transform:uppercase;color:var(--ink-dim);display:flex;justify-content:space-between;align-items:center;
   }
-  .rail h2 .count{color:var(--ink); background:#3a2364; border-radius:99px; padding:1px 8px; font-size:11px}
-  .rail p.hint{font-size:12px; color:var(--ink-dim); margin-bottom:10px}
+  .card h2 .count{background:var(--pink);color:#fff;border-radius:999px;padding:1px 8px;
+    font-size:11px;letter-spacing:0; font-weight:800}
+  .card .body{padding:0 14px 14px}
 
-  /* ---------- photo rail ---------- */
-  .thumbs{display:grid; grid-template-columns:1fr 1fr; gap:8px}
-  .thumb{position:relative; border-radius:var(--radius-sm); overflow:hidden; border:2px solid transparent; cursor:pointer; aspect-ratio:4/3; background:#12081f}
-  .thumb img{width:100%; height:100%; object-fit:cover; display:block; filter:saturate(1.15)}
-  .thumb .num{
-    position:absolute; top:5px; left:5px; width:19px; height:19px; border-radius:50%;
-    background:rgba(10,4,24,.85); color:#fff; font-size:11px; font-weight:800;
-    display:grid; place-items:center; border:1px solid rgba(255,255,255,.35);
-  }
-  .thumb.sel{border-color:var(--pink); box-shadow:0 0 0 2px rgba(255,46,136,.35)}
-  .rail .wide{width:100%; margin-top:8px; padding:9px 10px; border-radius:10px; font-weight:700; font-size:13px;
-    background:var(--panel-2); border:1px solid var(--line); text-align:center}
-  .rail .wide:hover{border-color:var(--pink); color:#fff}
-  .rail .wide.primary{background:linear-gradient(135deg,#ff2e88,#ff7a18); border:0; color:#fff}
+  /* photos rail */
+  .rail-note{font-size:12.5px;color:var(--ink-dim);margin:0 0 10px}
+  .thumbs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .thumb{position:relative;border-radius:10px;overflow:hidden;border:2px solid transparent;
+    padding:0;aspect-ratio:1/1;background:#0d0518}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .thumb.sel{border-color:var(--pink);box-shadow:0 0 0 2px rgba(255,79,163,.35)}
+  .thumb .num{position:absolute;top:5px;left:5px;width:20px;height:20px;border-radius:50%;
+    background:rgba(10,4,24,.75);color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center}
+  .rail-actions{display:grid;gap:8px;margin-top:12px}
+  .btn.wide{width:100%;text-align:center}
+  .btn.ghost{background:rgba(255,255,255,.04)}
+  .btn.warm{background:linear-gradient(135deg,var(--pink),var(--orange));border-color:transparent;color:#fff}
 
-  /* ---------- center stage ---------- */
-  .stage{display:flex; flex-direction:column; gap:10px; min-width:0; min-height:0; overflow-y:auto; padding-right:2px}
-  .size-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
-  .size-row .pill{
-    padding:8px 13px; border-radius:10px; background:var(--panel); border:1px solid var(--line);
-    font-weight:700; font-size:13px;
+  /* preview column */
+  .preview-col{display:flex;flex-direction:column;gap:12px;min-width:0}
+  .size-row{display:flex;gap:8px;flex-wrap:wrap}
+  .size-btn{flex:1;min-width:120px;padding:9px 10px;border-radius:11px;border:1px solid var(--line);
+    background:rgba(255,255,255,.03);text-align:center}
+  .size-btn b{display:block;font-size:14px}
+  .size-btn span{font-size:11px;color:var(--ink-dim)}
+  .size-btn.on{border-color:var(--pink);background:linear-gradient(135deg,rgba(255,79,163,.22),rgba(255,138,42,.16))}
+  .variant-row{display:flex;gap:8px;flex-wrap:wrap}
+  .variant-pill{padding:8px 18px;border-radius:999px;border:1px solid var(--line);
+    background:rgba(255,255,255,.03);font-weight:700;font-size:13.5px}
+  .variant-pill.on{background:linear-gradient(135deg,var(--pink),var(--orange));border-color:transparent;color:#fff}
+  .stage{
+    border:1px solid var(--line);border-radius:var(--radius);background:
+      repeating-conic-gradient(#221040 0% 25%, #1a0b31 0% 50%) 0 0/28px 28px;
+    padding:18px;display:grid;place-items:center;min-height:340px;box-shadow:var(--shadow);
   }
-  .size-row .pill small{display:block; font-size:10px; font-weight:600; color:var(--ink-dim)}
-  .size-row .pill.on{border-color:var(--pink); background:#3a1150; box-shadow:0 0 0 2px rgba(255,46,136,.3)}
-  .variant-row{display:flex; gap:8px; flex-wrap:wrap}
-  .variant-row .pill{
-    padding:8px 16px; border-radius:99px; background:var(--panel); border:1px solid var(--line);
-    font-weight:700; font-size:13px;
-  }
-  .variant-row .pill.on{background:linear-gradient(135deg,#ff2e88,#ff7a18); border:0; color:#fff}
-  .preview-wrap{
-    flex:1; min-height:280px; display:grid; place-items:center;
-    background:repeating-conic-gradient(#1a0c33 0% 25%, #170a2c 0% 50%) 0 0/22px 22px;
-    border:1px solid var(--line-soft); border-radius:var(--radius); padding:18px; overflow:hidden;
-  }
-  .preview-wrap .cover{box-shadow:0 24px 60px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.08)}
-  .export-row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
-  .export-row .note{font-size:12px; color:var(--ink-dim); margin-left:2px}
+  .stage .cover-holder{width:100%;max-width:760px}
+  .export-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .export-row .hint{font-size:12.5px;color:var(--ink-dim)}
 
-  /* ---------- right rail controls ---------- */
-  .opt-grid{display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-bottom:14px}
-  .opt-grid .opt{
-    padding:8px 6px; border-radius:9px; background:var(--panel-2); border:1px solid var(--line);
-    font-size:12px; font-weight:700; text-align:center;
+  /* ---------- the cover ---------- */
+  .cover{
+    position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;background:#0d0518;
+    border-radius:6px;box-shadow:0 14px 40px rgba(0,0,0,.55);user-select:none;
   }
-  .opt-grid .opt.on{border-color:var(--pink); background:#3a1150; color:#fff}
-  .opt-grid .opt .swatch{display:block; height:8px; border-radius:4px; margin-bottom:5px}
-  .field{margin-bottom:9px}
-  .field label{display:block; font-size:11px; color:var(--ink-dim); margin-bottom:4px; font-weight:600}
-  .field input[type=text], .field select{
-    width:100%; padding:8px 9px; border-radius:8px; background:#180b31; border:1px solid var(--line);
+  .cover.ratio-45{aspect-ratio:4/5}
+  .cover.ratio-11{aspect-ratio:1/1}
+  .cover-grid{position:absolute;inset:0;display:grid;gap:2px;background:#0d0518;
+    grid-template-columns:repeat(4,1fr);grid-template-rows:1fr 1fr 0.92fr}
+  .panel{position:relative;overflow:hidden;background:#160a2b;cursor:pointer}
+  .panel canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+  .panel .tag{
+    position:absolute;top:7%;left:6%;z-index:3;max-width:88%;
+    background:rgba(12,4,28,.82);border:1px solid rgba(255,255,255,.16);
+    border-radius:8px;padding:5px 9px;color:#fff;line-height:1.2;
+    box-shadow:0 2px 10px rgba(0,0,0,.4);pointer-events:none;
   }
-  .field input[type=text]:focus, .field select:focus{outline:2px solid var(--pink); border-color:var(--pink)}
-  .field input[type=range]{width:100%; accent-color:var(--pink)}
-  .field .rowline{display:flex; justify-content:space-between; font-size:11px; color:var(--ink-dim)}
-  .field .rowline output{color:var(--ink); font-weight:700}
-  .checks{display:grid; grid-template-columns:1fr 1fr; gap:6px 10px; margin-bottom:14px}
-  .checks label{display:flex; gap:7px; align-items:center; font-size:12px; color:var(--ink-dim); cursor:pointer}
-  .checks input{accent-color:var(--pink); width:15px; height:15px}
-  .checks label.on{color:var(--ink)}
-  .duo{display:grid; grid-template-columns:1fr 1fr; gap:8px}
-
-  /* ---------- bottom panel bar ---------- */
-  .panelbar{
-    margin:0 12px 12px; background:var(--panel); border:1px solid var(--line-soft);
-    border-radius:var(--radius); padding:10px 14px; display:flex; gap:16px; align-items:flex-end; flex-wrap:wrap;
+  .panel .tag b{display:block;font-size:.92em;letter-spacing:.05em;white-space:nowrap}
+  .panel .tag span{font-size:.68em;color:#ffd7ec;letter-spacing:.04em;white-space:nowrap}
+  .panel.hero{grid-column:1;grid-row:1/3}
+  .panel.hero-right{grid-column:4;grid-row:1/3}
+  .band{position:relative;grid-column:1/-1;overflow:hidden;background:#160a2b}
+  .band canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+  .band .scrim{position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(13,5,24,.12) 0%,rgba(13,5,24,.34) 55%,rgba(13,5,24,.72) 100%)}
+  .band .tag{position:absolute;top:2%;right:3%;left:auto;z-index:3}
+  .title-block{position:absolute;left:0;right:0;bottom:11%;z-index:4;text-align:center;pointer-events:none}
+  .title-main{
+    margin:0;font-weight:900;letter-spacing:.015em;line-height:.92;
+    /* Sized from the cover's own width (--cfs, set in JS): vw units break
+       when the cover is narrower than the viewport and the title overflows. */
+    font-size:var(--cfs,72px);color:transparent;
+    background:linear-gradient(180deg,#ffe9a8 0%,#ffb03a 34%,#ff5f8f 62%,#e83e8c 82%,#ff7ab8 100%);
+    -webkit-background-clip:text;background-clip:text;
+    filter:drop-shadow(0 3px 0 rgba(90,10,60,.85)) drop-shadow(0 8px 18px rgba(0,0,0,.55));
+    white-space:nowrap;
   }
-  .panelbar .cell{min-width:110px}
-  .panelbar .cell.grow{flex:1; min-width:140px}
-  .panelbar label{display:block; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--ink-dim); margin-bottom:4px; font-weight:700}
-  .panelbar select, .panelbar input[type=text]{width:100%; padding:7px 8px; border-radius:8px; background:#180b31; border:1px solid var(--line)}
-  .panelbar input[type=range]{width:130px; accent-color:var(--pink)}
-  .panelbar .who{font-size:13px; font-weight:800; color:var(--pink-soft)}
-  .panelbar .who small{display:block; font-size:11px; color:var(--ink-dim); font-weight:600}
-  .panelbar .hintline{width:100%; font-size:11px; color:var(--ink-faint); margin-top:2px}
-  .panelbar .reset{
-    padding:8px 12px; border-radius:9px; background:var(--panel-2); border:1px solid var(--line);
-    font-weight:700; font-size:12px;
+  .title-script{
+    font-family:"Segoe Script","Brush Script MT",cursive;font-size:calc(var(--cfs,72px)*0.34);
+    color:#ff8fc7;margin-top:.1em;text-shadow:0 2px 10px rgba(0,0,0,.7);transform:rotate(-2deg);
   }
-  .panelbar .reset:hover{border-color:var(--pink)}
-
-  /* ---------- cover ---------- */
-  .cover{position:relative; overflow:hidden; background:#0d0618; user-select:none}
-  .cover .cell{position:absolute; overflow:hidden; cursor:pointer; background:#1c0e33}
-  .cover .cell img{position:absolute; max:none; will-change:transform}
-  .cover .cell.picked{outline:3px solid var(--pink); outline-offset:-3px; z-index:5}
-  .cover .cell.picked::after{
-    content:""; position:absolute; inset:0; background:rgba(255,46,136,.14); pointer-events:none;
+  .title-kicker{margin-top:.55em;font-size:calc(var(--cfs,72px)*0.16);font-weight:800;letter-spacing:.14em;color:#fff;
+    text-shadow:0 2px 8px rgba(0,0,0,.8)}
+  .title-kicker .stars{color:var(--gold);letter-spacing:.1em}
+  .badge-est{
+    position:absolute;left:3.2%;bottom:16%;z-index:5;width:9.5%;aspect-ratio:1;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#ffe98a,#ffc93c 55%,#e8a100);
+    border:3px solid #fff3c4;color:#5a3b00;display:grid;place-items:center;text-align:center;
+    box-shadow:0 4px 16px rgba(0,0,0,.5);transform:rotate(-8deg);
   }
-  .tag{
-    position:absolute; z-index:3; background:rgba(8,3,18,.82); border:1px solid rgba(255,255,255,.22);
-    border-radius:6px; padding:.06em .16em; color:#fff; line-height:1.2; pointer-events:none;
-    box-shadow:0 2px 8px rgba(0,0,0,.45); white-space:nowrap; max-width:94%; overflow:hidden;
+  .badge-est small{display:block;font-size:.62em;font-weight:800;letter-spacing:.12em}
+  .badge-est b{display:block;font-size:1.05em;font-weight:900;line-height:1}
+  .badge-est .yr{font-size:1.35em}
+  .tag-vol{
+    position:absolute;right:3%;bottom:30%;z-index:5;background:var(--teal);color:#04222b;
+    font-weight:900;padding:.35em .7em;border-radius:6px;font-size:clamp(9px,1.25vw,18px);
+    box-shadow:0 3px 10px rgba(0,0,0,.45);transform:rotate(2deg);
   }
-  .tag b{display:block; font-size:.21em; line-height:1.25; letter-spacing:.6px; font-weight:800}
-  .tag span{display:block; font-size:.17em; line-height:1.25; letter-spacing:.4px; color:#ffd9ec; font-weight:600}
-  .cover .band{position:absolute; left:0; right:0; bottom:0; z-index:4; pointer-events:none}
-  .cover .band .scrim{position:absolute; inset:0; background:linear-gradient(180deg, transparent 0%, rgba(10,3,22,.55) 45%, rgba(10,3,22,.78) 100%)}
-  .cover .headline{
-    position:relative; text-align:center; font-weight:900; letter-spacing:1px; line-height:.92;
-    background:linear-gradient(180deg,#fff7d6 0%, #ffd166 28%, #ff7a59 52%, #ff2e88 78%, #b5179e 100%);
-    -webkit-background-clip:text; background-clip:text; color:transparent;
-    filter:drop-shadow(0 3px 0 #2b0a4d) drop-shadow(0 6px 0 rgba(43,10,77,.85)) drop-shadow(0 10px 14px rgba(0,0,0,.5));
+  .ribbon{
+    position:absolute;right:2.4%;bottom:17%;z-index:5;background:var(--pink);color:#fff;
+    font-weight:900;letter-spacing:.08em;padding:.4em .8em;border-radius:4px;
+    font-size:clamp(8px,1.05vw,15px);transform:rotate(-3deg);
+    box-shadow:0 3px 12px rgba(0,0,0,.5);
   }
-  .cover .script-sub{
-    position:relative; text-align:center; font-family:"Segoe Script","Brush Script MT","Snell Roundhand",cursive;
-    font-style:italic; font-weight:700; color:#ff5da2;
-    text-shadow:0 0 12px rgba(255,46,136,.65), 0 2px 0 rgba(60,5,40,.8);
+  .wanted{
+    position:absolute;right:3%;top:15%;z-index:5;background:rgba(12,4,28,.85);
+    border:1px solid rgba(255,255,255,.22);color:#fff;font-weight:900;
+    padding:.4em .8em;border-radius:999px;font-size:clamp(9px,1.2vw,17px);letter-spacing:.08em;
+    box-shadow:0 3px 12px rgba(0,0,0,.5);white-space:nowrap;
   }
-  .cover .kicker{
-    position:relative; text-align:center; color:#ffe9f4; font-weight:800; letter-spacing:1px;
-    text-shadow:0 2px 6px rgba(0,0,0,.7);
+  .wanted .stars{color:var(--gold)}
+  .strip{
+    grid-column:1/-1;z-index:6;
+    background:linear-gradient(90deg,#c026d3,#ff4fa3 55%,#a855f7);
+    display:grid;place-items:center;color:#fff;font-weight:900;
+    letter-spacing:.22em;font-size:calc(var(--cfs,72px)*0.16);text-transform:uppercase;
   }
-  .cover .kicker .stars{color:var(--amber); letter-spacing:2px}
-  .cover .est{
-    position:absolute; z-index:5; border-radius:50%; display:grid; place-items:center; text-align:center;
-    background:radial-gradient(circle at 35% 30%, #ffe27a, #ffb020 60%, #f08c00);
-    color:#3a2200; font-weight:900; border:3px solid #fff3c4;
-    box-shadow:0 4px 14px rgba(0,0,0,.55), inset 0 -3px 8px rgba(120,60,0,.35);
+  .catalog{
+    grid-column:1/-1;z-index:7;background:#0d0518;color:#b9a8d6;
+    display:flex;align-items:center;justify-content:space-between;padding:0 8px;
+    font-size:calc(var(--cfs,72px)*0.075);letter-spacing:.12em;
   }
-  .cover .est small{display:block; font-size:.34em; letter-spacing:1px}
-  .cover .vol{
-    position:absolute; z-index:5; background:var(--cyan); color:#04202a; font-weight:900;
-    border-radius:5px; padding:2px 8px; letter-spacing:1px; box-shadow:0 3px 10px rgba(0,0,0,.5);
-  }
-  .cover .ribbon{
-    position:absolute; z-index:5; background:linear-gradient(90deg,#ff2e88,#ff5da2); color:#fff;
-    font-weight:900; letter-spacing:1px; padding:4px 14px; border-radius:4px;
-    transform:rotate(-3deg); box-shadow:0 4px 12px rgba(0,0,0,.5);
-  }
-  .cover .wanted{
-    position:absolute; z-index:5; background:rgba(8,3,18,.88); border:1.5px solid rgba(255,255,255,.35);
-    color:#fff; font-weight:900; letter-spacing:1px; border-radius:99px; padding:4px 12px;
-    box-shadow:0 3px 10px rgba(0,0,0,.5);
-  }
-  .cover .wanted .stars{color:var(--amber)}
-  .cover .strip{
-    position:absolute; left:0; right:0; bottom:0; z-index:6;
-    background:linear-gradient(90deg,#7b1fa2,#ff2e88 50%,#7b1fa2);
-    color:#fff; font-weight:900; letter-spacing:2.5px; text-align:center;
-    text-shadow:0 1px 3px rgba(0,0,0,.6); border-top:2px solid rgba(255,255,255,.25);
-  }
-  .cover .catalog{
-    position:absolute; left:0; right:0; bottom:0; z-index:6; display:flex; justify-content:space-between;
-    align-items:center; color:rgba(255,255,255,.85); font-weight:600; letter-spacing:.5px;
-    background:rgba(8,3,18,.9); padding:2px 8px;
-  }
-  .cover .barcode{width:44px; height:12px;
-    background:repeating-linear-gradient(90deg,#fff 0 2px, transparent 2px 4px, #fff 4px 5px, transparent 5px 9px, #fff 9px 12px, transparent 12px 14px)}
-  .cover .halftone{position:absolute; inset:0; z-index:2; pointer-events:none; opacity:.5;
-    background-image:radial-gradient(rgba(0,0,0,.55) 1.1px, transparent 1.4px); background-size:7px 7px}
-  .cover .speedlines{position:absolute; inset:0; z-index:2; pointer-events:none; opacity:.35;
-    background:repeating-linear-gradient(115deg, transparent 0 14px, rgba(255,255,255,.28) 14px 15px, transparent 15px 30px)}
-
-  /* ---------- cover-only shot mode ---------- */
-  body.shot-cover{overflow:hidden; background:#0d0618}
-  body.shot-cover .studio{display:none}
-  body.shot-cover .shot-stage{display:grid; place-items:center; height:100vh; background:#0d0618}
-  .shot-stage{display:none}
-  .hidden{display:none !important}
 </style>
 </head>
 <body>
-<div class="studio" id="studio">
-  <header class="topbar">
-    <div class="brand"><span class="mark">SS</span><span><b>SUNSET STATE</b> cover studio<small>Make GTA 6 Cover Art</small></span></div>
-    <div class="steps"><span><b>1</b>Add photos</span><span><b>2</b>Pick a size</span><span><b>3</b>Export PNG</span></div>
-    <div class="spacer"></div>
-    <button class="btn ghost" id="addPhotosBtn" type="button">+ Add photos</button>
-    <button class="btn" id="exportAllTopBtn" type="button">Export all 3 sizes</button>
-    <input type="file" id="photoInput" accept="image/*" multiple class="hidden">
-  </header>
+<style>
+  /* ---------- controls column ---------- */
+  .ctl-group{padding:0 14px 14px}
+  .ctl-group + .ctl-group{border-top:1px solid var(--line-soft)}
+  .ctl-group h3{margin:0;padding:12px 0 8px;font-size:11px;letter-spacing:.24em;
+    text-transform:uppercase;color:var(--ink-dim)}
+  .chip-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+  .chip-btn{padding:8px 6px;border-radius:10px;border:1px solid var(--line);
+    background:rgba(255,255,255,.03);font-size:12.5px;font-weight:700;
+    position:relative;overflow:hidden}
+  .chip-btn::before{content:"";display:block;height:5px;border-radius:99px;margin-bottom:6px;
+    background:linear-gradient(90deg,var(--pink),var(--orange))}
+  .chip-btn.on{border-color:var(--pink);background:linear-gradient(135deg,rgba(255,79,163,.25),rgba(255,138,42,.14))}
+  .chip-btn[data-tint="teal"]::before{background:linear-gradient(90deg,#22d3ee,#818cf8)}
+  .chip-btn[data-tint="gold"]::before{background:linear-gradient(90deg,#fbbf24,#f97316)}
+  .chip-btn[data-tint="violet"]::before{background:linear-gradient(90deg,#a855f7,#6366f1)}
+  .chip-btn[data-tint="mono"]::before{background:linear-gradient(90deg,#94a3b8,#e2e8f0)}
+  .chip-btn[data-tint="green"]::before{background:linear-gradient(90deg,#a3e635,#22d3ee)}
+  .slider-row{display:grid;grid-template-columns:86px 1fr 34px;align-items:center;gap:8px;
+    padding:5px 0;font-size:12.5px;color:var(--ink-dim)}
+  .slider-row output{text-align:right;color:var(--ink);font-weight:700;font-size:12px}
+  input[type="range"]{width:100%;accent-color:var(--pink);height:4px}
+  .check-row{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px;color:var(--ink-dim)}
+  .check-row input{accent-color:var(--pink);width:16px;height:16px}
+  .field{margin-bottom:9px}
+  .field label{display:block;font-size:11.5px;color:var(--ink-dim);margin-bottom:4px;letter-spacing:.04em}
+  .field input[type="text"],.field select{
+    width:100%;padding:8px 10px;border-radius:9px;border:1px solid var(--line);
+    background:rgba(10,4,24,.55);outline:none;
+  }
+  .field input[type="text"]:focus,.field select:focus{border-color:var(--pink)}
+  .field select option{background:#241040}
 
-  <div class="workbench">
-    <aside class="rail" aria-label="Photos">
-      <h2>Photos <span class="count" id="photoCount">8 loaded</span></h2>
-      <p class="hint">Drop photos here or use Add photos. One photo fills every panel with different crops; several are spread across panels.</p>
-      <div class="thumbs" id="thumbs"></div>
-      <button class="wide primary" id="autoFillBtn" type="button">Auto fill panels</button>
-      <button class="wide" id="spreadBtn" type="button">Spread all photos across panels</button>
-    </aside>
-
-    <main class="stage">
-      <div class="size-row" id="sizeRow" role="group" aria-label="Export size"></div>
-      <div class="variant-row" id="variantRow" role="group" aria-label="Cover variant"></div>
-      <div class="preview-wrap"><div class="cover" id="cover" aria-label="Cover preview"></div></div>
-      <div class="export-row">
-        <button class="btn" id="exportPngBtn" type="button">Export PNG 1920 &times; 1080</button>
-        <button class="btn ghost" id="exportAllBtn" type="button">Export all 3 sizes</button>
-        <span class="note">Pick a photo, pick a size, export your cover.</span>
-      </div>
-    </main>
-
-    <aside class="rail" aria-label="Cover controls">
-      <h2>Layout</h2>
-      <div class="opt-grid" id="layoutGrid"></div>
-      <h2>Grade</h2>
-      <div class="opt-grid" id="gradeGrid"></div>
-      <div id="sliderBox"></div>
-      <div class="checks" id="fxChecks"></div>
-      <h2>Texts</h2>
-      <div id="textBox"></div>
-      <h2>Stickers &amp; Effects</h2>
-      <div class="checks" id="stickerChecks"></div>
-    </aside>
+  /* ---------- bottom panel bar ---------- */
+  .panelbar{
+    margin:0 20px 16px;padding:12px 16px;display:flex;gap:14px;flex-wrap:wrap;align-items:end;
+  }
+  .panelbar .pb-title{font-size:12px;color:var(--ink-dim);letter-spacing:.1em;text-transform:uppercase}
+  .panelbar .pb-title b{display:block;color:var(--pink2);font-size:14px;letter-spacing:0;text-transform:none}
+  .panelbar .field{margin:0;min-width:150px;flex:1}
+  .panelbar .field.narrow{min-width:110px;flex:0 1 150px}
+  .panelbar .hintline{width:100%;font-size:12px;color:var(--ink-faint);margin-top:2px}
+  .foot{padding:0 20px 18px;color:var(--ink-faint);font-size:12px;text-align:center}
+  .hidden-file{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+  @media (max-width:1080px){
+    .studio{grid-template-columns:190px minmax(0,1fr)}
+    .controls-col{grid-column:1/-1}
+    .controls-col .chip-grid{grid-template-columns:repeat(3,1fr)}
+  }
+  @media (max-width:760px){
+    .studio{grid-template-columns:1fr}
+    .panelbar{margin:0 12px 12px}
+  }
+</style>
+</head>
+<body>
+<header class="masthead">
+  <div class="brand">
+    <div class="monogram">SS</div>
+    <div>
+      <div class="name">SUNSET STATE <em>cover studio</em></div>
+      <div class="sub">Make GTA 6 cover art</div>
+    </div>
   </div>
+  <div class="steps">
+    <span><b>1</b>Add photos</span>
+    <span><b>2</b>Pick a size</span>
+    <span><b>3</b>Export PNG</span>
+  </div>
+  <div class="spacer"></div>
+  <button class="btn" id="btnAddTop" type="button">+ Add photos</button>
+  <button class="btn hot" id="btnExportAllTop" type="button">Export all 3 sizes</button>
+  <input class="hidden-file" id="fileInput" type="file" accept="image/*" multiple>
+</header>
 
-  <footer class="panelbar" aria-label="Panel editor">
-    <div class="cell"><span class="who" id="panelWho">Panel 1<small>1 of 7</small></span></div>
-    <div class="cell"><label for="panelPhoto">Photo</label><select id="panelPhoto"></select></div>
-    <div class="cell"><label for="panelZoom">Zoom</label><input type="range" id="panelZoom" min="1" max="2.4" step="0.01" value="1"></div>
-    <div class="cell"><label for="panelGrade">Grade</label><select id="panelGrade"></select></div>
-    <div class="cell"><label for="panelSwap">Swap with</label><select id="panelSwap"></select></div>
-    <div class="cell grow"><label for="panelPlace">Place</label><input type="text" id="panelPlace"></div>
-    <div class="cell grow"><label for="panelSub">Sub-line</label><input type="text" id="panelSub"></div>
-    <div class="cell"><button class="reset" id="resetCropBtn" type="button">Reset crop</button></div>
-    <div class="hintline">Click a panel to select it &middot; drag to move the photo &middot; double-click to re-center &middot; drop a photo on a panel to replace it.</div>
-  </footer>
-</div>
-<div class="shot-stage"><div class="cover" id="shotCover"></div></div>
-<canvas id="workCanvas" class="hidden"></canvas>
+<main class="studio">
+  <aside class="card">
+    <h2>Photos <span class="count" id="photoCount">8 loaded</span></h2>
+    <div class="body">
+      <p class="rail-note">Drop photos here or use Add photos. One photo fills every panel with different crops; several are spread across panels.</p>
+      <div class="thumbs" id="thumbs"></div>
+      <div class="rail-actions">
+        <button class="btn wide warm" id="btnAutoFill" type="button">Auto fill panels</button>
+        <button class="btn wide ghost" id="btnSpread" type="button">Spread all photos across panels</button>
+      </div>
+    </div>
+  </aside>
 
+  <section class="preview-col">
+    <div class="size-row" id="sizeRow"></div>
+    <div class="variant-row" id="variantRow"></div>
+    <div class="stage"><div class="cover-holder" id="coverHolder"></div></div>
+    <div class="export-row">
+      <button class="btn hot" id="btnExportOne" type="button">Export PNG 1920 × 1080</button>
+      <button class="btn" id="btnExportAll" type="button">Export all 3 sizes</button>
+      <span class="hint">Pick a photo, pick a size, export your cover.</span>
+    </div>
+  </section>
+
+  <aside class="card controls-col">
+    <h2>Studio</h2>
+    <div class="ctl-group">
+      <h3>Layout</h3>
+      <div class="chip-grid" id="layoutGrid"></div>
+    </div>
+    <div class="ctl-group">
+      <h3>Grade</h3>
+      <div class="chip-grid" id="gradeGrid"></div>
+      <div style="margin-top:10px" id="sliderBox"></div>
+      <label class="check-row"><input type="checkbox" id="chkHalftone"> Halftone print dots</label>
+      <label class="check-row"><input type="checkbox" id="chkSpeed"> Speed lines</label>
+    </div>
+    <div class="ctl-group">
+      <h3>Texts</h3>
+      <div id="textFields"></div>
+    </div>
+    <div class="ctl-group">
+      <h3>Stickers &amp; Effects</h3>
+      <div id="stickerBox"></div>
+    </div>
+  </aside>
+</main>
+
+<section class="card panelbar" id="panelBar">
+  <div class="pb-title">Panel <b id="pbPanelName">Panel 1</b><span id="pbPanelOf">1 of 8</span></div>
+  <div class="field"><label>Photo</label><select id="pbPhoto"></select></div>
+  <div class="field"><label>Zoom <span id="pbZoomVal">1.00×</span></label><input type="range" id="pbZoom" min="1" max="2.4" step="0.01" value="1"></div>
+  <div class="field narrow"><label>Grade</label><select id="pbGrade"></select></div>
+  <div class="field narrow"><label>Swap with</label><select id="pbSwap"></select></div>
+  <div class="field"><label>Place</label><input type="text" id="pbPlace"></div>
+  <div class="field"><label>Sub-line</label><input type="text" id="pbSub"></div>
+  <button class="btn ghost" id="pbReset" type="button">Reset crop</button>
+  <div class="hintline">Click a panel to edit it. Drag a photo to reposition it. Double-click a panel to reset its crop.</div>
+</section>
+
+<footer class="foot">Sunset State — an original cover studio. All photos are graded on your machine; nothing is uploaded.</footer>
 <script>
 "use strict";
-/* Sunset State cover studio — offline, photos never leave the machine. */
+/* Sunset State cover studio — all state lives here; nothing leaves the machine. */
 
-/* ---------- library ---------- */
-const SHOTS = [
-  { key:"woman",  file:"samples/sample-woman.jpg",  place:"CORAL ROW",      when:"6:12 PM", sub:"TOP DOWN",    fx:0.33, fy:0.58 },
-  { key:"man",    file:"samples/sample-man.jpg",    place:"NEON MILE",      when:"9:47 PM", sub:"ENGINE HOT",  fx:0.48, fy:0.42 },
-  { key:"car",    file:"samples/sample-car.jpg",    place:"SUNSET KEYS",    when:"5:05 PM", sub:"COAST RUN",   fx:0.62, fy:0.68 },
-  { key:"tower",  file:"samples/sample-tower.jpg",  place:"TIDEWATCH",      when:"6:10 PM", sub:"TOWER WATCH", fx:0.53, fy:0.48 },
-  { key:"angler", file:"samples/sample-angler.jpg", place:"REEF SIDE",      when:"5:30 AM", sub:"FIRST CAST",  fx:0.52, fy:0.35 },
-  { key:"boat",   file:"samples/sample-boat.jpg",   place:"HARBOUR LIGHTS", when:"4:20 PM", sub:"WAKE TRAIL",  fx:0.42, fy:0.65 },
-  { key:"motel",  file:"samples/sample-motel.jpg",  place:"PALM COURT",     when:"8:15 PM", sub:"NEON HUM",    fx:0.50, fy:0.50 },
-  { key:"road",   file:"samples/sample-road.jpg",   place:"DUNE ROAD",      when:"7:05 PM", sub:"OPEN ROAD",   fx:0.68, fy:0.55 },
+/* ---- sample library: 8 photos, each with a focus point (fx, fy) in 0..1 ---- */
+const LIBRARY = [
+  { id:"woman",  file:"samples/sample-woman.jpg",  place:"CORAL ROW",       sub:"6:12 PM — TOP DOWN",    fx:0.50, fy:0.42 },
+  { id:"man",    file:"samples/sample-man.jpg",    place:"NEON MILE",       sub:"9:47 PM — ENGINE HOT",  fx:0.50, fy:0.45 },
+  { id:"car",    file:"samples/sample-car.jpg",    place:"SUNSET KEYS",     sub:"5:05 PM — COAST RUN",   fx:0.70, fy:0.72 },
+  { id:"tower",  file:"samples/sample-tower.jpg",  place:"TIDEWATCH",       sub:"6:10 PM — TOWER WATCH", fx:0.48, fy:0.45 },
+  { id:"angler", file:"samples/sample-angler.jpg", place:"REEF SIDE",       sub:"5:30 AM — FIRST CAST",  fx:0.55, fy:0.40 },
+  { id:"boat",   file:"samples/sample-boat.jpg",   place:"HARBOUR LIGHTS",  sub:"4:20 PM — WAKE TRAIL",  fx:0.62, fy:0.72 },
+  { id:"motel",  file:"samples/sample-motel.jpg",  place:"PALM COURT",      sub:"8:15 PM — NEON HUM",    fx:0.55, fy:0.42 },
+  { id:"road",   file:"samples/sample-road.jpg",   place:"DUNE ROAD",       sub:"7:05 PM — OPEN ROAD",   fx:0.45, fy:0.45 },
 ];
-const EDITIONS = {
-  sunset:{ label:"Sunset State", title:"SUNSET STATE", script:"Neon Tide", strip:"CHASE THE LIGHT \u2022 OWN THE NIGHT",
-           kicker:"A COAST THAT NEVER SLEEPS", ratio:[16,9], layout:"heroLeft", cat:"CAT. SS-0626", size:[1920,1080] },
-  heat:{ label:"Heat Wave", title:"HEAT WAVE", script:"Coast to Coast", strip:"ONE SUMMER \u2022 NO SHADE \u2022 ALL HEAT",
-         kicker:"TOO HOT TO SLOW DOWN", ratio:[4,5], layout:"heroRight", cat:"CAT. HW-0626", size:[1080,1350] },
-  night:{ label:"Night Drive", title:"NIGHT DRIVE", script:"Neon Tide", strip:"NEON ON \u2022 ENGINE HOT \u2022 AFTER DARK",
-          kicker:"THE CITY AFTER MIDNIGHT", ratio:[16,9], layout:"mosaic", cat:"CAT. ND-0626", size:[1920,1080] },
+
+/* ---- cover variants: title, script line, strip, kicker, default layout/size ---- */
+const VARIANTS = {
+  sunset: { name:"Sunset State", title:"SUNSET STATE", script:"Neon Tide",
+    strip:"CHASE THE LIGHT • OWN THE NIGHT", kicker:"A COAST THAT NEVER SLEEPS",
+    catalog:"SUNSET STATE — A COVER STUDIO PICTURE — YOUR PHOTOS — GRADED BY HAND — CAT. SS-0626",
+    layout:"heroLeft", size:"landscape" },
+  heat:   { name:"Heat Wave", title:"HEAT WAVE", script:"Coast to Coast",
+    strip:"ONE SUMMER • NO SHADE • ALL HEAT", kicker:"TOO HOT TO SLOW DOWN",
+    catalog:"HEAT WAVE — A COVER STUDIO PICTURE — YOUR PHOTOS — GRADED BY HAND — CAT. HW-0626",
+    layout:"heroRight", size:"portrait" },
+  night:  { name:"Night Drive", title:"NIGHT DRIVE", script:"Neon Tide",
+    strip:"NEON ON • ENGINE HOT • AFTER DARK", kicker:"PARADISE NEVER SLEEPS",
+    catalog:"NIGHT DRIVE — A COVER STUDIO PICTURE — YOUR PHOTOS — GRADED BY HAND — CAT. ND-0626",
+    layout:"mosaic", size:"landscape" },
 };
-const SIZES = [
-  { id:"wide",  label:"1920 \u00D7 1080", note:"Landscape", w:1920, h:1080 },
-  { id:"tall",  label:"1080 \u00D7 1350", note:"Portrait",  w:1080, h:1350 },
-  { id:"square",label:"1080 \u00D7 1080", note:"Square",    w:1080, h:1080 },
-];
+
+const SIZES = {
+  landscape:{ label:"1920 × 1080", sub:"Landscape", w:1920, h:1080, cls:"" },
+  portrait: { label:"1080 × 1350", sub:"Portrait",  w:1080, h:1350, cls:"ratio-45" },
+  square:   { label:"1080 × 1080", sub:"Square",    w:1080, h:1080, cls:"ratio-11" },
+};
+
+/* ---- layouts: each slot is [photoIndex, colStart, colEnd, rowStart, rowEnd]
+        on a 4-col grid; the motel band is the wide bottom row. ---- */
 const LAYOUTS = {
-  heroLeft:{ label:"Hero Left" }, heroRight:{ label:"Hero Right" }, grid3:{ label:"Grid 3\u00D73" },
-  center:{ label:"Center Stage" }, mosaic:{ label:"Mosaic" },
-  one:{ label:"1 panel" }, two:{ label:"2 panels" }, three:{ label:"3 panels" }, four:{ label:"4 panels" },
+  heroLeft:  { name:"Hero Left",  cols:4, rows:3, band:true, slots:[
+    [0,1,2,1,3],[1,2,3,1,2],[2,3,4,1,2],[7,4,5,1,2],
+    [3,2,3,2,3],[4,3,4,2,3],[5,4,5,2,3] ] },
+  heroRight: { name:"Hero Right", cols:4, rows:3, band:true, slots:[
+    [0,4,5,1,3],[1,1,2,1,2],[2,2,3,1,2],[7,3,4,1,2],
+    [3,1,2,2,3],[4,2,3,2,3],[5,3,4,2,3] ] },
+  grid3x3:   { name:"Grid 3×3",   cols:3, rows:3, band:false, slots:[
+    [0,1,2,1,2],[1,2,3,1,2],[2,3,4,1,2],
+    [3,1,2,2,3],[4,2,3,2,3],[5,3,4,2,3],
+    [7,1,2,3,4],[6,2,3,3,4] ] },
+  center:    { name:"Center Stage", cols:4, rows:3, band:true, slots:[
+    [0,2,4,1,3],[1,1,2,1,2],[2,4,5,1,2],
+    [3,1,2,2,3],[4,4,5,2,3],[5,2,3,3,4],[7,3,4,3,4] ] },
+  mosaic:    { name:"Mosaic",     cols:4, rows:3, band:true, slots:[
+    [0,1,2,1,2],[1,2,4,1,2],[2,4,5,1,2],
+    [3,1,3,2,3],[4,3,4,2,3],[5,4,5,2,3] ] },
+  one:       { name:"1 panel",    cols:1, rows:2, band:true, slots:[ [0,1,2,1,3] ] },
+  two:       { name:"2 panels",   cols:2, rows:2, band:true, slots:[ [0,1,2,1,3],[1,2,3,1,3] ] },
+  three:     { name:"3 panels",   cols:3, rows:2, band:true, slots:[ [0,1,2,1,3],[1,2,3,1,3],[2,3,4,1,3] ] },
+  four:      { name:"4 panels",   cols:4, rows:2, band:true, slots:[ [0,1,2,1,3],[1,2,3,1,3],[2,3,4,1,3],[3,4,5,1,3] ] },
 };
+
+/* ---- grade presets: warm/cool tint + pink/teal split tone, all in the shader ---- */
 const GRADES = {
-  vice:  { label:"Vice Sunset", sat:1.30, con:1.08, bri:1.03, warm:0.16, teal:-0.10, vig:0.30 },
-  neon:  { label:"Neon Nights", sat:1.48, con:1.12, bri:0.96, warm:-0.06, teal:0.14, vig:0.36 },
-  golden:{ label:"Golden Hour", sat:1.24, con:1.05, bri:1.08, warm:0.24, teal:-0.06, vig:0.18 },
-  noir:  { label:"Noir Heat", sat:0.85, con:1.26, bri:0.94, warm:0.08, teal:0.00, vig:0.46 },
-  comic: { label:"Comic Ink", sat:1.62, con:1.34, bri:1.00, warm:0.00, teal:0.00, vig:0.14 },
-  natural:{label:"Natural", sat:1.00, con:1.00, bri:1.00, warm:0.00, teal:0.00, vig:0.00 },
+  vice:   { name:"Vice Sunset", tint:[1.06,0.94,1.02], warm:0.22, pink:0.30, teal:0.22, tint2:"pink" },
+  neon:   { name:"Neon Nights", tint:[0.94,0.98,1.14], warm:0.02, pink:0.34, teal:0.30, tint2:"teal" },
+  golden: { name:"Golden Hour", tint:[1.12,1.00,0.86], warm:0.38, pink:0.10, teal:0.08, tint2:"gold" },
+  noir:   { name:"Noir Heat",   tint:[1.00,0.94,0.92], warm:0.16, pink:0.16, teal:0.10, tint2:"violet" },
+  comic:  { name:"Comic Ink",   tint:[1.04,1.02,1.00], warm:0.10, pink:0.22, teal:0.16, tint2:"pink" },
+  natural:{ name:"Natural",     tint:[1.00,1.00,1.00], warm:0.00, pink:0.00, teal:0.00, tint2:"none" },
 };
-const GRADE_TINTS = {
-  vice:["#ff2e88","#ffb020"], neon:["#b5179e","#22d3ee"], golden:["#ff7a18","#ffd166"],
-  noir:["#5b21b6","#111827"], comic:["#ff2e88","#22d3ee"], natural:["#8b5cf6","#22d3ee"],
-};
+const GRADE_TINTS = { vice:"pink", neon:"teal", golden:"gold", noir:"violet", comic:"pink", natural:"green" };
 
-/* Panel maps: normalized rects [x, y, w, h] plus the photo index into SHOTS.
-   The bottom band photo (motel) carries the title on top of it. */
-function panelMap(kind){
-  const W=0, M=1, C=2, T=3, A=4, B=5, H=6, R=7; /* woman man car tower angler boat motel road */
-  switch(kind){
-    case "heroRight": return [
-      { p:M, r:[0.00,0.00,0.24,0.31] }, { p:C, r:[0.24,0.00,0.24,0.31] }, { p:R, r:[0.48,0.00,0.24,0.31] },
-      { p:T, r:[0.00,0.31,0.24,0.31] }, { p:A, r:[0.24,0.31,0.24,0.31] }, { p:B, r:[0.48,0.31,0.24,0.31] },
-      { p:W, r:[0.72,0.00,0.28,0.62] }, { p:H, r:[0.00,0.62,1.00,0.38], band:true } ];
-    case "grid3": return [
-      { p:W, r:[0.00,0.00,0.34,0.34] }, { p:M, r:[0.34,0.00,0.33,0.34] }, { p:C, r:[0.67,0.00,0.33,0.34] },
-      { p:T, r:[0.00,0.34,0.34,0.33] }, { p:A, r:[0.34,0.34,0.33,0.33] }, { p:B, r:[0.67,0.34,0.33,0.33] },
-      { p:H, r:[0.00,0.67,0.34,0.33] }, { p:R, r:[0.34,0.67,0.33,0.33] }, { p:W, r:[0.67,0.67,0.33,0.33] } ];
-    case "center": return [
-      { p:M, r:[0.00,0.00,0.26,0.38] }, { p:C, r:[0.74,0.00,0.26,0.38] },
-      { p:W, r:[0.26,0.00,0.48,0.62] },
-      { p:T, r:[0.00,0.38,0.26,0.24] }, { p:A, r:[0.74,0.38,0.26,0.24] },
-      { p:B, r:[0.26,0.62,0.24,0.38] }, { p:R, r:[0.50,0.62,0.24,0.38] }, { p:H, r:[0.74,0.62,0.26,0.38], band:true } ];
-    case "mosaic": return [
-      { p:W, r:[0.00,0.00,0.34,0.34] }, { p:M, r:[0.34,0.00,0.33,0.34] }, { p:C, r:[0.67,0.00,0.33,0.34] },
-      { p:T, r:[0.00,0.34,0.66,0.28] }, { p:A, r:[0.66,0.34,0.34,0.28] },
-      { p:B, r:[0.00,0.62,0.34,0.38] }, { p:H, r:[0.34,0.62,0.33,0.38] }, { p:R, r:[0.67,0.62,0.33,0.38] } ];
-    case "one": return [ { p:W, r:[0,0,1,1] } ];
-    case "two": return [ { p:W, r:[0,0,0.5,1] }, { p:M, r:[0.5,0,0.5,1] } ];
-    case "three": return [ { p:W, r:[0,0,0.34,1] }, { p:M, r:[0.34,0,0.33,1] }, { p:C, r:[0.67,0,0.33,1] } ];
-    case "four": return [ { p:W, r:[0,0,0.5,0.5] }, { p:M, r:[0.5,0,0.5,0.5] }, { p:C, r:[0,0.5,0.5,0.5] }, { p:T, r:[0.5,0.5,0.5,0.5] } ];
-    case "heroLeft": default: return [
-      { p:W, r:[0.00,0.00,0.28,0.62] },
-      { p:M, r:[0.28,0.00,0.24,0.31] }, { p:C, r:[0.52,0.00,0.24,0.31] }, { p:R, r:[0.76,0.00,0.24,0.31] },
-      { p:T, r:[0.28,0.31,0.24,0.31] }, { p:A, r:[0.52,0.31,0.24,0.31] }, { p:B, r:[0.76,0.31,0.24,0.31] },
-      { p:H, r:[0.00,0.62,1.00,0.38], band:true } ];
-  }
-}
-
-/* ---------- state ---------- */
-const store = {
-  edition:"sunset", size:"wide", layout:"heroLeft", grade:"vice",
+const state = {
+  size:"landscape", variant:"sunset", layout:"heroLeft", grade:"vice",
   strength:0.90, contrast:1.00, saturation:1.00, grain:0.28, vignette:0.50,
-  halftone:false, speedlines:false,
-  title:"SUNSET STATE", script:"Neon Tide", kicker:"A COAST THAT NEVER SLEEPS",
-  strip:"CHASE THE LIGHT \u2022 OWN THE NIGHT", badge:"EST. 2026", volume:"VOL. 06",
-  ribbon:"COLLECTOR'S EDITION", hud:"WANTED", stars:5,
-  showTags:true, showBadge:true, showVolume:true, showRibbon:true, showWanted:true, showCatalog:true,
-  picked:0, crops:{}, /* crops[panelIndex] = {zoom, ox, oy} */
+  halftone:false, speed:false,
+  texts:{ title:"SUNSET STATE", script:"Neon Tide", kicker:"A COAST THAT NEVER SLEEPS",
+    strip:"CHASE THE LIGHT • OWN THE NIGHT", badge:"EST. 2026", volume:"VOL. 06",
+    ribbon:"COLLECTOR'S EDITION", hud:"WANTED", stars:5 },
+  stickers:{ tags:true, badge:true, volume:true, ribbon:true, wanted:true, catalog:true },
+  /* per-slot assignment: slot index -> photo index; zoom + pan per slot */
+  assign:[0,1,2,7,3,4,5],
+  zoom:{}, panX:{}, panY:{}, perGrade:{},
+  selected:0,
 };
-const imgs = new Map(); /* key -> HTMLImageElement */
-let gradeMode = "webgl";
+const SLOT_COUNT = () => LAYOUTS[state.layout].slots.length;
+const slotPhoto = i => state.assign[i % state.assign.length];
+const slotZoom  = i => state.zoom[i] || 1;
+const slotPanX  = i => state.panX[i] || 0;
+const slotPanY  = i => state.panY[i] || 0;
+const slotGrade = i => state.perGrade[i] || state.grade;
 
-function shot(i){ return SHOTS[i]; }
-function edition(){ return EDITIONS[store.edition]; }
-function panels(){ return panelMap(store.layout); }
-function cropFor(i){
-  if(!store.crops[i]) store.crops[i] = { zoom:1, ox:0, oy:0 };
-  return store.crops[i];
-}
-function coverFit(img, rectW, rectH, fx, fy, zoom, ox, oy){
-  /* Returns [sx, sy, sw, sh, dx, dy, dw, dh] to draw img cover-filling rectW x rectH,
-     centred on focus (fx, fy), with zoom and pan offsets. Works for both
-     loaded images and graded canvases. */
-  const iw = img.naturalWidth || img.width, ih = img.naturalHeight || img.height;
-  const scale = Math.max(rectW / iw, rectH / ih) * zoom;
-  const dw = iw * scale, dh = ih * scale;
-  const cx = fx * dw, cy = fy * dh;
-  const dx = rectW / 2 - cx + ox * rectW;
-  const dy = rectH / 2 - cy + oy * rectH;
-  return [0, 0, iw, ih, dx, dy, dw, dh];
-}
-function cssFilter(){
-  const g = GRADES[store.grade], s = store.strength;
-  const sat = 1 + (g.sat - 1) * s * store.saturation;
-  const con = 1 + (g.con - 1) * s + (store.contrast - 1);
-  const bri = 1 + (g.bri - 1) * s;
-  return `saturate(${sat.toFixed(3)}) contrast(${con.toFixed(3)}) brightness(${bri.toFixed(3)})`;
-}
+/* ================= photo grading: WebGL first, 2D canvas fallback ================= */
+const GL_VERT = `attribute vec2 aPos; attribute vec2 aUv; varying vec2 vUv;
+  void main(){ vUv=aUv; gl_Position=vec4(aPos,0.0,1.0); }`;
+const GL_FRAG = `precision mediump float; varying vec2 vUv;
+  uniform sampler2D uTex; uniform vec3 uTint; uniform float uWarm, uPink, uTeal;
+  uniform float uContrast, uSaturation, uStrength, uGrain, uVignette, uSeed;
+  float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453); }
+  void main(){
+    vec4 c = texture2D(uTex, vUv);
+    vec3 col = c.rgb * uTint;
+    float lum = dot(col, vec3(0.299, 0.587, 0.114));
+    col = mix(vec3(lum), col, uSaturation);                 /* saturation */
+    col = (col - 0.5) * uContrast + 0.5;                    /* contrast */
+    col.r += uWarm * 0.05; col.b -= uWarm * 0.04;           /* warm push */
+    vec3 sh = vec3(0.0, 0.85, 0.95) * uTeal;                /* teal shadows */
+    vec3 hi = vec3(1.0, 0.45, 0.75) * uPink;                /* pink highlights */
+    col = mix(col, col + sh * (1.0 - lum), uTeal * 0.35);
+    col = mix(col, col + hi * lum, uPink * 0.30);
+    col = mix(c.rgb, col, uStrength);                       /* preset strength */
+    float d = distance(vUv, vec2(0.5));                     /* vignette */
+    col *= 1.0 - uVignette * 0.45 * smoothstep(0.35, 0.85, d);
+    col += (hash(vUv * 913.7 + uSeed) - 0.5) * uGrain * 0.14;/* grain */
+    gl_FragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
+  }`;
 
-/* ---------- DOM cover ---------- */
-const $ = (id) => document.getElementById(id);
-const coverEl = $("cover"), shotEl = $("shotCover");
-
-function fitCoverBox(el){
-  const [rw, rh] = edition().ratio;
-  const wrap = el.parentElement;
-  const availW = Math.max(320, (wrap.clientWidth || 900) - 36);
-  const availH = Math.max(240, (wrap.clientHeight || 600) - 36);
-  const scale = Math.min(availW / rw, availH / rh);
-  const shownW = Math.floor(rw * scale);
-  el.style.width = shownW + "px";
-  el.style.height = Math.floor(rh * scale) + "px";
-  el.style.fontSize = Math.max(10, (shownW * 0.074)).toFixed(1) + "px";
-}
-function chipHTML(s){
-  return `<b>${s.place}</b><span>${s.when} \u2014 ${s.sub}</span>`;
-}
-function buildCoverInto(el, forShot){
-  const ed = edition(), list = panels();
-  const [rw, rh] = ed.ratio;
-  el.innerHTML = "";
-  el.style.aspectRatio = rw + " / " + rh;
-  const W = el.clientWidth || 900, H = el.clientHeight || Math.round(W * rh / rw);
-  const px = (v) => (v * 100).toFixed(2) + "%";
-  list.forEach((cell, idx) => {
-    const s = shot(cell.p);
-    const d = document.createElement("div");
-    d.className = "cell" + (idx === store.picked && !forShot ? " picked" : "");
-    d.style.left = px(cell.r[0]); d.style.top = px(cell.r[1]);
-    d.style.width = px(cell.r[2]); d.style.height = px(cell.r[3]);
-    d.dataset.panel = idx;
-    const im = document.createElement("img");
-    im.src = s.file; im.alt = s.place; im.draggable = false;
-    im.style.filter = cssFilter();
-    const c = cropFor(idx);
-    const fit = coverFit(imgs.get(s.key) || { naturalWidth:1920, naturalHeight:1280 },
-      cell.r[2] * W, cell.r[3] * H, s.fx, s.fy, c.zoom, c.ox, c.oy);
-    im.style.left = fit[4] + "px"; im.style.top = fit[5] + "px";
-    im.style.width = fit[6] + "px"; im.style.height = fit[7] + "px";
-    d.appendChild(im);
-    if(store.showTags && !cell.band){
-      const t = document.createElement("div");
-      t.className = "tag";
-      t.style.left = "2.5%"; t.style.top = "4%";
-      t.innerHTML = chipHTML(s);
-      d.appendChild(t);
-    }
-    el.appendChild(d);
-  });
-  if(store.halftone){ const h = document.createElement("div"); h.className = "halftone"; el.appendChild(h); }
-  if(store.speedlines){ const h = document.createElement("div"); h.className = "speedlines"; el.appendChild(h); }
-  /* title band */
-  const band = document.createElement("div");
-  band.className = "band";
-  band.style.height = "34%";
-  band.innerHTML = `<div class="scrim"></div>`;
-  const head = document.createElement("div");
-  head.className = "headline";
-  head.textContent = store.title;
-  head.style.fontSize = "1.55em";
-  head.style.marginTop = "0.35em";
-  band.appendChild(head);
-  const sub = document.createElement("div");
-  sub.className = "script-sub";
-  sub.textContent = store.script;
-  sub.style.fontSize = "0.62em";
-  sub.style.marginTop = "-0.1em";
-  band.appendChild(sub);
-  const kick = document.createElement("div");
-  kick.className = "kicker";
-  kick.style.fontSize = "0.24em";
-  kick.style.marginTop = "0.55em";
-  kick.innerHTML = `<span class="stars">${"\u2605".repeat(store.stars)}</span> ${store.kicker}`;
-  band.appendChild(kick);
-  el.appendChild(band);
-  /* badges + chips */
-  if(store.showBadge){
-    const b = document.createElement("div");
-    b.className = "est";
-    b.style.width = "1.05em"; b.style.height = "1.05em";
-    b.style.left = "3%"; b.style.bottom = "16%";
-    b.innerHTML = `<span style="font-size:.30em; line-height:1.1"><small>EST.</small>2026</span>`;
-    el.appendChild(b);
-  }
-  if(store.showVolume){
-    const v = document.createElement("div");
-    v.className = "vol"; v.textContent = store.volume;
-    v.style.right = "4%"; v.style.bottom = "24%"; v.style.fontSize = "0.24em";
-    el.appendChild(v);
-  }
-  if(store.showRibbon){
-    const r = document.createElement("div");
-    r.className = "ribbon"; r.textContent = store.ribbon;
-    r.style.right = "3%"; r.style.bottom = "17.5%"; r.style.fontSize = "0.22em";
-    el.appendChild(r);
-  }
-  if(store.showWanted){
-    const w = document.createElement("div");
-    w.className = "wanted";
-    w.innerHTML = `${store.hud} <span class="stars">${"\u2605".repeat(store.stars)}</span>`;
-    w.style.right = "3%"; w.style.top = "15%"; w.style.fontSize = "0.24em";
-    el.appendChild(w);
-  }
-  /* strip + catalog */
-  const stripH = 0.055, catH = 0.028;
-  const strip = document.createElement("div");
-  strip.className = "strip";
-  strip.textContent = store.strip;
-  strip.style.height = (stripH * 100) + "%";
-  strip.style.fontSize = "0.26em";
-  strip.style.display = "flex"; strip.style.alignItems = "center"; strip.style.justifyContent = "center";
-  strip.style.bottom = store.showCatalog ? (catH * 100) + "%" : "0";
-  el.appendChild(strip);
-  if(store.showCatalog){
-    const cat = document.createElement("div");
-    cat.className = "catalog";
-    cat.style.height = (catH * 100) + "%";
-    cat.style.fontSize = "0.15em";
-    cat.innerHTML = `<span>${store.title} \u2014 A COVER STUDIO PICTURE \u2014 YOUR PHOTOS \u2014 GRADED BY HAND \u2014 ${ed.cat}</span><span class="barcode"></span>`;
-    el.appendChild(cat);
-  }
-}
-function renderAll(){
-  fitCoverBox(coverEl);
-  buildCoverInto(coverEl, false);
-  syncPanelBar();
-}
-
-/* ---------- controls ---------- */
-function pillBtn(label, note, on, fn){
-  const b = document.createElement("button");
-  b.type = "button"; b.className = "pill" + (on ? " on" : "");
-  b.innerHTML = note ? `${label}<small>${note}</small>` : label;
-  b.addEventListener("click", fn);
-  return b;
-}
-function buildControls(){
-  const sr = $("sizeRow"); sr.innerHTML = "";
-  SIZES.forEach((s) => sr.appendChild(pillBtn(s.label, s.note, store.size === s.id, () => {
-    store.size = s.id; $("exportPngBtn").textContent = `Export PNG ${s.w} \u00D7 ${s.h}`; buildControls(); renderAll();
-  })));
-  const vr = $("variantRow"); vr.innerHTML = "";
-  Object.keys(EDITIONS).forEach((k) => vr.appendChild(pillBtn(EDITIONS[k].label, null, store.edition === k, () => {
-    store.edition = k; const ed = edition();
-    store.layout = ed.layout; store.title = ed.title; store.script = ed.script;
-    store.strip = ed.strip; store.kicker = ed.kicker;
-    store.picked = 0; store.crops = {};
-    buildControls(); renderAll();
-  })));
-  const lg = $("layoutGrid"); lg.innerHTML = "";
-  Object.keys(LAYOUTS).forEach((k) => {
-    const b = document.createElement("button");
-    b.type = "button"; b.className = "opt" + (store.layout === k ? " on" : "");
-    const [c1, c2] = GRADE_TINTS[store.grade];
-    b.innerHTML = `<span class="swatch" style="background:linear-gradient(90deg, ${c1}, ${c2})"></span>${LAYOUTS[k].label}`;
-    b.addEventListener("click", () => { store.layout = k; store.picked = 0; buildControls(); renderAll(); });
-    lg.appendChild(b);
-  });
-  const gg = $("gradeGrid"); gg.innerHTML = "";
-  Object.keys(GRADES).forEach((k) => {
-    const b = document.createElement("button");
-    b.type = "button"; b.className = "opt" + (store.grade === k ? " on" : "");
-    const [c1, c2] = GRADE_TINTS[k];
-    b.innerHTML = `<span class="swatch" style="background:linear-gradient(90deg, ${c1}, ${c2})"></span>${GRADES[k].label}`;
-    b.addEventListener("click", () => { store.grade = k; buildControls(); renderAll(); });
-    gg.appendChild(b);
-  });
-  const sliders = [
-    ["strength", "Strength", 0, 1, 0.01], ["contrast", "Contrast", 0.5, 1.6, 0.01],
-    ["saturation", "Saturation", 0.4, 1.8, 0.01], ["grain", "Grain", 0, 1, 0.01], ["vignette", "Vignette", 0, 1, 0.01],
-  ];
-  const sb = $("sliderBox"); sb.innerHTML = "";
-  sliders.forEach(([key, label, lo, hi, step]) => {
-    const f = document.createElement("div"); f.className = "field";
-    f.innerHTML = `<div class="rowline"><label>${label}</label><output>${(+store[key]).toFixed(2)}</output></div>`;
-    const r = document.createElement("input");
-    r.type = "range"; r.min = lo; r.max = hi; r.step = step; r.value = store[key];
-    r.addEventListener("input", () => { store[key] = +r.value; f.querySelector("output").textContent = (+r.value).toFixed(2); renderAll(); });
-    f.appendChild(r); sb.appendChild(f);
-  });
-  const fx = $("fxChecks"); fx.innerHTML = "";
-  [["halftone", "Halftone print dots"], ["speedlines", "Speed lines"]].forEach(([key, label]) => {
-    const l = document.createElement("label"); l.className = store[key] ? "on" : "";
-    l.innerHTML = `<input type="checkbox" ${store[key] ? "checked" : ""}> ${label}`;
-    l.querySelector("input").addEventListener("change", (e) => { store[key] = e.target.checked; renderAll(); });
-    fx.appendChild(l);
-  });
-  const texts = [
-    ["title", "Title"], ["script", "Neon tagline"], ["kicker", "Kicker line"], ["strip", "Bottom strip"],
-    ["badge", "Badge"], ["volume", "Volume"], ["ribbon", "Ribbon"], ["hud", "HUD word"],
-  ];
-  const tb = $("textBox"); tb.innerHTML = "";
-  texts.forEach(([key, label]) => {
-    const f = document.createElement("div"); f.className = "field";
-    f.innerHTML = `<label>${label}</label>`;
-    const inp = document.createElement("input");
-    inp.type = "text"; inp.value = store[key];
-    inp.addEventListener("input", () => { store[key] = inp.value; renderAll(); });
-    f.appendChild(inp); tb.appendChild(f);
-  });
-  const sf = document.createElement("div"); sf.className = "field";
-  sf.innerHTML = `<div class="rowline"><label>Stars</label><output>${store.stars}</output></div>`;
-  const sr2 = document.createElement("input");
-  sr2.type = "range"; sr2.min = 1; sr2.max = 5; sr2.step = 1; sr2.value = store.stars;
-  sr2.addEventListener("input", () => { store.stars = +sr2.value; sf.querySelector("output").textContent = sr2.value; renderAll(); });
-  sf.appendChild(sr2); tb.appendChild(sf);
-  const stickers = [
-    ["showTags", "Location tags"], ["showBadge", "Badge"], ["showVolume", "Volume tag"],
-    ["showRibbon", "Ribbon"], ["showWanted", "WANTED chip"], ["showCatalog", "Catalog line"],
-  ];
-  const sc = $("stickerChecks"); sc.innerHTML = "";
-  stickers.forEach(([key, label]) => {
-    const l = document.createElement("label"); l.className = store[key] ? "on" : "";
-    l.innerHTML = `<input type="checkbox" ${store[key] ? "checked" : ""}> ${label}`;
-    l.querySelector("input").addEventListener("change", (e) => { store[key] = e.target.checked; renderAll(); });
-    sc.appendChild(l);
-  });
-  const pg = $("panelGrade"); pg.innerHTML = "";
-  Object.keys(GRADES).forEach((k) => {
-    const o = document.createElement("option"); o.value = k; o.textContent = GRADES[k].label;
-    if(store.grade === k) o.selected = true; pg.appendChild(o);
-  });
-  pg.addEventListener("change", () => { store.grade = pg.value; buildControls(); renderAll(); });
-}
-
-/* ---------- panel bar ---------- */
-function syncPanelBar(){
-  const list = panels();
-  const idx = Math.min(store.picked, list.length - 1);
-  store.picked = idx;
-  const cell = list[idx], s = shot(cell.p), c = cropFor(idx);
-  $("panelWho").innerHTML = `Panel ${idx + 1}<small>${idx + 1} of ${list.length}</small>`;
-  const pp = $("panelPhoto"); pp.innerHTML = "";
-  SHOTS.forEach((sh, i) => {
-    const o = document.createElement("option"); o.value = i; o.textContent = `${i + 1}. ${sh.place}`;
-    if(i === cell.p) o.selected = true; pp.appendChild(o);
-  });
-  pp.onchange = () => { list[idx].p = +pp.value; renderAll(); };
-  $("panelZoom").value = c.zoom;
-  $("panelZoom").oninput = (e) => { c.zoom = +e.target.value; renderAll(); };
-  const ps = $("panelSwap"); ps.innerHTML = `<option value="">\u2014</option>`;
-  list.forEach((cl, i) => {
-    if(i === idx) return;
-    const o = document.createElement("option"); o.value = i; o.textContent = `Panel ${i + 1} (${shot(cl.p).place})`;
-    ps.appendChild(o);
-  });
-  ps.onchange = () => {
-    if(ps.value === "") return;
-    const j = +ps.value, tmp = list[idx].p; list[idx].p = list[j].p; list[j].p = tmp;
-    ps.value = ""; renderAll();
-  };
-  $("panelPlace").value = s.place;
-  $("panelPlace").oninput = (e) => { s.place = e.target.value.toUpperCase(); renderAll(); };
-  $("panelSub").value = `${s.when} \u2014 ${s.sub}`;
-  $("panelSub").oninput = (e) => {
-    const parts = e.target.value.split("\u2014");
-    if(parts[0] !== undefined) s.when = parts[0].trim();
-    if(parts[1] !== undefined) s.sub = parts[1].trim().toUpperCase();
-    renderAll();
-  };
-  $("resetCropBtn").onclick = () => { store.crops[idx] = { zoom:1, ox:0, oy:0 }; renderAll(); };
-}
-
-/* ---------- thumbs + photos ---------- */
-function buildThumbs(){
-  const box = $("thumbs"); box.innerHTML = "";
-  SHOTS.forEach((s, i) => {
-    const d = document.createElement("div");
-    d.className = "thumb" + (store.pickedPhoto === i ? " sel" : "");
-    d.innerHTML = `<img src="${s.file}" alt="${s.place}"><span class="num">${i + 1}</span>`;
-    d.addEventListener("click", () => {
-      const list = panels();
-      list[store.picked].p = i; store.pickedPhoto = i;
-      buildThumbs(); renderAll();
-    });
-    box.appendChild(d);
-  });
-  $("photoCount").textContent = `${SHOTS.length} loaded`;
-}
-function loadSamples(){
-  return Promise.all(SHOTS.map((s) => new Promise((res) => {
-    const im = new Image();
-    im.onload = () => { imgs.set(s.key, im); res(true); };
-    im.onerror = () => res(false);
-    im.src = s.file;
-  })));
-}
-
-/* ---------- WebGL grade ---------- */
-/* Each grade call builds its own WebGL context, sized to the photo it grades. */
-const FRAG = `
-precision mediump float;
-varying vec2 vUv;
-uniform sampler2D uImg;
-uniform float uSat, uCon, uBri, uWarm, uTeal, uVig, uGrain, uHalo, uSpeed, uTime, uStrength;
-float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-void main(){
-  vec4 c = texture2D(uImg, vUv);
-  vec3 col = c.rgb;
-  float lum = dot(col, vec3(0.299, 0.587, 0.114));
-  col = mix(vec3(lum), col, uSat);
-  col = (col - 0.5) * uCon + 0.5;
-  col *= uBri;
-  col.r += uWarm * 0.10; col.b -= uWarm * 0.08;
-  col.g += uTeal * 0.06; col.b += uTeal * 0.08;
-  col = mix(c.rgb, col, uStrength);
-  vec2 d = vUv - 0.5;
-  float vig = 1.0 - uVig * dot(d, d) * 1.6;
-  col *= clamp(vig, 0.0, 1.0);
-  if(uGrain > 0.001){
-    float n = hash(vUv * vec2(913.0, 771.0) + fract(uTime) * 17.0) - 0.5;
-    col += n * uGrain * 0.12;
-  }
-  if(uHalo > 0.5){
-    vec2 g = vUv * vec2(160.0, 160.0);
-    float dotp = step(0.72, fract(g.x * 0.5 + g.y) * fract(g.x + g.y * 0.5));
-    col = mix(col, col * 0.55 + 0.25, dotp * 0.35);
-  }
-  if(uSpeed > 0.5){
-    float band = smoothstep(0.94, 1.0, sin((vUv.x + vUv.y) * 220.0) * 0.5 + 0.5);
-    col = mix(col, vec3(1.0), band * 0.10);
-  }
-  gl_FragColor = vec4(clamp(col, 0.0, 1.0), c.a);
-}`;
-const VERT = `attribute vec2 aPos; varying vec2 vUv;
-void main(){ vUv = vec2(aPos.x * 0.5 + 0.5, 0.5 - aPos.y * 0.5); gl_Position = vec4(aPos, 0.0, 1.0); }`;
+const grader = { mode:"none", gl:null, prog:null, canvas:null, tex:null };
 function glSetup(w, h){
+  /* Build a fresh, correctly-sized WebGL context per photo (v6 lesson:
+     a shared canvas left at its 300x150 default while the viewport was set
+     to the photo size, so the graded output came out a 300x150 sliver). */
   const cv = document.createElement("canvas");
-  cv.width = w; cv.height = h;
-  const gl = cv.getContext("webgl", { preserveDrawingBuffer:true }) || cv.getContext("experimental-webgl");
+  cv.width = Math.max(2, Math.round(w)); cv.height = Math.max(2, Math.round(h));
+  const gl = cv.getContext("webgl", { preserveDrawingBuffer:true, antialias:false })
+          || cv.getContext("experimental-webgl", { preserveDrawingBuffer:true });
   if(!gl) return null;
   const compile = (type, src) => {
-    const sh = gl.createShader(type); gl.shaderSource(sh, src); gl.compileShader(sh);
-    return gl.getShaderParameter(sh, gl.COMPILE_STATUS) ? sh : null;
+    const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+    if(!gl.getShaderParameter(s, gl.COMPILE_STATUS)) return null; return s;
   };
-  const vs = compile(gl.VERTEX_SHADER, VERT), fs = compile(gl.FRAGMENT_SHADER, FRAG);
+  const vs = compile(gl.VERTEX_SHADER, GL_VERT), fs = compile(gl.FRAGMENT_SHADER, GL_FRAG);
   if(!vs || !fs) return null;
-  const pr = gl.createProgram();
-  gl.attachShader(pr, vs); gl.attachShader(pr, fs); gl.linkProgram(pr);
-  if(!gl.getProgramParameter(pr, gl.LINK_STATUS)) return null;
+  const prog = gl.createProgram();
+  gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
+  if(!gl.getProgramParameter(prog, gl.LINK_STATUS)) return null;
+  gl.useProgram(prog);
   const buf = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
-  return { gl, prog: pr, tex: gl.createTexture() };
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 0,0,  1,-1, 1,0,  -1,1, 0,1,  1,1, 1,1]), gl.STATIC_DRAW);
+  const aPos = gl.getAttribLocation(prog, "aPos"), aUv = gl.getAttribLocation(prog, "aUv");
+  gl.enableVertexAttribArray(aPos); gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 16, 0);
+  gl.enableVertexAttribArray(aUv);  gl.vertexAttribPointer(aUv, 2, gl.FLOAT, false, 16, 8);
+  return { gl, prog, cv };
 }
-function gradeToCanvas(img){
-  const g = GRADES[store.grade];
-  const w = img.naturalWidth, h = img.naturalHeight;
-  const out = document.createElement("canvas"); out.width = w; out.height = h;
+/* Grade one image into a canvas of the requested size. Returns the canvas. */
+function gradePhoto(img, gradeKey, w, h){
+  const g = GRADES[gradeKey] || GRADES.vice;
   const setup = glSetup(w, h);
-  if(!setup){
-    gradeMode = "2d";
-    const ctx = out.getContext("2d");
-    ctx.filter = cssFilter();
-    ctx.drawImage(img, 0, 0);
-    ctx.filter = "none";
-    return out;
+  if(setup){
+    grader.mode = "webgl";
+    const { gl, prog, cv } = setup;
+    const tex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    /* Flip on upload: without this the image comes out upside down, because
+       texImage2D stores the first row at t=0 while clip-space y=-1 (the
+       bottom of the canvas) samples v=0. */
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
+    const U = n => gl.getUniformLocation(prog, n);
+    gl.uniform1i(U("uTex"), 0);
+    gl.uniform3fv(U("uTint"), g.tint);
+    gl.uniform1f(U("uWarm"), g.warm); gl.uniform1f(U("uPink"), g.pink); gl.uniform1f(U("uTeal"), g.teal);
+    gl.uniform1f(U("uContrast"), state.contrast);
+    gl.uniform1f(U("uSaturation"), state.saturation);
+    gl.uniform1f(U("uStrength"), state.strength);
+    gl.uniform1f(U("uGrain"), state.grain);
+    gl.uniform1f(U("uVignette"), state.vignette);
+    gl.uniform1f(U("uSeed"), Math.random() * 10);
+    gl.viewport(0, 0, cv.width, cv.height);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    gl.deleteTexture(tex);
+    return cv;
   }
-  const { gl, prog, tex } = setup;
-  gradeMode = "webgl";
-  gl.viewport(0, 0, w, h);
-  gl.bindTexture(gl.TEXTURE_2D, tex);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-  gl.useProgram(prog);
-  const loc = (n) => gl.getUniformLocation(prog, n);
-  gl.uniform1i(loc("uImg"), 0);
-  gl.uniform1f(loc("uSat"), 1 + (g.sat - 1) * store.strength * store.saturation);
-  gl.uniform1f(loc("uCon"), 1 + (g.con - 1) * store.strength + (store.contrast - 1));
-  gl.uniform1f(loc("uBri"), 1 + (g.bri - 1) * store.strength);
-  gl.uniform1f(loc("uWarm"), g.warm * store.strength);
-  gl.uniform1f(loc("uTeal"), g.teal * store.strength);
-  gl.uniform1f(loc("uVig"), g.vig * store.vignette);
-  gl.uniform1f(loc("uGrain"), store.grain);
-  gl.uniform1f(loc("uHalo"), store.halftone ? 1 : 0);
-  gl.uniform1f(loc("uSpeed"), store.speedlines ? 1 : 0);
-  gl.uniform1f(loc("uTime"), (Date.now() % 1000) / 1000);
-  gl.uniform1f(loc("uStrength"), store.strength);
-  const pos = gl.getAttribLocation(prog, "aPos");
-  gl.enableVertexAttribArray(pos);
-  gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
-  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-  out.getContext("2d").drawImage(gl.canvas, 0, 0);
-  return out;
-}
-
-/* ---------- canvas export ---------- */
-function roundRect(ctx, x, y, w, h, r){
-  ctx.beginPath();
-  ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
-  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
-}
-function drawChip(ctx, x, y, s, scale){
-  ctx.save();
-  ctx.fillStyle = "rgba(8,3,18,0.85)";
-  ctx.strokeStyle = "rgba(255,255,255,0.25)"; ctx.lineWidth = Math.max(1, 1.4 * scale);
-  const w = Math.max(150 * scale, ctx.measureText(s.place).width + 22 * scale);
-  const h = 34 * scale;
-  roundRect(ctx, x, y, w, h, 7 * scale); ctx.fill(); ctx.stroke();
-  ctx.fillStyle = "#fff"; ctx.font = `800 ${13 * scale}px Arial`; ctx.textBaseline = "middle";
-  ctx.fillText(s.place, x + 10 * scale, y + h * 0.32);
-  ctx.fillStyle = "#ffd9ec"; ctx.font = `600 ${10 * scale}px Arial`;
-  ctx.fillText(`${s.when} \u2014 ${s.sub}`, x + 10 * scale, y + h * 0.74);
-  ctx.restore();
-}
-function exportCanvas(W, H){
-  const ed = edition(), list = panels();
-  const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
-  const ctx = cv.getContext("2d");
-  ctx.fillStyle = "#0d0618"; ctx.fillRect(0, 0, W, H);
-  const scale = W / 1000;
-  const graded = new Map();
-  list.forEach((cell) => {
-    const s = shot(cell.p);
-    if(!graded.has(s.key)) graded.set(s.key, gradeToCanvas(imgs.get(s.key) || new Image()));
-  });
-  list.forEach((cell, idx) => {
-    const s = shot(cell.p), src = graded.get(s.key);
-    const [x, y, w, h] = [cell.r[0] * W, cell.r[1] * H, cell.r[2] * W, cell.r[3] * H];
-    ctx.save();
-    ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
-    const c = cropFor(idx);
-    const fit = coverFit(src, w, h, s.fx, s.fy, c.zoom, c.ox, c.oy);
-    ctx.drawImage(src, fit[4] + x, fit[5] + y, fit[6], fit[7]);
-    ctx.restore();
-    if(store.showTags && !cell.band) drawChip(ctx, x + w * 0.025, y + h * 0.04, s, scale);
-  });
-  if(store.halftone){
-    ctx.save(); ctx.globalAlpha = 0.16; ctx.fillStyle = "#000";
-    for(let yy = 0; yy < H; yy += 7) for(let xx = 0; xx < W; xx += 7){
-      if(((xx + yy) / 7) % 2 === 0){ ctx.beginPath(); ctx.arc(xx, yy, 1.1, 0, 7); ctx.fill(); }
-    }
-    ctx.restore();
-  }
-  /* title band */
-  const bandH = H * 0.34, bandY = H - bandH - H * 0.083;
-  const scrim = ctx.createLinearGradient(0, bandY, 0, H);
-  scrim.addColorStop(0, "rgba(10,3,22,0)"); scrim.addColorStop(0.45, "rgba(10,3,22,0.55)"); scrim.addColorStop(1, "rgba(10,3,22,0.8)");
-  ctx.fillStyle = scrim; ctx.fillRect(0, bandY, W, bandH + H * 0.083);
-  const grad = ctx.createLinearGradient(0, bandY + 10, 0, bandY + bandH * 0.62);
-  grad.addColorStop(0, "#fff7d6"); grad.addColorStop(0.28, "#ffd166"); grad.addColorStop(0.52, "#ff7a59");
-  grad.addColorStop(0.78, "#ff2e88"); grad.addColorStop(1, "#b5179e");
-  ctx.save();
-  ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  const tSize = W * 0.115;
-  ctx.font = `900 ${tSize}px "Arial Black", Arial, sans-serif`;
-  ctx.shadowColor = "rgba(43,10,77,0.9)"; ctx.shadowBlur = 0; ctx.shadowOffsetY = tSize * 0.10;
-  ctx.fillStyle = grad;
-  ctx.fillText(store.title, W / 2, bandY + bandH * 0.34);
-  ctx.shadowOffsetY = 0;
-  ctx.font = `italic 700 ${W * 0.042}px "Segoe Script", "Brush Script MT", cursive`;
-  ctx.fillStyle = "#ff5da2"; ctx.shadowColor = "rgba(255,46,136,0.6)"; ctx.shadowBlur = W * 0.012;
-  ctx.fillText(store.script, W / 2, bandY + bandH * 0.66);
-  ctx.shadowBlur = 0;
-  ctx.font = `800 ${W * 0.017}px Arial`;
-  ctx.fillStyle = "#ffe9f4";
-  ctx.fillText(`${"\u2605".repeat(store.stars)}  ${store.kicker}`, W / 2, bandY + bandH * 0.88);
-  ctx.restore();
-  /* badges */
-  if(store.showBadge){
-    const bx = W * 0.035, by = H - H * 0.20, br = W * 0.038;
-    ctx.save();
-    const bg = ctx.createRadialGradient(bx - br * 0.3, by - br * 0.3, br * 0.1, bx, by, br);
-    bg.addColorStop(0, "#ffe27a"); bg.addColorStop(0.6, "#ffb020"); bg.addColorStop(1, "#f08c00");
-    ctx.fillStyle = bg; ctx.beginPath(); ctx.arc(bx, by, br, 0, 7); ctx.fill();
-    ctx.lineWidth = 3; ctx.strokeStyle = "#fff3c4"; ctx.stroke();
-    ctx.fillStyle = "#3a2200"; ctx.textAlign = "center";
-    ctx.font = `800 ${br * 0.28}px Arial`; ctx.fillText("EST.", bx, by - br * 0.18);
-    ctx.font = `900 ${br * 0.52}px Arial`; ctx.fillText("2026", bx, by + br * 0.32);
-    ctx.restore();
-  }
-  if(store.showVolume){
-    ctx.save();
-    ctx.font = `900 ${W * 0.016}px Arial`;
-    const vw = ctx.measureText(store.volume).width + W * 0.02;
-    ctx.fillStyle = "#22d3ee";
-    roundRect(ctx, W - vw - W * 0.04, H - H * 0.245, vw, H * 0.032, 5); ctx.fill();
-    ctx.fillStyle = "#04202a"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    ctx.fillText(store.volume, W - vw / 2 - W * 0.04, H - H * 0.245 + H * 0.016);
-    ctx.restore();
-  }
-  if(store.showRibbon){
-    ctx.save();
-    ctx.translate(W - W * 0.13, H - H * 0.185); ctx.rotate(-0.05);
-    ctx.font = `900 ${W * 0.015}px Arial`;
-    const rw = ctx.measureText(store.ribbon).width + W * 0.03;
-    ctx.fillStyle = "#ff2e88";
-    roundRect(ctx, -rw / 2, -H * 0.016, rw, H * 0.032, 4); ctx.fill();
-    ctx.fillStyle = "#fff"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    ctx.fillText(store.ribbon, 0, 0);
-    ctx.restore();
-  }
-  if(store.showWanted){
-    ctx.save();
-    ctx.font = `900 ${W * 0.016}px Arial`;
-    const label = `${store.hud} ${"\u2605".repeat(store.stars)}`;
-    const ww = ctx.measureText(label).width + W * 0.03;
-    ctx.fillStyle = "rgba(8,3,18,0.88)";
-    roundRect(ctx, W - ww - W * 0.03, H * 0.15, ww, H * 0.038, H * 0.019); ctx.fill();
-    ctx.strokeStyle = "rgba(255,255,255,0.35)"; ctx.lineWidth = 1.5; ctx.stroke();
-    ctx.fillStyle = "#fff"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    ctx.fillText(label, W - ww / 2 - W * 0.03, H * 0.15 + H * 0.019);
-    ctx.restore();
-  }
-  /* strip + catalog */
-  const catH = store.showCatalog ? H * 0.028 : 0;
-  const stripH = H * 0.055, stripY = H - catH - stripH;
-  const sg = ctx.createLinearGradient(0, stripY, W, stripY);
-  sg.addColorStop(0, "#7b1fa2"); sg.addColorStop(0.5, "#ff2e88"); sg.addColorStop(1, "#7b1fa2");
-  ctx.fillStyle = sg; ctx.fillRect(0, stripY, W, stripH);
-  ctx.fillStyle = "rgba(255,255,255,0.25)"; ctx.fillRect(0, stripY, W, 2);
-  ctx.fillStyle = "#fff"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  ctx.font = `900 ${stripH * 0.42}px Arial`;
-  ctx.fillText(store.strip, W / 2, stripY + stripH / 2);
-  if(store.showCatalog){
-    ctx.fillStyle = "rgba(8,3,18,0.9)"; ctx.fillRect(0, H - catH, W, catH);
-    ctx.fillStyle = "rgba(255,255,255,0.85)"; ctx.textAlign = "left";
-    ctx.font = `600 ${catH * 0.42}px Arial`;
-    ctx.fillText(`${store.title} \u2014 A COVER STUDIO PICTURE \u2014 YOUR PHOTOS \u2014 GRADED BY HAND \u2014 ${ed.cat}`, W * 0.01, H - catH / 2);
-    ctx.fillStyle = "#fff";
-    let bx = W * 0.955;
-    for(let i = 0; i < 22; i++){ const bw = (i % 3 === 0 ? 3 : 1.5) * scale; ctx.fillRect(bx, H - catH * 0.8, bw, catH * 0.6); bx += bw + 2.4 * scale; }
-  }
+  /* 2D fallback: same knobs through the canvas filter chain. */
+  grader.mode = "2d";
+  const cv = document.createElement("canvas");
+  cv.width = Math.max(2, Math.round(w)); cv.height = Math.max(2, Math.round(h));
+  const cx = cv.getContext("2d");
+  cx.filter = `saturate(${state.saturation}) contrast(${state.contrast}) brightness(${1 + g.warm * 0.04})`;
+  cx.drawImage(img, 0, 0, cv.width, cv.height);
+  cx.filter = "none";
   return cv;
 }
-function downloadCanvas(cv, name){
-  cv.toBlob((blob) => {
-    if(!blob) return;
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob); a.download = name;
-    document.body.appendChild(a); a.click();
-    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000);
-  }, "image/png");
+/* cover-fit rect for a photo inside a box, anchored on its focus point. */
+function coverRect(srcW, srcH, boxW, boxH, fx, fy, zoom, panX, panY){
+  const scale = Math.max(boxW / srcW, boxH / srcH) * zoom;
+  const dw = srcW * scale, dh = srcH * scale;
+  let dx = boxW / 2 - fx * dw + panX * boxW;
+  let dy = boxH / 2 - fy * dh + panY * boxH;
+  dx = Math.min(0, Math.max(boxW - dw, dx));
+  dy = Math.min(0, Math.max(boxH - dh, dy));
+  return { dx, dy, dw, dh };
 }
-function exportDataURL(w, h){ return exportCanvas(w, h).toDataURL("image/png"); }
-function exportSize(s){ downloadCanvas(exportCanvas(s.w, s.h), `sunset-state-${s.id}-${s.w}x${s.h}.png`); }
-function exportAllSizes(){ SIZES.forEach((s, i) => setTimeout(() => exportSize(s), i * 450)); }
 
-/* ---------- interactions ---------- */
-function wireInteractions(){
-  let drag = null;
-  coverEl.addEventListener("pointerdown", (e) => {
-    const cell = e.target.closest(".cell");
-    if(!cell) return;
-    store.picked = +cell.dataset.panel;
-    drag = { panel: store.picked, x0: e.clientX, y0: e.clientY, moved: false };
-    coverEl.setPointerCapture(e.pointerId);
-    renderAll();
+/* ================= loading ================= */
+const images = {}; let loadedCount = 0;
+function loadPhotos(){
+  LIBRARY.forEach(p => {
+    const im = new Image();
+    im.onload = () => { images[p.id] = im; loadedCount++; renderAll(); };
+    im.onerror = () => { loadedCount++; renderAll(); };
+    im.src = p.file;
   });
-  coverEl.addEventListener("pointermove", (e) => {
+}
+const photoOf = slot => LIBRARY[slotPhoto(slot)];
+
+/* ================= DOM cover ================= */
+const holder = document.getElementById("coverHolder");
+function buildCover(){
+  const v = VARIANTS[state.variant], size = SIZES[state.size], lay = LAYOUTS[state.layout];
+  holder.innerHTML = "";
+  const cover = document.createElement("div");
+  cover.className = "cover " + size.cls;
+  cover.id = "coverEl";
+  const grid = document.createElement("div");
+  grid.className = "cover-grid";
+  grid.style.gridTemplateColumns = `repeat(${lay.cols},1fr)`;
+  /* Strip + catalog are grid rows (not overlays) so they can never be cut off. */
+  grid.style.gridTemplateRows = lay.band ? "1fr 1fr 0.92fr 0.19fr 0.09fr" : `repeat(${lay.rows},1fr) 0.19fr 0.09fr`;
+
+  lay.slots.forEach((slot, i) => {
+    const [pi, c1, c2, r1, r2] = slot;
+    const cell = document.createElement("div");
+    cell.className = "panel" + (i === 0 && state.layout.startsWith("hero") ? " hero" : "");
+    if(state.layout === "heroRight" && i === 0) cell.className = "panel hero-right";
+    cell.style.gridColumn = `${c1} / ${c2}`;
+    cell.style.gridRow = `${r1} / ${r2}`;
+    cell.dataset.slot = i;
+    paintPanel(cell, i);
+    cell.addEventListener("click", () => { state.selected = i; renderPanelBar(); markSelected(); });
+    cell.addEventListener("dblclick", () => { delete state.zoom[i]; delete state.panX[i]; delete state.panY[i]; renderAll(); });
+    cell.addEventListener("pointerdown", ev => startDrag(ev, i));
+    grid.appendChild(cell);
+  });
+
+  if(lay.band){
+    const band = document.createElement("div");
+    band.className = "band";
+    const motel = LIBRARY[6];
+    const bi = document.createElement("canvas");
+    band.appendChild(bi);
+    const scrim = document.createElement("div"); scrim.className = "scrim"; band.appendChild(scrim);
+    if(state.stickers.tags){
+      const tag = document.createElement("div");
+      tag.className = "tag";
+      tag.innerHTML = `<b>${motel.place}</b><span>${motel.sub}</span>`;
+      band.appendChild(tag);
+    }
+    band.dataset.band = "1";
+    grid.appendChild(band);
+    requestAnimationFrame(() => paintBand(band));
+  }
+  cover.appendChild(grid);
+
+  /* title block + badges + strip (DOM overlays) */
+  const tb = document.createElement("div");
+  tb.className = "title-block";
+  tb.innerHTML = `<h1 class="title-main">${escapeHtml(state.texts.title)}</h1>
+    <div class="title-script">${escapeHtml(state.texts.script)}</div>
+    <div class="title-kicker"><span class="stars">${"★".repeat(state.texts.stars)}</span> ${escapeHtml(state.texts.kicker)}</div>`;
+  cover.appendChild(tb);
+  if(state.stickers.badge){
+    const b = document.createElement("div");
+    b.className = "badge-est";
+    b.innerHTML = `<span><small>EST.</small><b class="yr">2026</b></span>`;
+    cover.appendChild(b);
+  }
+  if(state.stickers.volume){
+    const t = document.createElement("div");
+    t.className = "tag-vol"; t.textContent = state.texts.volume; cover.appendChild(t);
+  }
+  if(state.stickers.ribbon){
+    const r = document.createElement("div");
+    r.className = "ribbon"; r.textContent = state.texts.ribbon; cover.appendChild(r);
+  }
+  if(state.stickers.wanted){
+    const w = document.createElement("div");
+    w.className = "wanted";
+    w.innerHTML = `${escapeHtml(state.texts.hud)} <span class="stars">${"★".repeat(state.texts.stars)}</span>`;
+    cover.appendChild(w);
+  }
+  const strip = document.createElement("div");
+  strip.className = "strip"; strip.textContent = state.texts.strip;
+  grid.appendChild(strip);
+  if(state.stickers.catalog){
+    const cat = document.createElement("div");
+    cat.className = "catalog";
+    cat.innerHTML = `<span>${escapeHtml(v.catalog)}</span><span id="barcodeBox"></span>`;
+    grid.appendChild(cat);
+    drawBarcode(cat.querySelector("#barcodeBox"));
+  }
+  holder.appendChild(cover);
+  /* Title sizes derive from the cover's own width so the title can never
+     overflow the cover when the studio preview is narrower than the viewport. */
+  cover.style.setProperty("--cfs", Math.max(28, cover.clientWidth * 0.085) + "px");
+  requestAnimationFrame(() => { paintAllPanels(); markSelected(); });
+}
+function escapeHtml(s){ return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function drawBarcode(box){
+  if(!box) return;
+  box.innerHTML = "";
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("width", "64"); svg.setAttribute("height", "10");
+  let x = 0; const bars = [2,1,3,1,1,2,1,4,1,2,2,1,1,3,2,1];
+  bars.forEach(w => { const r = document.createElementNS("http://www.w3.org/2000/svg","rect");
+    r.setAttribute("x", x); r.setAttribute("y", 0); r.setAttribute("width", w); r.setAttribute("height", 10);
+    r.setAttribute("fill", "#e8ddf7"); svg.appendChild(r); x += w + 1; });
+  box.appendChild(svg);
+}
+function paintPanel(cell, slot){
+  const p = photoOf(slot), img = images[p.id];
+  cell.querySelectorAll("canvas").forEach(c => c.remove());
+  cell.querySelectorAll(".tag").forEach(t => t.remove());
+  if(!img) return;
+  const w = cell.clientWidth || 320, h = cell.clientHeight || 200;
+  const graded = gradePhoto(img, slotGrade(slot), Math.max(240, w), Math.max(160, h));
+  const cv = document.createElement("canvas");
+  cv.width = Math.max(2, w); cv.height = Math.max(2, h);
+  const cx = cv.getContext("2d");
+  /* NOTE: use the image element's own width/height — naturalWidth is
+     undefined on a canvas, which used to produce NaN rects and blank photos. */
+  const iw = img.width || graded.width, ih = img.height || graded.height;
+  const r = coverRect(iw, ih, w, h, p.fx, p.fy, slotZoom(slot), slotPanX(slot), slotPanY(slot));
+  cx.drawImage(graded, r.dx, r.dy, r.dw, r.dh);
+  applyFx(cx, w, h);
+  cell.appendChild(cv);
+  if(state.stickers.tags){
+    const tag = document.createElement("div");
+    tag.className = "tag";
+    tag.innerHTML = `<b>${p.place}</b><span>${p.sub}</span>`;
+    cell.appendChild(tag);
+  }
+}
+function paintBand(band){
+  const img = images["motel"];
+  const cv = band.querySelector("canvas");
+  if(!img || !cv) return;
+  const w = band.clientWidth || 640, h = band.clientHeight || 180;
+  cv.width = Math.max(2, w); cv.height = Math.max(2, h);
+  const graded = gradePhoto(img, state.grade, Math.max(480, w), Math.max(160, h));
+  const cx = cv.getContext("2d");
+  const iw = img.width || graded.width, ih = img.height || graded.height;
+  const r = coverRect(iw, ih, w, h, 0.55, 0.42, 1, 0, 0);
+  cx.drawImage(graded, r.dx, r.dy, r.dw, r.dh);
+  applyFx(cx, w, h);
+}
+function paintAllPanels(){
+  document.querySelectorAll(".panel").forEach(cell => paintPanel(cell, +cell.dataset.slot));
+  const band = document.querySelector(".band");
+  if(band) paintBand(band);
+}
+function applyFx(cx, w, h){
+  if(state.halftone){
+    cx.save(); cx.globalAlpha = 0.10; cx.fillStyle = "#000";
+    for(let y = 4; y < h; y += 9) for(let x = 4; x < w; x += 9){
+      cx.beginPath(); cx.arc(x, y, 1.1, 0, 7); cx.fill();
+    }
+    cx.restore();
+  }
+  if(state.speed){
+    cx.save(); cx.globalAlpha = 0.10; cx.strokeStyle = "#fff"; cx.lineWidth = 2;
+    for(let i = 0; i < 7; i++){
+      const y = h * (0.12 + i * 0.13);
+      cx.beginPath(); cx.moveTo(w * 0.55, y); cx.lineTo(w, y - h * 0.06); cx.stroke();
+    }
+    cx.restore();
+  }
+}
+/* drag to pan a panel's photo */
+let drag = null;
+function startDrag(ev, slot){
+  const cell = ev.currentTarget;
+  drag = { slot, x0: ev.clientX, y0: ev.clientY, px: slotPanX(slot), py: slotPanY(slot), w: cell.clientWidth, h: cell.clientHeight, moved:false };
+  cell.setPointerCapture(ev.pointerId);
+  const move = e => {
     if(!drag) return;
-    const rect = coverEl.getBoundingClientRect();
-    const dx = (e.clientX - drag.x0) / rect.width, dy = (e.clientY - drag.y0) / rect.height;
-    if(Math.abs(dx) + Math.abs(dy) > 0.004) drag.moved = true;
-    const c = cropFor(drag.panel);
-    c.ox = Math.max(-0.4, Math.min(0.4, c.ox + dx));
-    c.oy = Math.max(-0.4, Math.min(0.4, c.oy + dy));
-    drag.x0 = e.clientX; drag.y0 = e.clientY;
+    const dx = (e.clientX - drag.x0) / drag.w, dy = (e.clientY - drag.y0) / drag.h;
+    if(Math.abs(dx) + Math.abs(dy) > 0.01) drag.moved = true;
+    state.panX[drag.slot] = drag.px + dx; state.panY[drag.slot] = drag.py + dy;
+    paintPanel(cell, drag.slot);
+  };
+  const up = () => { drag = null; cell.removeEventListener("pointermove", move); cell.removeEventListener("pointerup", up); };
+  cell.addEventListener("pointermove", move);
+  cell.addEventListener("pointerup", up);
+}
+function markSelected(){
+  document.querySelectorAll(".panel").forEach(c => {
+    c.style.outline = (+c.dataset.slot === state.selected) ? "2px solid #ff4fa3" : "none";
+  });
+}
+
+/* ================= thumbnails / controls ================= */
+function renderThumbs(){
+  const box = document.getElementById("thumbs");
+  box.innerHTML = "";
+  LIBRARY.forEach((p, i) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "thumb" + (i === state.selected ? " sel" : "");
+    b.innerHTML = `<img src="${p.file}" alt="${p.place}"><span class="num">${i + 1}</span>`;
+    b.addEventListener("click", () => { state.selected = i; renderThumbs(); renderPanelBar(); markSelected(); });
+    box.appendChild(b);
+  });
+  document.getElementById("photoCount").textContent = `${LIBRARY.length} loaded`;
+}
+function renderSizeRow(){
+  const row = document.getElementById("sizeRow");
+  row.innerHTML = "";
+  Object.entries(SIZES).forEach(([key, s]) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "size-btn" + (state.size === key ? " on" : "");
+    b.innerHTML = `<b>${s.label}</b><span>${s.sub}</span>`;
+    b.addEventListener("click", () => { state.size = key; renderAll(); });
+    row.appendChild(b);
+  });
+}
+function renderVariantRow(){
+  const row = document.getElementById("variantRow");
+  row.innerHTML = "";
+  Object.entries(VARIANTS).forEach(([key, v]) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "variant-pill" + (state.variant === key ? " on" : "");
+    b.textContent = v.name;
+    b.addEventListener("click", () => {
+      state.variant = key; state.layout = v.layout; state.size = v.size;
+      state.texts.title = v.title; state.texts.script = v.script;
+      state.texts.strip = v.strip; state.texts.kicker = v.kicker;
+      state.assign = [0,1,2,7,3,4,5];
+      renderAll();
+    });
+    row.appendChild(b);
+  });
+}
+function renderLayoutGrid(){
+  const grid = document.getElementById("layoutGrid");
+  grid.innerHTML = "";
+  Object.entries(LAYOUTS).forEach(([key, l]) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "chip-btn" + (state.layout === key ? " on" : "");
+    b.textContent = l.name;
+    b.addEventListener("click", () => { state.layout = key; state.selected = 0; renderAll(); });
+    grid.appendChild(b);
+  });
+}
+function renderGradeGrid(){
+  const grid = document.getElementById("gradeGrid");
+  grid.innerHTML = "";
+  Object.entries(GRADES).forEach(([key, g]) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "chip-btn" + (state.grade === key ? " on" : "");
+    b.dataset.tint = GRADE_TINTS[key];
+    b.textContent = g.name;
+    b.addEventListener("click", () => { state.grade = key; syncGradeSelect(); renderAll(); });
+    grid.appendChild(b);
+  });
+}
+function renderSliders(){
+  const defs = [
+    ["strength", "Strength", 0, 1, 0.01],
+    ["contrast", "Contrast", 0.6, 1.5, 0.01],
+    ["saturation", "Saturation", 0.4, 1.8, 0.01],
+    ["grain", "Grain", 0, 1, 0.01],
+    ["vignette", "Vignette", 0, 1, 0.01],
+  ];
+  const box = document.getElementById("sliderBox");
+  box.innerHTML = "";
+  defs.forEach(([key, label, min, max, step]) => {
+    const row = document.createElement("div");
+    row.className = "slider-row";
+    row.innerHTML = `<span>${label}</span><input type="range" min="${min}" max="${max}" step="${step}" value="${state[key]}"><output>${state[key].toFixed(2)}</output>`;
+    const input = row.querySelector("input");
+    input.addEventListener("input", () => {
+      state[key] = +input.value; row.querySelector("output").textContent = state[key].toFixed(2);
+      paintAllPanels();
+    });
+    box.appendChild(row);
+  });
+}
+function renderTextFields(){
+  const defs = [
+    ["title", "Title"], ["script", "Neon tagline"], ["kicker", "Kicker line"],
+    ["strip", "Bottom strip"], ["badge", "Badge"], ["volume", "Volume"],
+    ["ribbon", "Ribbon"], ["hud", "HUD word"],
+  ];
+  const box = document.getElementById("textFields");
+  box.innerHTML = "";
+  defs.forEach(([key, label]) => {
+    const f = document.createElement("div");
+    f.className = "field";
+    f.innerHTML = `<label>${label}</label><input type="text" value="${escapeHtml(state.texts[key])}">`;
+    f.querySelector("input").addEventListener("input", e => { state.texts[key] = e.target.value; buildCover(); });
+    box.appendChild(f);
+  });
+  const stars = document.createElement("div");
+  stars.className = "field";
+  stars.innerHTML = `<label>Stars <span id="starsVal">${state.texts.stars}</span></label>
+    <input type="range" min="0" max="5" step="1" value="${state.texts.stars}">`;
+  stars.querySelector("input").addEventListener("input", e => {
+    state.texts.stars = +e.target.value;
+    document.getElementById("starsVal").textContent = state.texts.stars;
+    buildCover();
+  });
+  box.appendChild(stars);
+}
+function renderStickers(){
+  const defs = [
+    ["tags", "Location tags"], ["badge", "Badge"], ["volume", "Volume tag"],
+    ["ribbon", "Ribbon"], ["wanted", "WANTED chip"], ["catalog", "Catalog line"],
+  ];
+  const box = document.getElementById("stickerBox");
+  box.innerHTML = "";
+  defs.forEach(([key, label]) => {
+    const l = document.createElement("label");
+    l.className = "check-row";
+    l.innerHTML = `<input type="checkbox" ${state.stickers[key] ? "checked" : ""}> ${label}`;
+    l.querySelector("input").addEventListener("change", e => { state.stickers[key] = e.target.checked; buildCover(); });
+    box.appendChild(l);
+  });
+}
+function renderPanelBar(){
+  const i = state.selected, p = photoOf(i);
+  document.getElementById("pbPanelName").textContent = `Panel ${i + 1}`;
+  document.getElementById("pbPanelOf").textContent = `${i + 1} of ${SLOT_COUNT()}`;
+  const sel = document.getElementById("pbPhoto");
+  sel.innerHTML = "";
+  LIBRARY.forEach((q, j) => {
+    const o = document.createElement("option");
+    o.value = j; o.textContent = `${j + 1}. ${q.place}`;
+    if(j === slotPhoto(i)) o.selected = true;
+    sel.appendChild(o);
+  });
+  sel.onchange = () => { state.assign[i] = +sel.value; renderAll(); };
+  const zoom = document.getElementById("pbZoom");
+  zoom.value = slotZoom(i);
+  document.getElementById("pbZoomVal").textContent = slotZoom(i).toFixed(2) + "×";
+  zoom.oninput = () => {
+    state.zoom[i] = +zoom.value;
+    document.getElementById("pbZoomVal").textContent = (+zoom.value).toFixed(2) + "×";
+    paintAllPanels();
+  };
+  const gs = document.getElementById("pbGrade");
+  gs.innerHTML = "";
+  Object.entries(GRADES).forEach(([k, g]) => {
+    const o = document.createElement("option");
+    o.value = k; o.textContent = g.name;
+    if(k === slotGrade(i)) o.selected = true;
+    gs.appendChild(o);
+  });
+  gs.onchange = () => { state.perGrade[i] = gs.value; paintAllPanels(); };
+  const sw = document.getElementById("pbSwap");
+  sw.innerHTML = `<option value="">—</option>`;
+  for(let j = 0; j < SLOT_COUNT(); j++){
+    if(j === i) continue;
+    const o = document.createElement("option");
+    o.value = j; o.textContent = `Panel ${j + 1} (${photoOf(j).place})`;
+    sw.appendChild(o);
+  }
+  sw.onchange = () => {
+    if(sw.value === "") return;
+    const j = +sw.value;
+    [state.assign[i], state.assign[j]] = [state.assign[j], state.assign[i]];
     renderAll();
+  };
+  const place = document.getElementById("pbPlace");
+  place.value = p.place;
+  place.oninput = () => { p.place = place.value; paintAllPanels(); renderThumbs(); };
+  const sub = document.getElementById("pbSub");
+  sub.value = p.sub;
+  sub.oninput = () => { p.sub = sub.value; paintAllPanels(); };
+}
+function syncGradeSelect(){
+  const gs = document.getElementById("pbGrade");
+  if(gs) gs.value = slotGrade(state.selected);
+}
+function renderAll(){
+  renderThumbs(); renderSizeRow(); renderVariantRow();
+  renderLayoutGrid(); renderGradeGrid(); renderSliders();
+  renderTextFields(); renderStickers(); renderPanelBar();
+  buildCover();
+}
+
+/* ================= canvas export (mirrors the DOM layout math) ================= */
+function layoutGeometry(W, H){
+  const lay = LAYOUTS[state.layout];
+  const stripH = H * 0.064, catH = state.stickers.catalog ? H * 0.031 : 0;
+  const bandH = lay.band ? (H - stripH - catH) * 0.92 / 2.92 : 0;
+  const gridH = H - stripH - catH - bandH;
+  const rows = lay.band ? gridH / 2 : gridH / lay.rows;
+  return { lay, stripH, catH, bandH, gridH, rows };
+}
+function drawCoverToCanvas(W, H){
+  const v = VARIANTS[state.variant], size = SIZES[state.size];
+  const cv = document.createElement("canvas");
+  cv.width = W; cv.height = H;
+  const cx = cv.getContext("2d");
+  cx.fillStyle = "#0d0518"; cx.fillRect(0, 0, W, H);
+  const { lay, stripH, catH, bandH, gridH } = layoutGeometry(W, H);
+  const gap = Math.max(2, W * 0.002);
+  const colW = (W - gap * (lay.cols - 1)) / lay.cols;
+  const rowH = lay.band ? gridH / 2 : gridH / lay.rows;
+
+  const drawPhotoBox = (img, gradeKey, x, y, w, h, fx, fy, zoom, px, py) => {
+    const graded = gradePhoto(img, gradeKey, Math.min(1200, Math.max(240, w)), Math.min(1200, Math.max(160, h)));
+    const iw = img.width || graded.width, ih = img.height || graded.height;
+    const r = coverRect(iw, ih, w, h, fx, fy, zoom, px, py);
+    cx.save(); cx.beginPath(); cx.rect(x, y, w, h); cx.clip();
+    cx.drawImage(graded, x + r.dx, y + r.dy, r.dw, r.dh);
+    cx.restore();
+  };
+  const drawTag = (x, y, place, sub, scale, align) => {
+    cx.save();
+    cx.font = `700 ${Math.round(15 * scale)}px Inter, system-ui, sans-serif`;
+    const w1 = cx.measureText(place).width;
+    cx.font = `${Math.round(11 * scale)}px Inter, system-ui, sans-serif`;
+    const w2 = cx.measureText(sub).width;
+    const bw = Math.max(w1, w2) + 18 * scale, bh = 34 * scale;
+    if (align === "right") x -= bw; /* x is the right edge, not the left */
+    cx.fillStyle = "rgba(12,4,28,0.82)";
+    roundRect(cx, x, y, bw, bh, 8 * scale); cx.fill();
+    cx.strokeStyle = "rgba(255,255,255,0.16)"; cx.lineWidth = 1; cx.stroke();
+    cx.fillStyle = "#fff"; cx.textBaseline = "top";
+    cx.font = `700 ${Math.round(15 * scale)}px Inter, system-ui, sans-serif`;
+    cx.fillText(place, x + 9 * scale, y + 5 * scale);
+    cx.fillStyle = "#ffd7ec";
+    cx.font = `${Math.round(11 * scale)}px Inter, system-ui, sans-serif`;
+    cx.fillText(sub, x + 9 * scale, y + 20 * scale);
+    cx.restore();
+  };
+  const scale = W / 1280;
+
+  lay.slots.forEach((slot, i) => {
+    const [pi, c1, c2, r1, r2] = slot;
+    const p = LIBRARY[slotPhoto(i)], img = images[p.id];
+    if(!img) return;
+    const x = (c1 - 1) * (colW + gap), y = (r1 - 1) * (rowH + gap);
+    const w = (c2 - c1) * colW + (c2 - c1 - 1) * gap;
+    const h = (r2 - r1) * rowH + (r2 - r1 - 1) * gap;
+    drawPhotoBox(img, slotGrade(i), x, y, w, h, p.fx, p.fy, slotZoom(i), slotPanX(i), slotPanY(i));
+    if(state.stickers.tags) drawTag(x + w * 0.06, y + h * 0.07, p.place, p.sub, scale * (w / 320 + 0.4));
   });
-  coverEl.addEventListener("pointerup", () => { drag = null; });
-  coverEl.addEventListener("dblclick", (e) => {
-    const cell = e.target.closest(".cell");
-    if(!cell) return;
-    store.crops[+cell.dataset.panel] = { zoom:1, ox:0, oy:0 };
-    renderAll();
-  });
-  coverEl.addEventListener("dragover", (e) => e.preventDefault());
-  coverEl.addEventListener("drop", (e) => {
-    e.preventDefault();
-    const cell = e.target.closest(".cell");
-    if(!cell || !e.dataTransfer.files.length) return;
-    addUserPhoto(e.dataTransfer.files[0], +cell.dataset.panel);
-  });
-  $("addPhotosBtn").addEventListener("click", () => $("photoInput").click());
-  $("photoInput").addEventListener("change", (e) => {
-    [...e.target.files].forEach((f) => addUserPhoto(f, null));
+
+  if(lay.band){
+    const motel = LIBRARY[6], img = images["motel"];
+    const y = gridH, h = bandH;
+    if(img){
+      drawPhotoBox(img, state.grade, 0, y, W, h, 0.55, 0.42, 1, 0, 0);
+      const g = cx.createLinearGradient(0, y, 0, y + h);
+      g.addColorStop(0, "rgba(13,5,24,0.10)"); g.addColorStop(0.55, "rgba(13,5,24,0.34)"); g.addColorStop(1, "rgba(13,5,24,0.72)");
+      cx.fillStyle = g; cx.fillRect(0, y, W, h);
+      if(state.stickers.tags) drawTag(W * 0.03, y + h * 0.80, motel.place, motel.sub, scale);
+    }
+  }
+  /* effects */
+  if(state.halftone){
+    cx.save(); cx.globalAlpha = 0.10; cx.fillStyle = "#000";
+    for(let y = 6; y < H; y += 11) for(let x = 6; x < W; x += 11){
+      cx.beginPath(); cx.arc(x, y, 1.4, 0, 7); cx.fill();
+    }
+    cx.restore();
+  }
+  if(state.speed){
+    cx.save(); cx.globalAlpha = 0.10; cx.strokeStyle = "#fff"; cx.lineWidth = 2;
+    for(let i = 0; i < 7; i++){
+      const y = H * (0.12 + i * 0.13);
+      cx.beginPath(); cx.moveTo(W * 0.55, y); cx.lineTo(W, y - H * 0.06); cx.stroke();
+    }
+    cx.restore();
+  }
+  /* title block — sized from the band so title + script + kicker all fit
+     above the strip (the old geometry pushed the kicker behind the strip). */
+  const bandTop = lay.band ? gridH : gridH * 0.55;
+  const bandSpan = bandH || H * 0.3;
+  const titleSize = Math.min(W * 0.085, bandSpan * 0.78);
+  const titleY = bandTop + bandSpan * 0.42;
+  cx.save(); cx.textAlign = "center"; cx.textBaseline = "middle";
+  const grad = cx.createLinearGradient(0, titleY - titleSize * 0.5, 0, titleY + titleSize * 0.5);
+  grad.addColorStop(0, "#ffe9a8"); grad.addColorStop(0.34, "#ffb03a");
+  grad.addColorStop(0.62, "#ff5f8f"); grad.addColorStop(0.82, "#e83e8c"); grad.addColorStop(1, "#ff7ab8");
+  cx.font = `900 ${Math.round(titleSize)}px Inter, system-ui, sans-serif`;
+  cx.shadowColor = "rgba(0,0,0,0.55)"; cx.shadowBlur = 18; cx.shadowOffsetY = 6;
+  cx.fillStyle = grad;
+  cx.fillText(state.texts.title, W / 2, titleY);
+  cx.shadowColor = "transparent"; cx.shadowBlur = 0; cx.shadowOffsetY = 0;
+  cx.font = `italic ${Math.round(titleSize * 0.34)}px "Segoe Script", cursive`;
+  cx.fillStyle = "#ff8fc7";
+  cx.fillText(state.texts.script, W / 2, titleY + titleSize * 0.46);
+  cx.font = `800 ${Math.round(titleSize * 0.15)}px Inter, system-ui, sans-serif`;
+  cx.fillStyle = "#fff";
+  cx.fillText(`${"★".repeat(state.texts.stars)} ${state.texts.kicker}`, W / 2, titleY + titleSize * 0.70);
+  cx.restore();
+  /* badges */
+  if(state.stickers.badge){
+    const r = W * 0.047, bx = W * 0.075, by = titleY - titleSize * 0.28;
+    const g2 = cx.createRadialGradient(bx - r * 0.3, by - r * 0.3, r * 0.1, bx, by, r);
+    g2.addColorStop(0, "#ffe98a"); g2.addColorStop(0.55, "#ffc93c"); g2.addColorStop(1, "#e8a100");
+    cx.save(); cx.beginPath(); cx.arc(bx, by, r, 0, 7); cx.fillStyle = g2; cx.fill();
+    cx.lineWidth = 3; cx.strokeStyle = "#fff3c4"; cx.stroke();
+    cx.fillStyle = "#5a3b00"; cx.textAlign = "center"; cx.textBaseline = "middle";
+    cx.font = `800 ${Math.round(r * 0.28)}px Inter, sans-serif`;
+    cx.fillText("EST.", bx, by - r * 0.28);
+    cx.font = `900 ${Math.round(r * 0.5)}px Inter, sans-serif`;
+    cx.fillText("2026", bx, by + r * 0.28);
+    cx.restore();
+  }
+  if(state.stickers.volume){
+    cx.save(); cx.font = `900 ${Math.round(W * 0.016)}px Inter, sans-serif`;
+    const tw = cx.measureText(state.texts.volume).width + W * 0.02;
+    const tx = W * 0.965 - tw, ty = titleY - titleSize * 0.55;
+    cx.fillStyle = "#22d3ee"; roundRect(cx, tx, ty, tw, W * 0.028, 6); cx.fill();
+    cx.fillStyle = "#04222b"; cx.textAlign = "center"; cx.textBaseline = "middle";
+    cx.fillText(state.texts.volume, tx + tw / 2, ty + W * 0.014);
+    cx.restore();
+  }
+  if(state.stickers.ribbon){
+    cx.save(); cx.font = `900 ${Math.round(W * 0.013)}px Inter, sans-serif`;
+    const tw = cx.measureText(state.texts.ribbon).width + W * 0.02;
+    const tx = W * 0.965 - tw, ty = titleY - titleSize * 0.05;
+    cx.fillStyle = "#ff4fa3"; roundRect(cx, tx, ty, tw, W * 0.026, 4); cx.fill();
+    cx.fillStyle = "#fff"; cx.textAlign = "center"; cx.textBaseline = "middle";
+    cx.fillText(state.texts.ribbon, tx + tw / 2, ty + W * 0.013);
+    cx.restore();
+  }
+  if(state.stickers.wanted){
+    cx.save(); cx.font = `900 ${Math.round(W * 0.016)}px Inter, sans-serif`;
+    const label = `${state.texts.hud} ${"★".repeat(state.texts.stars)}`;
+    const tw = cx.measureText(label).width + W * 0.024;
+    const tx = W * 0.965 - tw, ty = H * 0.10;
+    cx.fillStyle = "rgba(12,4,28,0.85)"; roundRect(cx, tx, ty, tw, W * 0.03, W * 0.015); cx.fill();
+    cx.strokeStyle = "rgba(255,255,255,0.22)"; cx.lineWidth = 1; cx.stroke();
+    cx.fillStyle = "#fff"; cx.textAlign = "center"; cx.textBaseline = "middle";
+    cx.fillText(label, tx + tw / 2, ty + W * 0.015);
+    cx.restore();
+  }
+  /* bottom strip + catalog line */
+  cx.save();
+  const sg = cx.createLinearGradient(0, 0, W, 0);
+  sg.addColorStop(0, "#c026d3"); sg.addColorStop(0.55, "#ff4fa3"); sg.addColorStop(1, "#a855f7");
+  cx.fillStyle = sg;
+  cx.fillRect(0, H - stripH - catH, W, stripH);
+  cx.fillStyle = "#fff"; cx.textAlign = "center"; cx.textBaseline = "middle";
+  cx.font = `900 ${Math.round(stripH * 0.42)}px Inter, sans-serif`;
+  cx.fillText(state.texts.strip, W / 2, H - stripH / 2 - catH);
+  if(state.stickers.catalog){
+    cx.fillStyle = "#0d0518"; cx.fillRect(0, H - catH, W, catH);
+    cx.fillStyle = "#b9a8d6"; cx.textAlign = "left";
+    cx.font = `${Math.round(catH * 0.42)}px Inter, sans-serif`;
+    cx.fillText(v.catalog, W * 0.008, H - catH / 2);
+    cx.fillStyle = "#e8ddf7";
+    let bx = W * 0.965;
+    [2,1,3,1,1,2,1,4,1,2,2,1,1,3,2,1].forEach(wb => { cx.fillRect(bx, H - catH * 0.85, wb * 1.6, catH * 0.7); bx += wb * 1.6 + 1.6; });
+  }
+  cx.restore();
+  return cv;
+}
+function roundRect(cx, x, y, w, h, r){
+  cx.beginPath();
+  cx.moveTo(x + r, y); cx.arcTo(x + w, y, x + w, y + h, r); cx.arcTo(x + w, y + h, x, y + h, r);
+  cx.arcTo(x, y + h, x, y, r); cx.arcTo(x, y, x + w, y, r); cx.closePath();
+}
+function downloadPNG(canvas, name){
+  const a = document.createElement("a");
+  a.href = canvas.toDataURL("image/png");
+  a.download = name;
+  a.click();
+}
+function exportSize(key){
+  const s = SIZES[key];
+  const cv = drawCoverToCanvas(s.w, s.h);
+  downloadPNG(cv, `sunset-state-${key}-${s.w}x${s.h}.png`);
+  return cv.toDataURL("image/png").length;
+}
+window.exportDataURL = (w, h) => drawCoverToCanvas(w, h).toDataURL("image/png");
+window.__coverApp = {
+  get gradeMode(){ return grader.mode; },
+  get photosLoaded(){ return loadedCount; },
+  get photoCount(){ return LIBRARY.length; },
+  get state(){ return state; },
+};
+
+/* ================= wiring ================= */
+function wire(){
+  document.getElementById("btnAddTop").addEventListener("click", () => document.getElementById("fileInput").click());
+  document.getElementById("fileInput").addEventListener("change", e => {
+    [...e.target.files].forEach(f => {
+      const url = URL.createObjectURL(f);
+      const id = "user" + LIBRARY.length;
+      LIBRARY.push({ id, file:url, place:f.name.replace(/\.[^.]+$/, "").toUpperCase().slice(0, 14) || "NEW PHOTO",
+        sub:"JUST ADDED", fx:0.5, fy:0.5 });
+      const im = new Image();
+      im.onload = () => { images[id] = im; loadedCount++; renderAll(); };
+      im.src = url;
+    });
     e.target.value = "";
   });
-  $("autoFillBtn").addEventListener("click", () => {
-    const list = panels();
-    list.forEach((cell, i) => { cell.p = i % SHOTS.length; });
-    store.crops = {}; renderAll();
+  document.getElementById("btnAutoFill").addEventListener("click", () => {
+    state.assign = [0,1,2,7,3,4,5]; state.selected = 0; renderAll();
   });
-  $("spreadBtn").addEventListener("click", () => {
-    const list = panels();
-    const order = SHOTS.map((_, i) => i).sort(() => 0.5 - Math.random());
-    list.forEach((cell, i) => { cell.p = order[i % order.length]; });
-    store.crops = {}; renderAll();
-  });
-  $("exportPngBtn").addEventListener("click", () => exportSize(SIZES.find((s) => s.id === store.size)));
-  $("exportAllBtn").addEventListener("click", exportAllSizes);
-  $("exportAllTopBtn").addEventListener("click", exportAllSizes);
-  window.addEventListener("resize", renderAll);
-}
-function addUserPhoto(file, panelIdx){
-  if(!file || !file.type.startsWith("image/")) return;
-  const url = URL.createObjectURL(file);
-  const im = new Image();
-  im.onload = () => {
-    const key = "user" + Date.now();
-    const shot = { key, file:url, place:file.name.replace(/\.[^.]+$/, "").toUpperCase().slice(0, 12) || "YOUR PHOTO",
-                   when:"NOW", sub:"JUST ADDED", fx:0.5, fy:0.5 };
-    SHOTS.push(shot); imgs.set(key, im);
-    if(panelIdx !== null && panelIdx !== undefined) panels()[panelIdx].p = SHOTS.length - 1;
-    buildThumbs(); renderAll();
-  };
-  im.src = url;
-}
-
-/* ---------- init ---------- */
-function shotMode(){
-  const q = new URLSearchParams(location.search);
-  return { shot: q.get("shot") || "", variant: q.get("variant") || "", size: q.get("size") || "" };
-}
-async function boot(){
-  const mode = shotMode();
-  if(mode.variant && EDITIONS[mode.variant]){
-    store.edition = mode.variant;
-    const ed = edition();
-    store.layout = ed.layout; store.title = ed.title; store.script = ed.script;
-    store.strip = ed.strip; store.kicker = ed.kicker;
-  }
-  await loadSamples();
-  buildControls(); buildThumbs(); wireInteractions();
-  if(mode.shot === "cover"){
-    document.body.classList.add("shot-cover");
-    const ed = edition();
-    const [rw, rh] = ed.ratio;
-    const cw = Math.min(window.innerWidth, Math.floor(window.innerHeight * rw / rh));
-    const ch = Math.round(cw * rh / rw);
-    shotEl.style.width = cw + "px";
-    shotEl.style.height = ch + "px";
-    shotEl.style.fontSize = (cw * 0.074).toFixed(1) + "px";
-    buildCoverInto(shotEl, true);
-  } else {
+  document.getElementById("btnSpread").addEventListener("click", () => {
+    const order = [0,1,2,3,4,5,6,7];
+    for(let i = order.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [order[i], order[j]] = [order[j], order[i]];
+    }
+    state.assign = order.slice(0, SLOT_COUNT());
     renderAll();
-  }
-  window.__studio = { exportDataURL, exportCanvas, gradeMode: () => gradeMode, store, SHOTS };
-  window.__ready = true;
+  });
+  document.getElementById("btnExportOne").addEventListener("click", () => exportSize(state.size));
+  const exportAll = () => { Object.keys(SIZES).forEach((k, i) => setTimeout(() => exportSize(k), i * 350)); };
+  document.getElementById("btnExportAll").addEventListener("click", exportAll);
+  document.getElementById("btnExportAllTop").addEventListener("click", exportAll);
+  document.getElementById("chkHalftone").addEventListener("change", e => { state.halftone = e.target.checked; renderAll(); });
+  document.getElementById("chkSpeed").addEventListener("change", e => { state.speed = e.target.checked; renderAll(); });
+  document.getElementById("pbReset").addEventListener("click", () => {
+    delete state.zoom[state.selected]; delete state.panX[state.selected]; delete state.panY[state.selected];
+    renderAll();
+  });
+  document.getElementById("btnExportOne").textContent = "Export PNG 1920 × 1080";
 }
-document.addEventListener("DOMContentLoaded", boot);
+/* Shot mode: ?shot=cover&variant=sunset&w=1280 renders just the cover at
+   full width (for screenshots), hiding the studio chrome. */
+function applyShotMode(){
+  const q = new URLSearchParams(location.search);
+  if(q.get("shot") !== "cover") return false;
+  document.querySelector(".masthead").style.display = "none";
+  const studio = document.querySelector(".studio");
+  studio.style.display = "block"; studio.style.padding = "0";
+  studio.querySelectorAll(":scope > aside").forEach(a => a.style.display = "none");
+  document.querySelector(".preview-col").style.display = "block";
+  document.querySelectorAll(".size-row, .variant-row, .export-row").forEach(e => e.style.display = "none");
+  document.querySelector(".panelbar").style.display = "none";
+  document.querySelector(".foot").style.display = "none";
+  const stage = document.querySelector(".stage");
+  stage.style.cssText = "border:0;background:none;padding:0;min-height:0;box-shadow:none";
+  const holderEl = document.querySelector(".stage .cover-holder");
+  holderEl.style.maxWidth = "none";
+  const w = Math.min(1920, Math.max(480, +(q.get("w") || 1280)));
+  holderEl.style.width = w + "px";
+  const variant = q.get("variant");
+  if(variant && VARIANTS[variant]){
+    state.variant = variant;
+    state.layout = VARIANTS[variant].layout;
+    state.size = VARIANTS[variant].size;
+    state.texts.title = VARIANTS[variant].title;
+    state.texts.script = VARIANTS[variant].script;
+    state.texts.strip = VARIANTS[variant].strip;
+    state.texts.kicker = VARIANTS[variant].kicker;
+  }
+  return true;
+}
+applyShotMode();
+window.addEventListener("resize", () => {
+  const cover = document.getElementById("coverEl");
+  if(cover) cover.style.setProperty("--cfs", Math.max(28, cover.clientWidth * 0.085) + "px");
+});
+wire();
+loadPhotos();
+renderAll();
 </script>
 </body>
 </html>

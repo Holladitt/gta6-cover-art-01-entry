@@ -1,11 +1,4 @@
-# build + tool outputs
 node_modules/
 out/
-output/
-*.log
-
-# OS + editor droppings
 .DS_Store
-Thumbs.db
-.vscode/
-.idea/
+*.log

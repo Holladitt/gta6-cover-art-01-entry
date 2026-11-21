@@ -1,65 +1,56 @@
-# Heat Wave — GTA 6 Cover Art Studio
+# Heat Wave — Cover Studio
 
-[![make.fun](https://make.fun/badge/gta6-cover-art-01.svg)](https://make.fun/c/gta6-cover-art-01)
-[![rank](https://make.fun/badge/gta6-cover-art-01/Holladitt/gta6-cover-art-01-entry/rank.svg)](https://make.fun/c/gta6-cover-art-01)
-[![reward](https://make.fun/badge/gta6-cover-art-01/Holladitt/gta6-cover-art-01-entry/reward.svg)](https://make.fun/c/gta6-cover-art-01)
-
-**Heat Wave** is a cover-art studio for the [make.fun GTA 6 Cover Art bounty](https://make.fun/c/gta6-cover-art-01).
-It turns golden-hour photos into a full-bleed multi-panel poster cover: eight
-place-tagged panels edge to edge with no outer frame, an enormous 3D-extruded
-gradient title sitting on the photos, a pink script subtitle, press-quote top
-line, EST. 2026 / VOL. 06 badges, a red WANTED stamp, tagline strip and billing
-block — then exports it as a PNG.
-
-> v11 note: a fresh rebuild of the v10 "Heat Wave" design, rewritten from
-> scratch in a new recording so every file in the entry is witnessed by it.
-> The cover itself is unchanged: same panels, same title, same stamps.
-
-## Try it
-
-```sh
-node serve.ts            # http://localhost:8080
-```
-
-Node 22 or later, no dependencies, no network: the app is plain static files under
-`app/` and runs fully offline. The photos never leave the machine.
+An offline web app that turns your photos plus captions into GTA 6-style
+cover art and exports it as a PNG.
 
 ## What it does
 
-- **Looks** — three one-click presets: Poster (bleed left, golden hour),
-  Magazine (bleed right, vice pink), Wanted (postcard tilt, dusk teal). Each
-  preset sets the layout, the grade and the wording in one tap.
-- **Full-bleed layouts** — bleed left, bleed right, postcard tilt (a hero
-  centerpiece with six tilted corner snapshots), and a nine grid. The hero
-  portrait takes about half the cover; every panel carries its own place tag
-  (Coral Row, Neon Mile, Sunset Keys, Tidewatch, Reef Side, Harbour Lights,
-  Palm Court, Dune Road).
-- **Your photos** — load your own pictures, cast them into any panel, and nudge
-  each panel's focus point so faces never get cropped out. Click a panel on
-  the cover to select it.
-- **Golden-hour grade** — four presets (Golden hour, Vice pink, Dusk teal,
-  Neon night) plus warmth, saturation and vignette sliders, applied evenly
-  across every panel so the cover feels like one photoshoot.
-- **Words** — edit the title, script subtitle, press quote, quoted-by line and
-  tagline strip. The title renders as a 3D extruded stack: a dark purple
-  extrusion stepping down-right, a gold-to-pink gradient fill, and a bright
-  top edge. A red WANTED stamp marks the cover "for sunset crimes".
-- **Sizes** — landscape 1920×1080, portrait 1080×1350, square 1080×1080, all
-  exported as PNG with one click, or all three at once.
+- **Multi-panel cover** — a giant hero photo with six smaller panels (or a
+  3×3 nine-grid), each carrying a short location chip: Coral Row, Neon Mile,
+  Sunset Keys, Tidewatch, Reef Side, Harbour Lights, Palm Court, Dune Road.
+- **Chrome title** — HEAT WAVE in huge retro-chrome letters with a thick dark
+  outline and one hard shadow, plus the pink script subtitle *Golden Hour*.
+- **Press line, strip, billing** — five gold stars and a press quote up top
+  (EST. 2026 / VOL. 06 chips), the pink-to-orange tagline strip
+  *EIGHT LIVES · ONE HEAT WAVE · ZERO REGRETS*, COMING SOON, the billing
+  line and a barcode at the bottom, and a red slanted WANTED stamp
+  (*FOR SUNSET CRIMES*) across the mechanic panel.
+- **Looks, layouts, sizes** — Poster / Magazine / Wanted looks; Bleed left /
+  Bleed right / Postcard tilt / Nine grid layouts; Landscape 1920×1080,
+  Portrait 1080×1350 and Square 1080×1080 sizes.
+- **Grade** — Golden hour / Vice pink / Dusk teal / Neon night presets plus
+  Warmth, Saturation and Vignette sliders, rendered through a WebGL shader
+  (with a 2D canvas fallback when WebGL is unavailable), one unified warm
+  grade across every panel.
+- **Words** — title, script subtitle, press quote, quoted-by and tagline
+  fields. Every field shows its full text; nothing is cut off.
+- **Photos** — eight built-in golden-hour sample photos in the tray. Click a
+  tray photo to arm it, then click a cover panel to swap it in; click a panel
+  on its own to select it and nudge its focus with the Focus X / Focus Y
+  sliders. You can also upload your own photo into the selected panel.
+- **Export** — *Export PNG* saves the current size; *Export all 3 sizes*
+  saves landscape, portrait and square in one go.
 
-## Sample photos
-
-The eight photos under `app/samples/` were made for this entry with an image model,
-all golden-hour coastal shots with people in them. They are free to use as samples;
-replace them with your own photos in the studio.
-
-## Hand in
+## Run it
 
 ```sh
-MAKEFUN_OUTPUT_DIR=/tmp/heatwave-out node main.ts   # writes /tmp/heatwave-out/{app,screenshots,dossier.json}
-node ~/workspace/tools/makefun/gta6-cover-art-01-kit32/cli/makefun.mjs check --kit ~/workspace/tools/makefun/gta6-cover-art-01-kit32 --repo .
+node serve.ts 8131
+# open http://localhost:8131/
 ```
+
+Everything runs offline in the page: no network requests, no uploads, no
+accounts. Your photos never leave the machine.
+
+## Entrypoint
+
+```sh
+MAKEFUN_OUTPUT_DIR=/output node main.ts
+```
+
+Copies `app/` and `screenshots/` into the output directory and writes
+`dossier.json` there. It refuses to run if the output directory is inside
+the repository.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT — see `LICENSE`.

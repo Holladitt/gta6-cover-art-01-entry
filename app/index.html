@@ -5,889 +5,901 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Heat Wave — Cover Studio</title>
 <style>
-  :root {
-    --cream: #f7ecd7;
-    --lilac: #d9b8f2;
-    --plum: #33124f;
-    --plumdeep: #26103e;
-    --violet: #5b2f83;
-    --gold: #ffc93e;
-    --pink: #ff5da2;
-    --ink: #170a2c;
+  :root{
+    --bg:#150826; --bg2:#1e0e33; --panel:#241640; --panel2:#2c1b4d;
+    --line:#3d2560; --gold:#ffc800; --pink:#ff2e88; --ink:#f5eefc;
+    --muted:#b9a3d6; --chip:#0d0518;
   }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; background: var(--ink); color: var(--cream);
-    font-family: "Helvetica Neue", Arial, sans-serif; }
-  header { padding: 14px 20px 10px; border-bottom: 1px solid var(--violet); }
-  header h1 { margin: 0; font-size: 22px; letter-spacing: 2px; color: var(--gold);
-    font-family: "Arial Black", Arial, sans-serif; }
-  header h1 span { color: var(--pink); }
-  header p { margin: 4px 0 0; color: var(--lilac); font-size: 13px; }
-  main { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px;
-    padding: 16px 20px 24px; align-items: start; }
-  #booth { background: var(--plumdeep); border: 1px solid var(--violet); border-radius: 10px;
-    padding: 14px; }
-  #booth canvas { display: block; width: 100%; height: auto; border-radius: 4px;
-    background: #0d0518; cursor: crosshair; }
-  #booth .hint { margin: 10px 2px 0; color: var(--lilac); font-size: 12px; }
-  #strip { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-  #strip button { background: var(--plum); color: var(--cream); border: 1px solid var(--violet);
-    border-radius: 20px; padding: 5px 11px; font-size: 12px; cursor: pointer; }
-  #strip button.on { border-color: var(--gold); color: var(--gold); }
-  aside { background: var(--plumdeep); border: 1px solid var(--violet); border-radius: 10px;
-    padding: 14px; display: flex; flex-direction: column; gap: 16px; }
-  section h2 { margin: 0 0 8px; font-size: 12px; letter-spacing: 2px; color: var(--gold);
-    text-transform: uppercase; }
-  .row { display: flex; flex-wrap: wrap; gap: 6px; }
-  .row button { background: var(--plum); color: var(--cream); border: 1px solid var(--violet);
-    border-radius: 6px; padding: 7px 10px; font-size: 13px; cursor: pointer; }
-  .row button.on { background: var(--gold); color: #241040; border-color: var(--gold);
-    font-weight: 700; }
-  label.field { display: block; font-size: 12px; color: var(--lilac); margin-bottom: 8px; }
-  label.field span { display: block; margin-bottom: 3px; }
-  label.field input[type="text"] { width: 100%; background: #12081f; color: var(--cream);
-    border: 1px solid var(--violet); border-radius: 6px; padding: 7px 9px; font-size: 14px; }
-  label.field input[type="range"] { width: 100%; accent-color: var(--gold); }
-  #rack { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-  #rack figure { margin: 0; cursor: pointer; border: 2px solid transparent; border-radius: 6px;
-    overflow: hidden; position: relative; }
-  #rack figure.on { border-color: var(--gold); }
-  #rack img { display: block; width: 100%; height: 64px; object-fit: cover; }
-  #rack figcaption { position: absolute; left: 0; right: 0; bottom: 0; font-size: 9px;
-    background: rgba(10, 4, 22, 0.85); color: #fff; padding: 2px 4px;
-    letter-spacing: 0.5px; }
-  #saveBtn { background: var(--gold); color: #241040; border: none; border-radius: 8px;
-    padding: 12px; font-size: 16px; font-weight: 800; cursor: pointer; letter-spacing: 1px; }
-  #saveBtn:hover { background: #ffd968; }
-  #saveAllBtn { background: var(--pink); color: #2a0a1e; border: none; border-radius: 8px;
-    padding: 10px; font-size: 14px; font-weight: 800; cursor: pointer; }
-  #saveAllBtn:hover { background: #ff7ab5; }
-  #note { font-size: 12px; color: var(--lilac); min-height: 16px; }
-  #addPhotos { background: var(--pink); color: #2a0a1e; border: none; border-radius: 6px;
-    padding: 8px 10px; font-weight: 700; cursor: pointer; font-size: 13px; }
-  body.cover-only { background: #0d0518; }
-  body.cover-only header, body.cover-only aside, body.cover-only #booth .hint,
-  body.cover-only #strip { display: none; }
-  body.cover-only main { display: block; padding: 0; }
-  body.cover-only #booth { border: none; border-radius: 0; padding: 0; background: transparent; }
-  body.cover-only #booth canvas { border-radius: 0; }
-  @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+    font-family:"Helvetica Neue",Arial,sans-serif}
+  body{min-height:100vh}
+  header{padding:14px 20px 10px;border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,#221040,#180a2c)}
+  header h1{margin:0;font-size:22px;letter-spacing:.06em}
+  header h1 .a{color:var(--gold)} header h1 .b{color:var(--pink)}
+  header p{margin:4px 0 0;color:var(--muted);font-size:13px}
+  main{display:flex;gap:16px;padding:16px 20px 20px;align-items:flex-start}
+  .stage{flex:1 1 auto;min-width:0}
+  .cover-shell{border:1px solid var(--line);border-radius:10px;overflow:hidden;
+    background:#000;box-shadow:0 10px 40px rgba(0,0,0,.55)}
+  .hint{margin:10px 2px 0;color:var(--muted);font-size:13px;line-height:1.5}
+  .tray{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .tray figure{margin:0;width:116px;cursor:pointer;border:2px solid transparent;
+    border-radius:8px;overflow:hidden;background:var(--panel);position:relative}
+  .tray figure.armed{border-color:var(--gold)}
+  .tray figure img{display:block;width:116px;height:76px;object-fit:cover}
+  .tray figcaption{font-size:10px;font-weight:700;letter-spacing:.04em;
+    padding:5px 6px;color:var(--ink);line-height:1.3}
+  .tray .num{position:absolute;top:4px;left:4px;background:var(--gold);color:#1a0b00;
+    font-size:11px;font-weight:900;border-radius:999px;padding:1px 7px}
+  aside{flex:0 0 348px;width:348px;background:var(--panel);border:1px solid var(--line);
+    border-radius:10px;padding:12px 16px 16px;position:sticky;top:16px;
+    max-height:calc(100vh - 32px);overflow-y:auto}
+  aside h2{margin:12px 0 7px;font-size:12px;letter-spacing:.22em;color:var(--gold)}
+  aside h2:first-child{margin-top:0}
+  .choices{display:flex;flex-wrap:wrap;gap:8px}
+  .choices button{border:1px solid #5a3d8f;background:var(--panel2);color:var(--ink);
+    border-radius:999px;padding:7px 12px;font-size:13px;cursor:pointer}
+  .choices button.on{background:var(--gold);border-color:var(--gold);color:#1a0b00;font-weight:700}
+  .slider-row{margin:8px 0}
+  .slider-row label{display:flex;justify-content:space-between;font-size:13px;color:var(--ink)}
+  .slider-row label b{color:var(--gold)}
+  input[type=range]{width:100%;accent-color:var(--gold)}
+  .words label{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px}
+  .words input,.words textarea{width:100%;background:#170b2b;border:1px solid #5a3d8f;
+    color:var(--ink);border-radius:8px;padding:9px 10px;font-size:14px;line-height:1.45;
+    font-family:inherit;resize:vertical}
+  .words input:focus,.words textarea:focus{outline:2px solid var(--gold);outline-offset:0}
+  .words textarea{min-height:52px}
+  .actions{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+  .actions button{flex:1 1 auto;border:0;border-radius:8px;padding:11px 10px;font-size:14px;
+    font-weight:700;cursor:pointer;background:var(--gold);color:#1a0b00}
+  .actions button.ghost{background:var(--panel2);color:var(--ink);border:1px solid #5a3d8f}
+  .upload{margin-top:12px;font-size:13px;color:var(--muted)}
+  .upload input{margin-top:6px;color:var(--ink)}
+  .status{margin-top:12px;font-size:12px;color:var(--muted);line-height:1.5}
+  .status b{color:var(--gold)}
+
+  /* ---------- the cover ---------- */
+  .cover{position:relative;width:100%;height:100%;overflow:hidden;background:#0a0614;
+    container-type:size;--u:1px}
+  .cover .panel{position:absolute;overflow:hidden;background:#222}
+  .cover .panel canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .cover .panel.sel{outline:3px solid var(--gold);outline-offset:-3px;z-index:5}
+  .cover .panel .frame{position:absolute;inset:0;border:2px solid rgba(255,200,0,.85);
+    pointer-events:none}
+  .chip{position:absolute;z-index:4;background:rgba(8,3,18,.85);color:#fff;
+    border:2px solid var(--gold);font-weight:800;letter-spacing:.05em;
+    padding:calc(var(--u)*7) calc(var(--u)*12);font-size:calc(var(--u)*21);line-height:1;
+    white-space:nowrap}
+  .chip.tl{top:calc(var(--u)*14);left:calc(var(--u)*14)}
+  .chip.bl{bottom:calc(var(--u)*14);left:calc(var(--u)*14)}
+  .scrim-top{position:absolute;left:0;right:0;top:0;height:16%;z-index:3;pointer-events:none;
+    background:linear-gradient(180deg,rgba(5,2,12,.72),rgba(5,2,12,0))}
+  .scrim-bot{position:absolute;left:0;right:0;bottom:0;height:20%;z-index:3;pointer-events:none;
+    background:linear-gradient(0deg,rgba(5,2,12,.78),rgba(5,2,12,0))}
+  .topline{position:absolute;z-index:6;left:0;right:0;top:calc(var(--u)*16);
+    text-align:center;font-size:calc(var(--u)*18);font-weight:700;color:#fff;
+    text-shadow:0 2px 6px rgba(0,0,0,.7);padding:0 calc(var(--u)*185);line-height:1.25;
+    white-space:nowrap;overflow:hidden}
+  .topline .stars{color:var(--gold);letter-spacing:.08em}
+  .topline .by{color:var(--gold)}
+  .est,.vol{position:absolute;z-index:7;top:calc(var(--u)*12);font-weight:900;
+    font-size:calc(var(--u)*24);padding:calc(var(--u)*7) calc(var(--u)*13);letter-spacing:.04em}
+  .est{left:calc(var(--u)*14);background:var(--pink);color:#fff}
+  .vol{right:calc(var(--u)*14);background:var(--gold);color:#1a0b00}
+  .title{position:absolute;z-index:8;left:0;right:0;margin:0;text-align:center;
+    font-family:"Arial Black",Arial,sans-serif;font-weight:900;
+    font-size:calc(var(--u)*300);line-height:.95;letter-spacing:calc(var(--u)*2);
+    background:linear-gradient(180deg,#ffe45c 0%,#ff9d2e 42%,#ff4d8d 72%,#e83e8c 100%);
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;color:transparent;
+    -webkit-text-stroke:calc(var(--u)*5) #2a0a3d;
+    filter:drop-shadow(calc(var(--u)*10) calc(var(--u)*13) 0 #2a0a3d);
+    white-space:nowrap}
+  .script{position:absolute;z-index:9;left:10%;text-align:left;
+    font-family:"Brush Script MT","Segoe Script",cursive;font-style:italic;font-weight:700;
+    font-size:calc(var(--u)*96);color:#ff5da2;line-height:1;
+    text-shadow:calc(var(--u)*3) calc(var(--u)*4) 0 rgba(42,10,61,.9);
+    transform:rotate(-3deg);white-space:nowrap}
+  .strip{position:absolute;z-index:8;left:0;right:0;text-align:center;
+    background:linear-gradient(90deg,#ff2e88,#ff7a2e,#ff2e88);
+    color:#2a0a3d;font-weight:900;letter-spacing:.06em;
+    font-size:calc(var(--u)*30);padding:calc(var(--u)*10) 0;white-space:nowrap}
+  .bottombar{position:absolute;z-index:8;left:0;right:0;bottom:0;
+    display:flex;align-items:flex-end;justify-content:space-between;
+    padding:calc(var(--u)*16) calc(var(--u)*22) calc(var(--u)*18)}
+  .soon{color:var(--pink);font-weight:900;font-size:calc(var(--u)*30);letter-spacing:.05em}
+  .billing{text-align:center;color:#fff;font-size:calc(var(--u)*22);line-height:1.5;
+    text-shadow:0 2px 5px rgba(0,0,0,.8);letter-spacing:.05em}
+  .barcode{background:#fff;padding:calc(var(--u)*6) calc(var(--u)*8) calc(var(--u)*3);
+    text-align:center}
+  .barcode .bars{height:calc(var(--u)*44);
+    background:repeating-linear-gradient(90deg,#000 0 calc(var(--u)*3),#fff calc(var(--u)*3) calc(var(--u)*6),
+      #000 calc(var(--u)*6) calc(var(--u)*12),#fff calc(var(--u)*12) calc(var(--u)*15),
+      #000 calc(var(--u)*15) calc(var(--u)*18),#fff calc(var(--u)*18) calc(var(--u)*24))}
+  .barcode .num{color:#000;font-size:calc(var(--u)*15);font-weight:700;letter-spacing:.08em}
+  .stamp{position:absolute;z-index:9;color:#ff2b2b;border:calc(var(--u)*5) solid #ff2b2b;
+    border-radius:calc(var(--u)*8);padding:calc(var(--u)*8) calc(var(--u)*16);
+    font-weight:900;text-align:center;transform:rotate(-12deg);
+    font-size:calc(var(--u)*44);line-height:1;letter-spacing:.06em;opacity:.92;
+    box-shadow:inset 0 0 0 calc(var(--u)*2) #ff2b2b;white-space:nowrap}
+  .stamp small{display:block;font-size:calc(var(--u)*20);margin-top:calc(var(--u)*4);white-space:nowrap}
+  .cover.look-magazine .title{
+    background:linear-gradient(180deg,#ffffff 0%,#ffd9ec 70%,#ff9d2e 100%);
+    -webkit-background-clip:text;background-clip:text}
+  .cover.look-magazine .strip{background:#111;color:#fff}
+  .cover.look-magazine .chip{border-color:#fff}
+  .cover.look-wanted .title{
+    background:linear-gradient(180deg,#fff3c4 0%,#f7c873 55%,#c98a3d 100%);
+    -webkit-background-clip:text;background-clip:text}
+  .cover.look-wanted .stamp{font-size:calc(var(--u)*64)}
+  .cover.look-wanted .scrim-top{background:linear-gradient(180deg,rgba(60,35,5,.55),rgba(60,35,5,0))}
+
+  /* cover-only mode for clean cover screenshots (?cover=1) */
+  body.cover-only{margin:0}
+  body.cover-only header,body.cover-only main aside,body.cover-only .hint,
+  body.cover-only .tray{display:none}
+  body.cover-only main{padding:0;display:block}
+  body.cover-only .stage{width:100vw;height:100vh}
+  body.cover-only .cover-shell{border:0;border-radius:0;width:100%;height:100%;
+    box-shadow:none}
+  @media (max-width:900px){
+    main{flex-direction:column}
+    aside{flex:1 1 auto;width:100%}
+  }
 </style>
 </head>
 <body>
 <header>
-  <h1>HEAT WAVE <span>— Cover Studio</span></h1>
-  <p>Turn your golden-hour photos into a GTA-style poster cover. Full-bleed panels, a 3D
-     title and a wanted stamp — then export a PNG in landscape, portrait or square.</p>
+  <h1><span class="a">HEAT WAVE</span> — <span class="b">Cover Studio</span></h1>
+  <p>Turn your golden-hour photos into a GTA-style poster. Full-bleed panels, a 3D title and a wanted stamp — then export a PNG in landscape, portrait or square.</p>
 </header>
 <main>
-  <div id="booth">
-    <canvas id="sheet" width="1920" height="1080"></canvas>
-    <p class="hint">Click a panel on the cover to select it, then swap its photo from the tray or
-       nudge its focus with the sliders. The title always sits on the photos, never in a band.</p>
-    <div id="strip" aria-label="Panels"></div>
-  </div>
+  <section class="stage">
+    <div class="cover-shell"><div class="cover" id="cover"></div></div>
+    <p class="hint">Click a photo in the tray to arm it, then click a panel on the cover to swap it in. Click a panel on its own to select it, then nudge its focus with the sliders. The title always sits on the photos, never in a band.</p>
+    <div class="tray" id="tray"></div>
+  </section>
   <aside>
-    <section>
-      <h2>Looks</h2>
-      <div class="row" id="lookBar">
-        <button data-look="poster" class="on">Poster</button>
-        <button data-look="magazine">Magazine</button>
-        <button data-look="wanted">Wanted</button>
-      </div>
-    </section>
-    <section>
-      <h2>Layout</h2>
-      <div class="row" id="layoutBar">
-        <button data-layout="bleed-left" class="on">Bleed left</button>
-        <button data-layout="bleed-right">Bleed right</button>
-        <button data-layout="postcard">Postcard tilt</button>
-        <button data-layout="nine">Nine grid</button>
-      </div>
-    </section>
-    <section>
-      <h2>Size</h2>
-      <div class="row" id="sizeBar">
-        <button data-size="landscape" class="on">Landscape 1920×1080</button>
-        <button data-size="portrait">Portrait 1080×1350</button>
-        <button data-size="square">Square 1080×1080</button>
-      </div>
-    </section>
-    <section>
-      <h2>Grade</h2>
-      <div class="row" id="toneBar">
-        <button data-grade="golden" class="on">Golden hour</button>
-        <button data-grade="vice">Vice pink</button>
-        <button data-grade="dusk">Dusk teal</button>
-        <button data-grade="neon">Neon night</button>
-      </div>
-      <label class="field"><span>Warmth <b id="warmVal">55</b></span>
-        <input type="range" id="warmSlider" min="0" max="100" value="55"></label>
-      <label class="field"><span>Saturation <b id="satVal">115</b>%</span>
-        <input type="range" id="satSlider" min="0" max="200" value="115"></label>
-      <label class="field"><span>Vignette <b id="vigVal">30</b></span>
-        <input type="range" id="vigSlider" min="0" max="100" value="30"></label>
-    </section>
-    <section>
-      <h2>Words</h2>
-      <label class="field"><span>Title</span>
-        <input type="text" id="titleField" value="Heat Wave" maxlength="24"></label>
-      <label class="field"><span>Script subtitle</span>
-        <input type="text" id="subField" value="Golden Hour" maxlength="24"></label>
-      <label class="field"><span>Press quote</span>
-        <input type="text" id="quoteField" value="GOLDEN LIGHT, LOUD ENGINES, NO BRAKES" maxlength="60"></label>
-      <label class="field"><span>Quoted by</span>
-        <input type="text" id="srcField" value="THE COASTAL GAZETTE" maxlength="32"></label>
-      <label class="field"><span>Tagline strip</span>
-        <input type="text" id="tagField" value="EIGHT LIVES · ONE HEAT WAVE · ZERO REGRETS" maxlength="60"></label>
-    </section>
-    <section>
-      <h2>Photos</h2>
-      <div id="rack"></div>
-      <p style="margin:10px 0 6px"><button id="addPhotos" type="button">Load your own photos…</button></p>
-      <input type="file" id="filePick" accept="image/*" multiple hidden>
-      <label class="field"><span>Selected panel photo focus — horizontal</span>
-        <input type="range" id="fxField" min="0" max="100" value="50"></label>
-      <label class="field"><span>Selected panel photo focus — vertical</span>
-        <input type="range" id="fyField" min="0" max="100" value="50"></label>
-      <label class="field"><span>Selected panel label</span>
-        <input type="text" id="labelField" value="CORAL ROW" maxlength="18"></label>
-    </section>
-    <button id="saveBtn" type="button">Export PNG</button>
-    <button id="saveAllBtn" type="button">Export all three sizes</button>
-    <p id="note" role="status"></p>
+    <h2>LOOKS</h2>
+    <div class="choices" id="looks"></div>
+    <h2>LAYOUT</h2>
+    <div class="choices" id="layouts"></div>
+    <h2>SIZE</h2>
+    <div class="choices" id="sizes"></div>
+    <h2>GRADE</h2>
+    <div class="choices" id="grades"></div>
+    <div class="slider-row"><label>Warmth <b id="warmthVal">55</b></label>
+      <input type="range" id="warmth" min="0" max="100" value="55"></div>
+    <div class="slider-row"><label>Saturation <b id="satVal">115%</b></label>
+      <input type="range" id="sat" min="50" max="200" value="115"></div>
+    <div class="slider-row"><label>Vignette <b id="vigVal">30</b></label>
+      <input type="range" id="vig" min="0" max="100" value="30"></div>
+    <div class="slider-row"><label>Focus X (selected panel) <b id="fxVal">50</b></label>
+      <input type="range" id="fx" min="0" max="100" value="50"></div>
+    <div class="slider-row"><label>Focus Y (selected panel) <b id="fyVal">50</b></label>
+      <input type="range" id="fy" min="0" max="100" value="50"></div>
+    <h2>WORDS</h2>
+    <div class="words">
+      <label for="wTitle">Title</label>
+      <input id="wTitle" value="Heat Wave">
+      <label for="wScript">Script subtitle</label>
+      <input id="wScript" value="Golden Hour">
+      <label for="wQuote">Press quote</label>
+      <textarea id="wQuote" rows="3">GOLDEN LIGHT, LOUD ENGINES, NO BRAKES</textarea>
+      <label for="wBy">Quoted by</label>
+      <input id="wBy" value="THE COASTAL GAZETTE">
+      <label for="wTag">Tagline strip</label>
+      <textarea id="wTag" rows="3">EIGHT LIVES · ONE HEAT WAVE · ZERO REGRETS</textarea>
+    </div>
+    <h2>PHOTOS</h2>
+    <div class="upload">
+      <label for="upload">Add your own photo to the selected panel:</label><br>
+      <input type="file" id="upload" accept="image/*">
+    </div>
+    <div class="actions">
+      <button id="exportOne">Export PNG</button>
+      <button id="exportAll" class="ghost">Export all 3 sizes</button>
+    </div>
+    <p class="status" id="status">Grade: <b id="gradeMode">starting…</b> · Photos: <b id="photoCount">0/8</b> · Everything runs offline in this page; your photos never leave the machine.</p>
   </aside>
 </main>
 <script>
 "use strict";
-
-/* ---------- the cast: eight golden-hour photos, focus = face position ---------- */
-const ROSTER = [
-  { src: "samples/hero-woman.jpg", fx: 0.52, fy: 0.38, tag: "CORAL ROW" },
-  { src: "samples/boss.jpg",      fx: 0.50, fy: 0.28, tag: "NEON MILE" },
-  { src: "samples/captain.jpg",   fx: 0.52, fy: 0.34, tag: "SUNSET KEYS" },
-  { src: "samples/rider.jpg",     fx: 0.38, fy: 0.26, tag: "TIDEWATCH" },
-  { src: "samples/driver.jpg",    fx: 0.28, fy: 0.47, tag: "REEF SIDE" },
-  { src: "samples/lifeguard.jpg", fx: 0.36, fy: 0.39, tag: "HARBOUR LIGHTS" },
-  { src: "samples/mechanic.jpg",  fx: 0.48, fy: 0.25, tag: "PALM COURT" },
-  { src: "samples/courier.jpg",   fx: 0.48, fy: 0.22, tag: "DUNE ROAD" }
+/* Heat Wave Cover Studio — single-file offline app.
+   Photos are graded through a small WebGL shader (2D canvas fallback),
+   the cover is drawn live as DOM panels and exported by a canvas renderer
+   that shares the same layout math. No network requests anywhere. */
+const PHOTOS = [
+  { id: "hero",      file: "samples/hero-woman.jpg", label: "CORAL ROW" },
+  { id: "boss",      file: "samples/boss.jpg",       label: "NEON MILE" },
+  { id: "captain",   file: "samples/captain.jpg",    label: "SUNSET KEYS" },
+  { id: "rider",     file: "samples/rider.jpg",      label: "TIDEWATCH" },
+  { id: "courier",   file: "samples/courier.jpg",    label: "REEF SIDE" },
+  { id: "lifeguard", file: "samples/lifeguard.jpg",  label: "HARBOUR LIGHTS" },
+  { id: "mechanic",  file: "samples/mechanic.jpg",   label: "PALM COURT" },
+  { id: "driver",    file: "samples/driver.jpg",     label: "DUNE ROAD" },
 ];
-
-const FORMATS = {
-  landscape: { w: 1920, h: 1080 },
-  portrait:  { w: 1080, h: 1350 },
-  square:    { w: 1080, h: 1080 }
+const PHOTO_BY_ID = Object.fromEntries(PHOTOS.map(p => [p.id, p]));
+const SIZES = {
+  landscape: { w: 1920, h: 1080, label: "Landscape 1920×1080" },
+  portrait:  { w: 1080, h: 1350, label: "Portrait 1080×1350" },
+  square:    { w: 1080, h: 1080, label: "Square 1080×1080" },
+};
+const LOOKS = { poster: "Poster", magazine: "Magazine", wanted: "Wanted" };
+const LAYOUTS = {
+  "bleed-left": "Bleed left", "bleed-right": "Bleed right",
+  "tilt": "Postcard tilt", "nine": "Nine grid",
+};
+const GRADES = {
+  golden: { label: "Golden hour", warmth: 55, sat: 115, vig: 30, tint: [1.0, 0.55, 0.20], tintAmt: 0.16 },
+  vice:   { label: "Vice pink",   warmth: 25, sat: 135, vig: 35, tint: [1.0, 0.36, 0.62], tintAmt: 0.20 },
+  dusk:   { label: "Dusk teal",   warmth: -15, sat: 105, vig: 45, tint: [0.16, 0.72, 0.68], tintAmt: 0.15 },
+  neon:   { label: "Neon night",  warmth: 5, sat: 150, vig: 55, tint: [0.45, 0.22, 1.0], tintAmt: 0.18 },
 };
 
-const TONES = {
-  golden: { warmth: 55, sat: 115, vig: 30, warm: [255, 150, 40],  cool: [255, 60, 140] },
-  vice:   { warmth: 35, sat: 140, vig: 35, warm: [255, 60, 140],  cool: [190, 40, 200] },
-  dusk:   { warmth: 20, sat: 110, vig: 45, warm: [255, 130, 60],  cool: [30, 170, 200] },
-  neon:   { warmth: 45, sat: 150, vig: 40, warm: [255, 80, 190],  cool: [60, 40, 220] }
-};
-
-const PRESETS = {
-  poster:   { layout: "bleed-left",  grade: "golden", title: "Heat Wave", subtitle: "Golden Hour" },
-  magazine: { layout: "bleed-right", grade: "vice",   title: "Heat Wave", subtitle: "Golden Hour" },
-  wanted:   { layout: "postcard",    grade: "dusk",   title: "Heat Wave", subtitle: "Golden Hour" }
-};
-
-const studio = {
-  look: "poster",
-  layout: "bleed-left",
-  size: "landscape",
-  grade: "golden",
-  warmth: 55,
-  sat: 115,
-  vig: 30,
-  title: "Heat Wave",
-  subtitle: "Golden Hour",
+const state = {
+  look: "poster", layout: "bleed-left", size: "landscape", grade: "golden",
+  warmth: 55, sat: 115, vig: 30,
+  title: "Heat Wave", script: "Golden Hour",
   quote: "GOLDEN LIGHT, LOUD ENGINES, NO BRAKES",
-  source: "THE COASTAL GAZETTE",
+  quotedBy: "THE COASTAL GAZETTE",
   tagline: "EIGHT LIVES · ONE HEAT WAVE · ZERO REGRETS",
-  photos: ROSTER.map((p) => ({ src: p.src, fx: p.fx, fy: p.fy, tag: p.tag, img: null, user: false })),
-  picked: 0
+  slots: { hero: "hero", p1: "boss", p2: "captain", p3: "rider", p4: "courier", p5: "lifeguard", p6: "mechanic" },
+  focus: {}, selected: "hero", armed: null,
 };
+for (const k of ["hero", "p1", "p2", "p3", "p4", "p5", "p6"]) state.focus[k] = { x: 50, y: 50 };
+state.focus.hero = { x: 50, y: 42 };
 
-const sheet = document.getElementById("sheet");
-const ctx = sheet.getContext("2d");
-const note = document.getElementById("note");
-let cells = [];
+const images = {};          // photo id -> HTMLImageElement (loaded)
+const customPhotos = {};    // custom id -> {label, url}
 let loadedCount = 0;
-window.__waveErrors = [];
-window.__waveState = studio;
+for (const p of PHOTOS) {
+  const img = new Image();
+  img.onload = () => { loadedCount++; updateStatus(); drawPanels(); if (loadedCount >= 8) setTimeout(drawPanels, 150); };
+  img.onerror = () => { updateStatus(); };
+  img.src = p.file;
+  images[p.id] = img;
+}
+function photoOf(id) {
+  if (customPhotos[id]) return { id, label: customPhotos[id].label, img: customPhotos[id].img };
+  const p = PHOTO_BY_ID[id];
+  return p ? { id, label: p.label, img: images[id] } : null;
+}
+function photoReady(id) {
+  const ph = photoOf(id);
+  return !!(ph && ph.img && ph.img.complete && ph.img.naturalWidth > 0);
+}
 
-const loadRoster = () => {
-  studio.photos.forEach((snap) => {
-    const pic = new Image();
-    pic.onload = () => { snap.img = pic; loadedCount += 1; renderCover(); };
-    pic.onerror = () => { window.__waveErrors.push("failed to load " + snap.src); };
-    pic.src = snap.src;
-  });
-};
-
-const loadedPhotos = () => studio.photos.filter((p) => p.img).length;
-
-/* ---------- frames: full-bleed fractions of the cover ---------- */
-const makeCell = (i, x, y, w, h, star) => ({
-  index: i, snap: studio.photos[i], x, y, w, h, star: !!star, tilt: 0
-});
-
-function layOut() {
-  const gap = 0.004;               // thin gold gutter between panels
-  const P = studio.photos;
-  const tall = FORMATS[studio.size].w / FORMATS[studio.size].h < 1.1;
-  const out = [];
-  if (studio.layout === "bleed-left" || studio.layout === "bleed-right") {
-    const heroW = 0.52;
-    const leftFirst = studio.layout === "bleed-left";
-    const heroX = leftFirst ? 0 : 1 - heroW;
-    const sideX = leftFirst ? heroW + gap : 0;
-    const sideW = 1 - heroW - gap;
-    out.push(makeCell(0, heroX, 0, heroW, 1, true));
-    const cols = 2, rows = 3;
-    const cw = (sideW - (cols - 1) * gap) / cols;
-    const ch = (1 - (rows - 1) * gap) / rows;
-    const order = leftFirst ? [1, 2, 3, 4, 5, 6] : [2, 1, 4, 3, 6, 5];
-    order.forEach((pi, k) => {
-      const c = k % cols, r = Math.floor(k / cols);
-      out.push(makeCell(pi, sideX + c * (cw + gap), r * (ch + gap), cw, ch, false));
+/* ---------- layout geometry (shared by DOM preview and canvas export) ---------- */
+function geometry() {
+  const { w: W, h: H } = SIZES[state.size];
+  const L = state.layout;
+  const cells = [];
+  if (L === "nine") {
+    const ids = ["hero", "boss", "captain", "lifeguard", "courier", "rider", "mechanic", "driver", "hero"];
+    const cw = W / 3, ch = H / 3;
+    ids.forEach((id, i) => {
+      const row = Math.floor(i / 3);
+      cells.push({ slot: "c" + i, photo: id, x: (i % 3) * cw, y: row * ch, w: cw, h: ch, rot: 0, chipAtBottom: row < 2 });
     });
-    // the eighth photo stays in the tray, ready to be cast in
-  } else if (studio.layout === "postcard") {
-    out.push(makeCell(0, 0.20, 0.04, 0.60, 0.92, true));
-    const corners = [
-      { i: 1, x: 0.005, y: 0.02, w: 0.24, h: 0.30, tilt: -0.06 },
-      { i: 2, x: 0.755, y: 0.03, w: 0.24, h: 0.30, tilt: 0.05 },
-      { i: 3, x: 0.01,  y: 0.66, w: 0.24, h: 0.30, tilt: 0.05 },
-      { i: 4, x: 0.75,  y: 0.65, w: 0.24, h: 0.30, tilt: -0.05 },
-      { i: 5, x: 0.30,  y: 0.005, w: 0.16, h: 0.20, tilt: 0.03 },
-      { i: 6, x: 0.56,  y: 0.78, w: 0.16, h: 0.18, tilt: -0.03 }
-    ];
-    corners.forEach((c) => {
-      const f = makeCell(c.i, c.x, c.y, c.w, c.h, false);
-      f.tilt = c.tilt;
-      out.push(f);
-    });
-  } else { // nine: 3x3 full-bleed grid
-    const n = 3;
-    const cw9 = (1 - (n - 1) * gap) / n, ch9 = (1 - (n - 1) * gap) / n;
-    const order9 = tall ? [0, 1, 2, 5, 4, 3, 6, 7, 0] : [0, 1, 2, 3, 4, 5, 6, 7, 0];
-    order9.forEach((pi, k) => {
-      const c = k % n, r = Math.floor(k / n);
-      out.push(makeCell(pi, c * (cw9 + gap), r * (ch9 + gap), cw9, ch9, pi === 0));
-    });
-    // ninth cell reframes the hero: same place, a different slice of the photo
-    out[out.length - 1].alt = { fx: 0.85, fy: 0.42 };
+    return { W, H, nine: true, cells, hero: cells[0], stampCell: cells[6], stampFrac: 0.38, titleY: H * 0.47, scriptY: H * 0.585 };
   }
-  return out;
+  const heroW = state.size === "portrait" ? W * 0.5 : W * 0.5;
+  const gridX = L === "bleed-right" ? 0 : W - heroW;
+  const heroX = L === "bleed-right" ? W - heroW : 0;
+  const gw = W - heroW, gh = H;
+  const cw = gw / 2, ch = gh / 3;
+  // small-panel order: rows of two. Portrait mirrors the reference: left column
+  // captain / courier / mechanic, right column boss / rider / lifeguard.
+  const order = state.size === "portrait"
+    ? ["captain", "boss", "courier", "rider", "mechanic", "lifeguard"]
+    : ["boss", "captain", "rider", "courier", "lifeguard", "mechanic"];
+  const slotKeys = ["p1", "p2", "p3", "p4", "p5", "p6"];
+  const tilt = L === "tilt";
+  const hero = { slot: "hero", photo: state.slots.hero, x: heroX, y: 0, w: heroW, h: H, rot: tilt ? 0.6 : 0 };
+  for (let i = 0; i < 6; i++) {
+    const col = i % 2, row = Math.floor(i / 2);
+    cells.push({
+      slot: slotKeys[i], photo: state.slots[slotKeys[i]],
+      x: gridX + col * cw, y: row * ch, w: cw, h: ch,
+      rot: tilt ? (i % 2 === 0 ? -1.4 : 1.4) : 0,
+      // chips sit at the bottom of a panel, except on the last row where the
+      // strip and billing live — there they sit at the top instead.
+      chipAtBottom: row < 2,
+    });
+  }
+  // stamp sits on the mechanic panel
+  const stampCell = cells.find(c => c.photo === "mechanic") || cells[5];
+  return { W, H, nine: false, hero, cells, stampCell, stampFrac: 0.42,
+    titleY: H * 0.46, scriptY: H * 0.585 };
 }
 
-/* ---------- photo drawing: cover-fit around the face focus ---------- */
-function fitCrop(img, dx, dy, dw, dh, fx, fy) {
-  const iw = img.naturalWidth, ih = img.naturalHeight;
-  const s = Math.max(dw / iw, dh / ih);
-  const sw = dw / s, sh = dh / s;
-  let sx = (iw - sw) * fx, sy = (ih - sh) * fy;
-  sx = Math.max(0, Math.min(iw - sw, sx));
-  sy = Math.max(0, Math.min(ih - sh, sy));
-  return { sx, sy, sw, sh };
+/* ---------- WebGL grade engine (2D fallback) ---------- */
+const grader = (() => {
+  const c = document.createElement("canvas");
+  const gl = c.getContext("webgl2") || c.getContext("webgl");
+  if (!gl) {
+    return { mode: "2d", grade: grade2d };
+  }
+  const vs = `attribute vec2 aP; varying vec2 vU; void main(){ vU = vec2(aP.x*0.5+0.5, aP.y*0.5+0.5); gl_Position = vec4(aP,0.,1.); }`;
+  const fs = `precision mediump float; varying vec2 vU; uniform sampler2D uT;
+    uniform float uWarm, uSat, uVig, uTintAmt; uniform vec3 uTint;
+    void main(){
+      vec3 col = texture2D(uT, vU).rgb;
+      float l = dot(col, vec3(0.299, 0.587, 0.114));
+      col = mix(vec3(l), col, uSat);
+      col.r += uWarm * 0.10; col.g += uWarm * 0.02; col.b -= uWarm * 0.08;
+      col = mix(col, uTint, uTintAmt * clamp(1.0 - abs(l - 0.5) * 1.4, 0.0, 1.0));
+      col = col * col * (3.0 - 2.0 * col) * 0.22 + col * 0.78;
+      vec2 d = vU - 0.5;
+      col *= clamp(1.0 - uVig * dot(d, d) * 2.4, 0.0, 1.0);
+      gl_FragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
+    }`;
+  function shader(type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src); gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+    return s;
+  }
+  const prog = gl.createProgram();
+  gl.attachShader(prog, shader(gl.VERTEX_SHADER, vs));
+  gl.attachShader(prog, shader(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(prog); gl.useProgram(prog);
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+  const loc = gl.getAttribLocation(prog, "aP");
+  gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  const tex = gl.createTexture();
+  function uni(name) { return gl.getUniformLocation(prog, name); }
+  const U = { t: uni("uT"), warm: uni("uWarm"), sat: uni("uSat"), vig: uni("uVig"), tint: uni("uTint"), amt: uni("uTintAmt") };
+  const out = document.createElement("canvas");
+  function grade(img, w, h, p) {
+    c.width = w; c.height = h;
+    gl.viewport(0, 0, w, h);
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.uniform1i(U.t, 0);
+    gl.uniform1f(U.warm, p.warmth / 100);
+    gl.uniform1f(U.sat, p.sat / 100);
+    gl.uniform1f(U.vig, p.vig / 100);
+    gl.uniform3fv(U.tint, p.tint);
+    gl.uniform1f(U.amt, p.tintAmt);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    out.width = w; out.height = h;
+    const octx = out.getContext("2d");
+    octx.drawImage(c, 0, 0);
+    return out;
+  }
+  return { mode: "webgl", grade };
+  function grade2d(img, w, h, p) {
+    out.width = w; out.height = h;
+    const octx = out.getContext("2d");
+    octx.filter = `saturate(${p.sat}%) sepia(${Math.max(0, p.warmth) * 0.35}%) brightness(1.03) contrast(1.05)`;
+    octx.drawImage(img, 0, 0, w, h);
+    octx.filter = "none";
+    const g = octx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.35, w / 2, h / 2, Math.max(w, h) * 0.75);
+    g.addColorStop(0, "rgba(0,0,0,0)");
+    g.addColorStop(1, `rgba(0,0,0,${p.vig / 100 * 0.55})`);
+    octx.fillStyle = g; octx.fillRect(0, 0, w, h);
+    return out;
+  }
+})();
+const gradeCache = new Map();
+function gradeParams() {
+  const g = GRADES[state.grade];
+  return { warmth: state.warmth, sat: state.sat, vig: state.vig, tint: g.tint, tintAmt: g.tintAmt };
+}
+/* Cover-fit crop of img into a w×h canvas, then grade it. Cached per photo+params+size. */
+function gradedPhoto(photoId, slotKey, w, h) {
+  const ph = photoOf(photoId);
+  if (!ph || !ph.img || !ph.img.naturalWidth) return null;
+  const p = gradeParams();
+  const f = (slotKey && state.focus[slotKey]) || { x: 50, y: 50 };
+  const key = [photoId, w, h, p.warmth, p.sat, p.vig, p.tintAmt, f.x, f.y].join("|");
+  const hit = gradeCache.get(key);
+  if (hit) return hit;
+  const iw = ph.img.naturalWidth, ih = ph.img.naturalHeight;
+  const scale = Math.max(w / iw, h / ih);
+  const sw = w / scale, sh = h / scale;
+  const sx = Math.max(0, Math.min(iw - sw, (f.x / 100) * iw - sw / 2));
+  const sy = Math.max(0, Math.min(ih - sh, (f.y / 100) * ih - sh / 2));
+  const crop = document.createElement("canvas");
+  crop.width = w; crop.height = h;
+  crop.getContext("2d").drawImage(ph.img, sx, sy, sw, sh, 0, 0, w, h);
+  const graded = grader.grade(crop, w, h, p);
+  const snap = document.createElement("canvas");
+  snap.width = w; snap.height = h;
+  snap.getContext("2d").drawImage(graded, 0, 0);
+  if (gradeCache.size > 60) gradeCache.clear();
+  gradeCache.set(key, snap);
+  return snap;
+}
+function slotKeyFor(photoId) {
+  for (const [k, v] of Object.entries(state.slots)) if (v === photoId) return k;
+  return "hero";
 }
 
-function toneWash() {
-  const g = TONES[studio.grade];
-  const warmA = (studio.warmth / 100) * 0.20;
-  const satA = ((studio.sat - 100) / 100) * 0.14;
-  return { warm: g.warm, cool: g.cool, warmA, satA, vig: studio.vig / 100 };
+/* ---------- DOM preview ---------- */
+const coverEl = document.getElementById("cover");
+const shellEl = coverEl.parentElement;
+let ro = null;
+function fitCoverUnit() {
+  const g = geometry();
+  shellEl.style.aspectRatio = g.W + " / " + g.H;
+  coverEl.style.setProperty("--u", (coverEl.clientWidth / g.W) + "px");
 }
-
-function drawPanel(cell, W, H) {
-  let x = cell.x * W, y = cell.y * H;
-  const w = cell.w * W, h = cell.h * H;
-  const snap = cell.snap;
-  if (!snap.img) {
-    ctx.fillStyle = "#241040";
-    ctx.fillRect(x, y, w, h);
+function chipEl(label, pos) {
+  const s = document.createElement("span");
+  s.className = "chip " + pos;
+  s.textContent = label;
+  return s;
+}
+function buildCover() {
+  const g = geometry();
+  coverEl.className = "cover look-" + state.look;
+  coverEl.innerHTML = "";
+  fitCoverUnit();
+  const all = g.nine ? g.cells : [g.hero, ...g.cells];
+  for (const cell of all) {
+    const ph = photoOf(cell.photo);
+    const d = document.createElement("div");
+    d.className = "panel" + (cell.slot === state.selected ? " sel" : "");
+    d.dataset.slot = cell.slot;
+    d.style.left = (cell.x / g.W * 100) + "%";
+    d.style.top = (cell.y / g.H * 100) + "%";
+    d.style.width = (cell.w / g.W * 100) + "%";
+    d.style.height = (cell.h / g.H * 100) + "%";
+    if (cell.rot) d.style.transform = `rotate(${cell.rot}deg)`;
+    const cv = document.createElement("canvas");
+    d.appendChild(cv);
+    const frame = document.createElement("div");
+    frame.className = "frame";
+    d.appendChild(frame);
+    if (ph) {
+      const chip = chipEl(ph.label, cell.chipAtBottom ? "bl" : "tl");
+      if (cell.slot === "hero" && !g.nine) {
+        // hero chip sits below the press line, clear of EST. / VOL.
+        chip.className = "chip tl";
+        chip.style.top = "7.5%";
+      }
+      d.appendChild(chip);
+    }
+    d.addEventListener("click", () => onPanelClick(cell.slot));
+    coverEl.appendChild(d);
+  }
+  const scrimT = document.createElement("div"); scrimT.className = "scrim-top"; coverEl.appendChild(scrimT);
+  const scrimB = document.createElement("div"); scrimB.className = "scrim-bot"; coverEl.appendChild(scrimB);
+  const top = document.createElement("div"); top.className = "topline";
+  top.innerHTML = "";
+  const stars = document.createElement("span"); stars.className = "stars"; stars.textContent = "★★★★★ ";
+  const q = document.createElement("span"); q.textContent = "“" + state.quote + "” ";
+  const by = document.createElement("span"); by.className = "by"; by.textContent = "— " + state.quotedBy;
+  top.append(stars, q, by); coverEl.appendChild(top);
+  const est = document.createElement("div"); est.className = "est"; est.textContent = "EST. 2026"; coverEl.appendChild(est);
+  const vol = document.createElement("div"); vol.className = "vol"; vol.textContent = "VOL. 06"; coverEl.appendChild(vol);
+  const title = document.createElement("h1"); title.className = "title"; title.textContent = state.title.toUpperCase();
+  title.style.top = (g.titleY / g.H * 100) + "%";
+  title.style.transform = "translateY(-50%)";
+  coverEl.appendChild(title);
+  // shrink the title until it fits the cover width (portrait/square are narrower).
+  // measure the TEXT with a canvas: the h1 itself spans the full cover width,
+  // so its scrollWidth never reflects the text.
+  const fitCtx = document.createElement("canvas").getContext("2d");
+  let tfs = parseFloat(getComputedStyle(title).fontSize);
+  fitCtx.font = `900 ${tfs}px "Arial Black", Arial, sans-serif`;
+  while (fitCtx.measureText(title.textContent).width > coverEl.clientWidth * 0.96 && tfs > 30) {
+    tfs *= 0.94;
+    fitCtx.font = `900 ${tfs}px "Arial Black", Arial, sans-serif`;
+  }
+  title.style.fontSize = tfs + "px";
+  const script = document.createElement("div"); script.className = "script"; script.textContent = state.script;
+  script.style.top = (g.scriptY / g.H * 100) + "%";
+  script.style.transform = "translateY(-50%) rotate(-3deg)";
+  coverEl.appendChild(script);
+  const strip = document.createElement("div"); strip.className = "strip"; strip.textContent = state.tagline;
+  strip.style.bottom = (g.H * 0.085 / g.H * 100) + "%";
+  coverEl.appendChild(strip);
+  const bar = document.createElement("div"); bar.className = "bottombar";
+  const soon = document.createElement("span"); soon.className = "soon"; soon.textContent = "COMING SOON";
+  const bill = document.createElement("span"); bill.className = "billing";
+  bill.innerHTML = "A HEAT WAVE PICTURE &nbsp;·&nbsp; STARRING YOU<br>SHOT ON YOUR OWN CAMERA &nbsp;·&nbsp; GRADED BY HAND";
+  const bc = document.createElement("span"); bc.className = "barcode";
+  bc.innerHTML = '<span class="bars" style="display:block"></span><span class="num">8 92625 01107</span>';
+  bar.append(soon, bill, bc); coverEl.appendChild(bar);
+  const stamp = document.createElement("div"); stamp.className = "stamp";
+  stamp.innerHTML = "WANTED<small>FOR SUNSET CRIMES</small>";
+  const sc = g.stampCell;
+  stamp.style.left = ((sc.x + sc.w * 0.52) / g.W * 100) + "%";
+  stamp.style.top = ((sc.y + sc.h * (g.stampFrac || 0.55)) / g.H * 100) + "%";
+  stamp.style.transform = "translate(-50%,-50%) rotate(-12deg)";
+  coverEl.appendChild(stamp);
+  if (ro) ro.disconnect();
+  ro = new ResizeObserver(() => fitCoverUnit());
+  ro.observe(coverEl);
+  drawPanels();
+}
+function drawPanels() {
+  const g = geometry();
+  const all = g.nine ? g.cells : [g.hero, ...g.cells];
+  for (const cell of all) {
+    const panel = coverEl.querySelector(`[data-slot="${cell.slot}"]`);
+    if (!panel) continue;
+    const cv = panel.querySelector("canvas");
+    const pw = Math.max(2, Math.round(panel.clientWidth * 1.5));
+    const ph2 = Math.max(2, Math.round(panel.clientHeight * 1.5));
+    if (cv.width !== pw || cv.height !== ph2) { cv.width = pw; cv.height = ph2; }
+    const ctx = cv.getContext("2d");
+    ctx.clearRect(0, 0, pw, ph2);
+    const graded = gradedPhoto(cell.photo, cell.slot, pw, ph2);
+    if (graded) ctx.drawImage(graded, 0, 0);
+    else { ctx.fillStyle = "#2a1745"; ctx.fillRect(0, 0, pw, ph2); }
+  }
+}
+function onPanelClick(slot) {
+  if (state.armed) {
+    if (slot === "hero") state.slots.hero = state.armed;
+    else if (slot.startsWith("p")) state.slots[slot] = state.armed;
+    else return; // nine-grid cells are fixed; pick a bleed layout to swap
+    state.armed = null;
+    buildTray(); buildCover();
     return;
   }
-  ctx.save();
-  if (cell.tilt) {
-    ctx.translate(x + w / 2, y + h / 2);
-    ctx.rotate(cell.tilt);
-    ctx.fillStyle = "#f7ecd7";
-    ctx.shadowColor = "rgba(5,2,12,0.55)";
-    ctx.shadowBlur = Math.round(W * 0.012);
-    ctx.shadowOffsetY = Math.round(H * 0.008);
-    ctx.fillRect(-w / 2 - 6, -h / 2 - 6, w + 12, h + 12);
-    ctx.shadowColor = "transparent";
-    ctx.shadowBlur = 0;
-    ctx.shadowOffsetY = 0;
-    ctx.translate(-w / 2, -h / 2);
-    x = 0; y = 0;
-  }
-  const crop = fitCrop(snap.img, x, y, w, h,
-    cell.alt ? cell.alt.fx : snap.fx, cell.alt ? cell.alt.fy : snap.fy);
-  ctx.drawImage(snap.img, crop.sx, crop.sy, crop.sw, crop.sh, x, y, w, h);
-  const wash = toneWash();
-  const top = ctx.createLinearGradient(x, y, x, y + h);
-  top.addColorStop(0, "rgba(" + wash.warm[0] + "," + wash.warm[1] + "," + wash.warm[2] + "," + wash.warmA + ")");
-  top.addColorStop(0.55, "rgba(" + wash.warm[0] + "," + wash.warm[1] + "," + wash.warm[2] + ",0)");
-  ctx.fillStyle = top;
-  ctx.fillRect(x, y, w, h);
-  const bot = ctx.createLinearGradient(x, y + h * 0.55, x, y + h);
-  bot.addColorStop(0, "rgba(" + wash.cool[0] + "," + wash.cool[1] + "," + wash.cool[2] + ",0)");
-  bot.addColorStop(1, "rgba(" + wash.cool[0] + "," + wash.cool[1] + "," + wash.cool[2] + "," + (wash.warmA * 0.9) + ")");
-  ctx.fillStyle = bot;
-  ctx.fillRect(x, y, w, h);
-  if (wash.satA > 0) {
-    ctx.fillStyle = "rgba(255,120,180," + wash.satA + ")";
-    ctx.fillRect(x, y, w, h);
-  }
-  const vig = ctx.createRadialGradient(x + w / 2, y + h / 2, Math.min(w, h) * 0.32,
-    x + w / 2, y + h / 2, Math.max(w, h) * 0.75);
-  vig.addColorStop(0, "rgba(10,4,22,0)");
-  vig.addColorStop(1, "rgba(10,4,22," + (wash.vig * 0.55) + ")");
-  ctx.fillStyle = vig;
-  ctx.fillRect(x, y, w, h);
-  // gold gutter edge around the frame
-  ctx.strokeStyle = "rgba(255,201,62,0.9)";
-  ctx.lineWidth = Math.max(1.5, W * 0.0016);
-  ctx.strokeRect(x + 1, y + 1, w - 2, h - 2);
-  ctx.restore();
+  state.selected = slot;
+  const f = state.focus[slot] || { x: 50, y: 50 };
+  document.getElementById("fx").value = f.x;
+  document.getElementById("fy").value = f.y;
+  document.getElementById("fxVal").textContent = f.x;
+  document.getElementById("fyVal").textContent = f.y;
+  coverEl.querySelectorAll(".panel").forEach(p => p.classList.toggle("sel", p.dataset.slot === slot));
 }
 
-function drawTag(cell, W, H) {
-  const x = cell.x * W, y = cell.y * H, w = cell.w * W, h = cell.h * H;
-  const snap = cell.snap;
-  const fs = Math.max(11, Math.round((cell.star ? H * 0.021 : H * 0.018)));
-  ctx.font = "800 " + fs + "px Arial, sans-serif";
-  ctx.textBaseline = "middle";
-  const label = snap.tag;
+/* ---------- canvas export (same geometry, full resolution) ---------- */
+function drawCoverCanvas(sizeKey) {
+  const savedSize = state.size;
+  state.size = sizeKey;
+  const g = geometry();
+  state.size = savedSize;
+  const cv = document.createElement("canvas");
+  cv.width = g.W; cv.height = g.H;
+  const ctx = cv.getContext("2d");
+  ctx.fillStyle = "#0a0614"; ctx.fillRect(0, 0, g.W, g.H);
+  const all = g.nine ? g.cells : [g.hero, ...g.cells];
+  for (const cell of all) {
+    ctx.save();
+    if (cell.rot) {
+      ctx.translate(cell.x + cell.w / 2, cell.y + cell.h / 2);
+      ctx.rotate(cell.rot * Math.PI / 180);
+      ctx.translate(-cell.w / 2, -cell.h / 2);
+    } else ctx.translate(cell.x, cell.y);
+    const graded = gradedPhoto(cell.photo, cell.slot, Math.round(cell.w), Math.round(cell.h));
+    if (graded) ctx.drawImage(graded, 0, 0, cell.w, cell.h);
+    ctx.strokeStyle = "rgba(255,200,0,.85)"; ctx.lineWidth = Math.max(2, g.W * 0.0012);
+    ctx.strokeRect(0, 0, cell.w, cell.h);
+    ctx.restore();
+    const ph = photoOf(cell.photo);
+    if (ph) drawChip(ctx, ph.label, cell, g);
+  }
+  if (state.look === "wanted") {
+    ctx.fillStyle = "rgba(120,80,20,0.10)"; ctx.fillRect(0, 0, g.W, g.H);
+  }
+  // top scrim + press line
+  const tg = ctx.createLinearGradient(0, 0, 0, g.H * 0.16);
+  tg.addColorStop(0, "rgba(5,2,12,0.72)"); tg.addColorStop(1, "rgba(5,2,12,0)");
+  ctx.fillStyle = tg; ctx.fillRect(0, 0, g.W, g.H * 0.16);
+  const bg = ctx.createLinearGradient(0, g.H * 0.8, 0, g.H);
+  bg.addColorStop(0, "rgba(5,2,12,0)"); bg.addColorStop(1, "rgba(5,2,12,0.78)");
+  ctx.fillStyle = bg; ctx.fillRect(0, g.H * 0.8, g.W, g.H * 0.2);
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  let qfs = Math.round(g.W * 0.0135);
+  ctx.font = `700 ${qfs}px Arial, sans-serif`;
+  const quoteText = "★★★★★  “" + state.quote + "”  — " + state.quotedBy;
+  while (ctx.measureText(quoteText).width > g.W * 0.70 && qfs > 8) {
+    qfs -= 1;
+    ctx.font = `700 ${qfs}px Arial, sans-serif`;
+  }
+  ctx.fillStyle = "#fff";
+  ctx.shadowColor = "rgba(0,0,0,0.7)"; ctx.shadowBlur = 6; ctx.shadowOffsetY = 2;
+  ctx.fillText(quoteText, g.W / 2, g.H * 0.028);
+  ctx.shadowColor = "transparent"; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+  drawEstVol(ctx, g);
+  // title: one hard shadow, thick dark outline, chrome gradient fill
+  const tpx = Math.round(g.W * 0.156);
+  ctx.font = `900 ${tpx}px "Arial Black", Arial, sans-serif`;
+  try { ctx.letterSpacing = Math.round(tpx * 0.01) + "px"; } catch (e) {}
+  let tw = ctx.measureText(state.title.toUpperCase()).width;
+  if (tw > g.W * 0.97) {
+    const s = g.W * 0.97 / tw;
+    ctx.font = `900 ${Math.round(tpx * s)}px "Arial Black", Arial, sans-serif`;
+  }
+  const ty = g.titleY, tx = g.W / 2;
+  const fs = parseInt(ctx.font.match(/(\d+)px/)[1], 10);
+  ctx.fillStyle = "#2a0a3d";
+  ctx.fillText(state.title.toUpperCase(), tx + fs * 0.045, ty + fs * 0.055);
+  ctx.lineWidth = fs * 0.045; ctx.strokeStyle = "#2a0a3d"; ctx.lineJoin = "round";
+  ctx.strokeText(state.title.toUpperCase(), tx, ty);
+  const grad = ctx.createLinearGradient(0, ty - fs * 0.5, 0, ty + fs * 0.55);
+  if (state.look === "magazine") {
+    grad.addColorStop(0, "#ffffff"); grad.addColorStop(0.7, "#ffd9ec"); grad.addColorStop(1, "#ff9d2e");
+  } else if (state.look === "wanted") {
+    grad.addColorStop(0, "#fff3c4"); grad.addColorStop(0.55, "#f7c873"); grad.addColorStop(1, "#c98a3d");
+  } else {
+    grad.addColorStop(0, "#ffe45c"); grad.addColorStop(0.42, "#ff9d2e");
+    grad.addColorStop(0.72, "#ff4d8d"); grad.addColorStop(1, "#e83e8c");
+  }
+  ctx.fillStyle = grad;
+  ctx.fillText(state.title.toUpperCase(), tx, ty);
+  // script subtitle overlapping the lower title, left of centre
+  ctx.save();
+  ctx.translate(g.W * 0.10, g.scriptY);
+  ctx.rotate(-0.05);
+  ctx.textAlign = "left";
+  ctx.font = `italic 700 ${Math.round(g.W * 0.048)}px "Brush Script MT", "Segoe Script", cursive`;
+  ctx.fillStyle = "#ff5da2";
+  ctx.shadowColor = "rgba(42,10,61,0.9)"; ctx.shadowBlur = 0;
+  ctx.shadowOffsetX = g.W * 0.002; ctx.shadowOffsetY = g.W * 0.0025;
+  ctx.fillText(state.script, 0, 0);
+  ctx.restore();
+  // tagline strip
+  const stripH = g.H * 0.038, stripY = g.H * 0.877;
+  const sg = ctx.createLinearGradient(0, 0, g.W, 0);
+  if (state.look === "magazine") { sg.addColorStop(0, "#111"); sg.addColorStop(1, "#111"); }
+  else { sg.addColorStop(0, "#ff2e88"); sg.addColorStop(0.5, "#ff7a2e"); sg.addColorStop(1, "#ff2e88"); }
+  ctx.fillStyle = sg; ctx.fillRect(0, stripY, g.W, stripH);
+  ctx.fillStyle = state.look === "magazine" ? "#fff" : "#2a0a3d";
+  ctx.font = `900 ${Math.round(g.W * 0.0155)}px Arial, sans-serif`;
+  ctx.fillText(state.tagline, g.W / 2, stripY + stripH / 2);
+  // bottom bar
+  ctx.textAlign = "left";
+  ctx.fillStyle = "#ff2e88";
+  ctx.font = `900 ${Math.round(g.W * 0.0155)}px Arial, sans-serif`;
+  ctx.fillText("COMING SOON", g.W * 0.012, g.H * 0.962);
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#fff";
+  ctx.font = `400 ${Math.round(g.W * 0.0115)}px Arial, sans-serif`;
+  ctx.fillText("A HEAT WAVE PICTURE  ·  STARRING YOU", g.W / 2, g.H * 0.945);
+  ctx.fillText("SHOT ON YOUR OWN CAMERA  ·  GRADED BY HAND", g.W / 2, g.H * 0.972);
+  drawBarcode(ctx, g);
+  drawStamp(ctx, g);
+  return cv;
+}
+function drawChip(ctx, label, cell, g) {
+  const fs = Math.round(g.W * 0.011);
+  ctx.font = `800 ${fs}px Arial, sans-serif`;
   const tw = ctx.measureText(label).width;
-  const padX = fs * 0.7, padY = fs * 0.42;
-  const bx = x + Math.max(6, W * 0.006);
-  let by = y + h - Math.max(6, H * 0.008) - (fs + padY * 2);
-  if (cell.star) { by = y + Math.max(6, H * 0.075); } // hero tag rides high, clear of the credits
-  // bottom-row tags ride high too: the billing block sits on their bottom edge
-  if (!cell.star && !cell.tilt && cell.y + cell.h >= 0.99) { by = y + Math.max(6, H * 0.01); }
-  if (cell.tilt) { by = y + h - (fs + padY * 2) - 8; }
-  const tagX = cell.tilt ? x + w / 2 - (tw + padX * 2) / 2 : bx;
-  ctx.fillStyle = "rgba(10,4,22,0.88)";
-  ctx.beginPath();
-  ctx.rect(tagX, by, tw + padX * 2, fs + padY * 2);
-  ctx.fill();
-  ctx.strokeStyle = "#ffc93e";
-  ctx.lineWidth = Math.max(1, fs * 0.08);
-  ctx.strokeRect(tagX, by, tw + padX * 2, fs + padY * 2);
-  ctx.fillStyle = "#ffffff";
+  const padX = g.W * 0.006, padY = g.W * 0.0035;
+  const bw = tw + padX * 2, bh = fs + padY * 2;
+  const x = cell.x + g.W * 0.007;
+  let y;
+  if (cell.slot === "hero" && !g.nine) y = cell.y + g.H * 0.075;
+  else if (cell.chipAtBottom) y = cell.y + cell.h - bh - g.W * 0.007;
+  else y = cell.y + g.W * 0.007;
+  ctx.fillStyle = "rgba(8,3,18,0.85)";
+  ctx.fillRect(x, y, bw, bh);
+  ctx.strokeStyle = "#ffc800"; ctx.lineWidth = Math.max(2, g.W * 0.001);
+  ctx.strokeRect(x, y, bw, bh);
+  ctx.fillStyle = "#fff"; ctx.textAlign = "left"; ctx.textBaseline = "middle";
+  ctx.fillText(label, x + padX, y + bh / 2);
+  ctx.textAlign = "center";
+}
+function drawEstVol(ctx, g) {
+  const fs = Math.round(g.W * 0.0125);
+  ctx.font = `900 ${fs}px Arial, sans-serif`;
+  ctx.textBaseline = "middle";
+  const padX = g.W * 0.007, padY = g.W * 0.0035;
   ctx.textAlign = "left";
-  ctx.fillText(label, tagX + padX, by + (fs + padY * 2) / 2 + 1);
+  const ew = ctx.measureText("EST. 2026").width + padX * 2;
+  ctx.fillStyle = "#ff2e88";
+  ctx.fillRect(g.W * 0.007, g.H * 0.012, ew, fs + padY * 2);
+  ctx.fillStyle = "#fff";
+  ctx.fillText("EST. 2026", g.W * 0.007 + padX, g.H * 0.012 + (fs + padY * 2) / 2);
+  ctx.textAlign = "right";
+  const vw = ctx.measureText("VOL. 06").width + padX * 2;
+  ctx.fillStyle = "#ffc800";
+  ctx.fillRect(g.W - g.W * 0.007 - vw, g.H * 0.012, vw, fs + padY * 2);
+  ctx.fillStyle = "#1a0b00";
+  ctx.fillText("VOL. 06", g.W - g.W * 0.007 - padX, g.H * 0.012 + (fs + padY * 2) / 2);
+  ctx.textAlign = "center";
 }
-
-/* ---------- masthead scrim: quote line over the photos ---------- */
-function fitText(text, maxW, startPx, family, weight) {
-  let px = startPx;
-  ctx.font = weight + " " + px + "px " + family;
-  while (px > 8 && ctx.measureText(text).width > maxW) {
-    px -= 1;
-    ctx.font = weight + " " + px + "px " + family;
+function drawBarcode(ctx, g) {
+  const bw = g.W * 0.075, bh = g.H * 0.052;
+  const x = g.W - g.W * 0.012 - bw, y = g.H - g.H * 0.012 - bh;
+  ctx.fillStyle = "#fff"; ctx.fillRect(x, y, bw, bh);
+  ctx.fillStyle = "#000";
+  const bars = [3, 1, 2, 1, 1, 3, 1, 2, 4, 1, 1, 2, 1, 3, 2, 1, 1, 1, 2, 3];
+  let bx = x + bw * 0.08;
+  const bwMax = bw * 0.84, unit = bwMax / bars.reduce((a, b) => a + b, 0);
+  const barH = bh * 0.62;
+  for (let i = 0; i < bars.length; i += 2) {
+    ctx.fillRect(bx, y + bh * 0.08, bars[i] * unit, barH);
+    bx += (bars[i] + bars[i + 1]) * unit;
   }
-  return px;
+  ctx.font = `700 ${Math.round(g.W * 0.008)}px Arial, sans-serif`;
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.fillText("8 92625 01107", x + bw / 2, y + bh * 0.86);
 }
-
-function drawTopBar(W, H) {
-  const scrimH = H * 0.075;
-  const sc = ctx.createLinearGradient(0, 0, 0, scrimH);
-  sc.addColorStop(0, "rgba(10,4,22,0.78)");
-  sc.addColorStop(1, "rgba(10,4,22,0)");
-  ctx.fillStyle = sc;
-  ctx.fillRect(0, 0, W, scrimH);
-  // EST. 2026 pill, top left
-  const pillPx = Math.round(H * 0.02);
-  ctx.font = "800 " + pillPx + "px Arial, sans-serif";
-  ctx.textBaseline = "middle";
-  const est = "EST. 2026";
-  const estW = ctx.measureText(est).width + H * 0.024;
-  const estH = H * 0.034, estY = (H * 0.052 - estH) / 2;
-  ctx.fillStyle = "#ff5da2";
-  ctx.beginPath();
-  ctx.rect(W * 0.012, estY, estW, estH);
-  ctx.fill();
-  ctx.fillStyle = "#2a0a1e";
-  ctx.textAlign = "center";
-  ctx.fillText(est, W * 0.012 + estW / 2, estY + estH / 2 + 1);
-  // VOL. 06 pill, top right
-  const vol = "VOL. 06";
-  const volW = ctx.measureText(vol).width + H * 0.024;
-  const volX = W - volW - W * 0.012;
-  ctx.fillStyle = "#ffc93e";
-  ctx.beginPath();
-  ctx.rect(volX, estY, volW, estH);
-  ctx.fill();
-  ctx.fillStyle = "#241040";
-  ctx.fillText(vol, volX + volW / 2, estY + estH / 2 + 1);
-  // stars + quote, centred between the pills
-  const stars = "★★★★★";
-  const quoteText = "“" + studio.quote + "”  ";
-  const srcText = "— " + studio.source;
-  fitText(stars + "  " + quoteText + srcText, W * 0.62, Math.round(H * 0.02), "Arial, sans-serif", "800");
-  const totalW = ctx.measureText(stars + "  ").width + ctx.measureText(quoteText).width + ctx.measureText(srcText).width;
-  let cx = (W - totalW) / 2;
-  const y = H * 0.052 / 2;
-  ctx.textAlign = "left";
-  ctx.fillStyle = "#ffc93e";
-  ctx.fillText(stars + "  ", cx, y);
-  cx += ctx.measureText(stars + "  ").width;
-  ctx.fillStyle = "#ffffff";
-  ctx.fillText(quoteText, cx, y);
-  cx += ctx.measureText(quoteText).width;
-  ctx.fillStyle = "#ffc93e";
-  ctx.fillText(srcText, cx, y);
-}
-
-/* ---------- the 3D headline: extruded stack + chrome gradient ---------- */
-function drawTitle(W, H) {
-  const title = studio.title.toUpperCase();
-  const family = "\"Arial Black\", Arial, sans-serif";
-  const px = fitText(title, W * 0.97, Math.round(W * 0.105), family, "900");
-  const tall = W / H < 1.1;
-  const titleY = H * (tall ? 0.50 : 0.52);
-  const grad = ctx.createLinearGradient(0, titleY - px * 0.55, 0, titleY + px * 0.55);
-  grad.addColorStop(0.00, "#fff3a0");
-  grad.addColorStop(0.18, "#ffd23e");
-  grad.addColorStop(0.20, "#ff9d2e");
-  grad.addColorStop(0.38, "#ff7a1a");
-  grad.addColorStop(0.40, "#ff5e62");
-  grad.addColorStop(0.58, "#ff2e88");
-  grad.addColorStop(0.60, "#e91e8c");
-  grad.addColorStop(0.78, "#b3127f");
-  grad.addColorStop(0.80, "#8f0f6e");
-  grad.addColorStop(1.00, "#7a0a5e");
-  ctx.font = "900 " + px + "px " + family;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.lineJoin = "round";
-  // extruded stack: six hard layers stepping down-right
-  const step = Math.max(2, Math.round(px * 0.022));
-  ctx.fillStyle = "#2a0a3e";
-  for (let k = 6; k >= 1; k--) {
-    ctx.fillText(title, W / 2 + step * k * 0.6, titleY + step * k);
-  }
-  // outline + chrome fill
-  ctx.strokeStyle = "#2a0a3e";
-  ctx.lineWidth = px * 0.045;
-  ctx.strokeText(title, W / 2, titleY);
-  ctx.fillStyle = grad;
-  ctx.fillText(title, W / 2, titleY);
-  // bright top edge: the same letters, clipped to their upper sliver
+function drawStamp(ctx, g) {
+  const sc = g.stampCell;
+  const cx = sc.x + sc.w * 0.52, cy = sc.y + sc.h * (g.stampFrac || 0.55);
+  const big = state.look === "wanted" ? g.W * 0.033 : g.W * 0.023;
   ctx.save();
-  ctx.beginPath();
-  ctx.rect(0, titleY - px * 0.62, W, px * 0.16);
-  ctx.clip();
-  ctx.fillStyle = "rgba(255,255,255,0.5)";
-  ctx.fillText(title, W / 2, titleY);
-  ctx.restore();
-  // pink script subtitle overlapping the headline's lower edge, left of centre
-  const subPx = Math.round(px * 0.36);
-  ctx.save();
-  ctx.translate(W * 0.30, titleY + px * 0.40);
-  ctx.rotate(-0.07);
-  ctx.font = "italic 700 " + subPx + "px \"Brush Script MT\", \"Segoe Script\", cursive";
-  ctx.textAlign = "center";
-  ctx.lineWidth = Math.max(2, subPx * 0.05);
-  ctx.strokeStyle = "#5c0a3a";
-  ctx.strokeText(studio.subtitle, 0, 0);
-  ctx.fillStyle = "#ff7ec2";
-  ctx.fillText(studio.subtitle, 0, 0);
+  ctx.translate(cx, cy); ctx.rotate(-0.21);
+  ctx.globalAlpha = 0.92;
+  ctx.strokeStyle = "#ff2b2b"; ctx.fillStyle = "#ff2b2b";
+  ctx.lineWidth = Math.max(3, g.W * 0.0025);
+  ctx.font = `900 ${Math.round(big)}px Arial, sans-serif`;
+  const w1 = ctx.measureText("WANTED").width;
+  ctx.font = `900 ${Math.round(big * 0.45)}px Arial, sans-serif`;
+  const w2 = ctx.measureText("FOR SUNSET CRIMES").width;
+  const bw = Math.max(w1, w2) + big * 0.7, bh = big * 1.9;
+  ctx.strokeRect(-bw / 2, -bh / 2, bw, bh);
+  ctx.strokeRect(-bw / 2 + big * 0.08, -bh / 2 + big * 0.08, bw - big * 0.16, bh - big * 0.16);
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.font = `900 ${Math.round(big)}px Arial, sans-serif`;
+  ctx.fillText("WANTED", 0, -big * 0.32);
+  ctx.font = `900 ${Math.round(big * 0.45)}px Arial, sans-serif`;
+  ctx.fillText("FOR SUNSET CRIMES", 0, big * 0.42);
   ctx.restore();
 }
-
-function drawRibbon(W, H) {
-  const stripH = H * 0.032, y = H * (1 - 0.118);
-  const grad = ctx.createLinearGradient(0, y, W, y);
-  grad.addColorStop(0, "#ffc93e");
-  grad.addColorStop(0.5, "#ff5e62");
-  grad.addColorStop(1, "#ff2e88");
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, y, W, stripH);
-  fitText(studio.tagline, W * 0.92, Math.round(H * 0.02), "Arial, sans-serif", "800");
-  ctx.fillStyle = "#2a0a3e";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText(studio.tagline, W / 2, y + stripH / 2 + 1);
-}
-
-function drawBars(W, H, x, y, w, h) {
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(x, y, w, h);
-  const bars = [3, 1, 2, 1, 1, 3, 1, 2, 2, 1, 3, 1, 1, 2, 1, 3, 2, 1, 1, 2, 3, 1, 2, 1, 1, 3, 1, 2];
-  let bx = x + w * 0.06;
-  const bw = (w * 0.88) / bars.reduce((a, b) => a + b, 0);
-  ctx.fillStyle = "#111111";
-  bars.forEach((b) => {
-    if (b % 2 === 1) ctx.fillRect(bx, y + h * 0.08, b * bw, h * 0.68);
-    bx += b * bw;
-  });
-  ctx.fillStyle = "#111111";
-  ctx.font = Math.round(h * 0.16) + "px Arial, sans-serif";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "alphabetic";
-  ctx.fillText("8 92625 01107", x + w / 2, y + h * 0.96);
-}
-
-function drawFooter(W, H) {
-  const y = H * (1 - 0.086);
-  const sc = ctx.createLinearGradient(0, y, 0, H);
-  sc.addColorStop(0, "rgba(10,4,22,0)");
-  sc.addColorStop(0.35, "rgba(10,4,22,0.85)");
-  sc.addColorStop(1, "rgba(10,4,22,0.92)");
-  ctx.fillStyle = sc;
-  ctx.fillRect(0, y, W, H * 0.086);
-  ctx.fillStyle = "#ff5da2";
-  ctx.font = "800 " + Math.round(H * 0.024) + "px Arial, sans-serif";
-  ctx.textAlign = "left";
-  ctx.textBaseline = "middle";
-  ctx.fillText("COMING SOON", W * 0.02, y + H * 0.043);
-  ctx.fillStyle = "#f7ecd7";
-  const line1 = "A HEAT WAVE PICTURE  ·  STARRING YOU";
-  const line2 = "SHOT ON YOUR OWN CAMERA  ·  GRADED BY HAND";
-  const px = fitText(line1, W * 0.56, Math.round(H * 0.017), "Arial, sans-serif", "400");
-  ctx.font = "400 " + px + "px Arial, sans-serif";
-  ctx.textAlign = "center";
-  ctx.fillText(line1, W * 0.5, y + H * 0.032);
-  ctx.fillText(line2, W * 0.5, y + H * 0.062);
-  drawBars(W, H, W * 0.905, y + H * 0.012, W * 0.075, H * 0.062);
-}
-
-function drawStamp(W, H) {
-  // nine grid: the ninth cell reprises the hero, so the stamp moves to the
-  // centre-bottom cell where it lands on a scooter, not on a face
-  const cx = studio.layout === "nine" ? W * 0.50 : W * 0.90;
-  const cy = studio.layout === "nine" ? H * 0.84 : H * 0.80;
-  const rw = W * 0.095, rh = H * 0.075;
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.rotate(-0.16);
-  ctx.strokeStyle = "#ff2e4d";
-  ctx.lineWidth = Math.max(3, W * 0.0022);
-  ctx.strokeRect(-rw / 2, -rh / 2, rw, rh);
-  ctx.lineWidth = Math.max(1, W * 0.0009);
-  ctx.strokeRect(-rw / 2 + 5, -rh / 2 + 5, rw - 10, rh - 10);
-  ctx.fillStyle = "#ff2e4d";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.font = "900 " + Math.round(rh * 0.42) + "px Arial, sans-serif";
-  ctx.fillText("WANTED", 0, -rh * 0.14);
-  ctx.font = "700 " + Math.round(rh * 0.20) + "px Arial, sans-serif";
-  ctx.fillText("FOR SUNSET CRIMES", 0, rh * 0.26);
-  ctx.restore();
-}
-
-/* ---------- print grain: a seeded speckle so every export matches ---------- */
-function drawSpeckle(W, H) {
-  let seed = 20261121;
-  const rnd = () => {
-    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
-    return seed / 0x7fffffff;
-  };
-  ctx.save();
-  for (let i = 0; i < 2200; i++) {
-    const gx = rnd() * W, gy = rnd() * H;
-    ctx.fillStyle = rnd() > 0.5 ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)";
-    ctx.fillRect(gx, gy, 2, 2);
-  }
-  ctx.restore();
-}
-
-/* ---------- the whole cover, one function the preview and the export share ---------- */
-function renderCover() {
-  const size = FORMATS[studio.size];
-  if (sheet.width !== size.w || sheet.height !== size.h) {
-    sheet.width = size.w;
-    sheet.height = size.h;
-  }
-  const W = size.w, H = size.h;
-  ctx.clearRect(0, 0, W, H);
-  ctx.fillStyle = "#170a2c";
-  ctx.fillRect(0, 0, W, H);
-  cells = layOut();
-  cells.forEach((cell) => { drawPanel(cell, W, H); });
-  cells.forEach((cell) => { drawTag(cell, W, H); });
-  drawTopBar(W, H);
-  drawTitle(W, H);
-  drawRibbon(W, H);
-  drawFooter(W, H);
-  drawStamp(W, H);
-  drawSpeckle(W, H);
-}
-
-/* ---------- export ---------- */
-function saveCover() {
-  sheet.toBlob((blob) => {
-    if (!blob) {
-      note.textContent = "Export failed: the browser could not make a PNG.";
-      return;
-    }
-    const url = URL.createObjectURL(blob);
+function downloadCanvas(cv, name) {
+  cv.toBlob(b => {
     const a = document.createElement("a");
-    a.href = url;
-    a.download = "heat-wave-" + studio.size + ".png";
+    a.href = URL.createObjectURL(b);
+    a.download = name;
     a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-    note.textContent = "Exported heat-wave-" + studio.size + ".png (" + studio.size + ").";
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
   }, "image/png");
 }
-
-function saveAll() {
-  const order = ["landscape", "portrait", "square"];
-  const size = studio.size;
-  let k = 0;
-  const step = () => {
-    if (k >= order.length) {
-      studio.size = size;
-      renderCover();
-      markActive(document.getElementById("sizeBar"), studio.size);
-      note.textContent = "Exported all three sizes.";
-      return;
-    }
-    studio.size = order[k];
-    renderCover();
-    markActive(document.getElementById("sizeBar"), studio.size);
-    k += 1;
-    saveCover();
-    setTimeout(step, 350);
-  };
-  step();
+async function exportPNG(sizeKey) {
+  const cv = drawCoverCanvas(sizeKey);
+  return cv.toDataURL("image/png");
 }
 
-/* ---------- studio controls ---------- */
-const markActive = (bar, value) => {
-  bar.querySelectorAll("button").forEach((b) => {
-    const key = b.dataset.look ?? b.dataset.layout ?? b.dataset.size ?? b.dataset.grade;
-    b.classList.toggle("on", key === value);
-  });
-};
-
-const refreshRack = () => {
-  const rack = document.getElementById("rack");
-  rack.innerHTML = "";
-  studio.photos.forEach((snap, i) => {
-    const fig = document.createElement("figure");
-    if (i === studio.picked) fig.classList.add("on");
-    const img = document.createElement("img");
-    img.src = snap.img ? snap.img.src : snap.src;
-    img.alt = snap.tag;
-    const cap = document.createElement("figcaption");
-    cap.textContent = snap.tag;
-    fig.appendChild(img);
-    fig.appendChild(cap);
-    fig.addEventListener("click", () => selectPanel(i));
-    rack.appendChild(fig);
-  });
-};
-
-const refreshStrip = () => {
-  const strip = document.getElementById("strip");
-  strip.innerHTML = "";
-  // one button per photo in the roster (all eight), even the one that is not
-  // on the cover right now: picking it shows its focus and label in the tray
-  studio.photos.forEach((snap, i) => {
+/* ---------- controls ---------- */
+function choiceGroup(elId, values, current, onPick) {
+  const el = document.getElementById(elId);
+  el.innerHTML = "";
+  for (const [key, label] of Object.entries(values)) {
     const b = document.createElement("button");
-    b.textContent = (i + 1) + " · " + snap.tag;
-    if (i === studio.picked) b.classList.add("on");
-    b.addEventListener("click", () => selectPanel(i));
-    strip.appendChild(b);
-  });
-};
-
-function selectPanel(i) {
-  studio.picked = i;
-  syncFocus();
-  refreshRack();
-  refreshStrip();
-}
-
-const syncFocus = () => {
-  const snap = studio.photos[studio.picked];
-  document.getElementById("fxField").value = Math.round(snap.fx * 100);
-  document.getElementById("fyField").value = Math.round(snap.fy * 100);
-  document.getElementById("labelField").value = snap.tag;
-};
-
-const syncToneLabels = () => {
-  document.getElementById("warmVal").textContent = studio.warmth;
-  document.getElementById("satVal").textContent = studio.sat + "%";
-  document.getElementById("vigVal").textContent = studio.vig;
-  document.getElementById("warmSlider").value = studio.warmth;
-  document.getElementById("satSlider").value = studio.sat;
-  document.getElementById("vigSlider").value = studio.vig;
-};
-
-function applyTone(grade) {
-  const g = TONES[grade];
-  if (!g) return;
-  studio.grade = grade;
-  studio.warmth = g.warmth;
-  studio.sat = g.sat;
-  studio.vig = g.vig;
-  syncToneLabels();
-  markActive(document.getElementById("toneBar"), grade);
-  renderCover();
-}
-
-function applyPreset(look) {
-  const preset = PRESETS[look];
-  if (!preset) return;
-  studio.layout = preset.layout;
-  studio.title = preset.title;
-  studio.subtitle = preset.subtitle;
-  document.getElementById("titleField").value = preset.title;
-  document.getElementById("subField").value = preset.subtitle;
-  markActive(document.getElementById("layoutBar"), preset.layout);
-  applyTone(preset.grade);
-  studio.look = look;
-  markActive(document.getElementById("lookBar"), look);
-  renderCover();
-}
-
-function wireControls() {
-  document.getElementById("lookBar").addEventListener("click", (e) => {
-    if (e.target.dataset.look) applyPreset(e.target.dataset.look);
-  });
-  document.getElementById("layoutBar").addEventListener("click", (e) => {
-    if (e.target.dataset.layout) {
-      studio.layout = e.target.dataset.layout;
-      markActive(e.currentTarget, studio.layout);
-      renderCover();
-      refreshStrip();
-    }
-  });
-  document.getElementById("sizeBar").addEventListener("click", (e) => {
-    if (e.target.dataset.size) {
-      studio.size = e.target.dataset.size;
-      markActive(e.currentTarget, studio.size);
-      renderCover();
-    }
-  });
-  document.getElementById("toneBar").addEventListener("click", (e) => {
-    if (e.target.dataset.grade) applyTone(e.target.dataset.grade);
-  });
-  const bindText = (id, key) => {
-    document.getElementById(id).addEventListener("input", (e) => {
-      studio[key] = e.target.value;
-      renderCover();
+    b.textContent = label;
+    if (key === current) b.classList.add("on");
+    b.addEventListener("click", () => {
+      onPick(key);
+      el.querySelectorAll("button").forEach(x => x.classList.remove("on"));
+      b.classList.add("on");
     });
+    el.appendChild(b);
+  }
+}
+function rebuildChoices() {
+  choiceGroup("looks", LOOKS, state.look, k => { state.look = k; buildCover(); });
+  choiceGroup("layouts", LAYOUTS, state.layout, k => { state.layout = k; buildCover(); });
+  choiceGroup("sizes", Object.fromEntries(Object.entries(SIZES).map(([k, v]) => [k, v.label])), state.size, k => { state.size = k; buildCover(); });
+  choiceGroup("grades", Object.fromEntries(Object.entries(GRADES).map(([k, v]) => [k, v.label])), state.grade, k => {
+    state.grade = k;
+    const g = GRADES[k];
+    state.warmth = g.warmth; state.sat = g.sat; state.vig = g.vig;
+    syncSliders(); gradeCache.clear(); drawPanels();
+  });
+}
+function syncSliders() {
+  document.getElementById("warmth").value = state.warmth;
+  document.getElementById("sat").value = state.sat;
+  document.getElementById("vig").value = state.vig;
+  document.getElementById("warmthVal").textContent = state.warmth;
+  document.getElementById("satVal").textContent = state.sat + "%";
+  document.getElementById("vigVal").textContent = state.vig;
+}
+function bindSlider(id, valId, fmt, apply) {
+  const el = document.getElementById(id);
+  el.addEventListener("input", () => {
+    const v = parseInt(el.value, 10);
+    document.getElementById(valId).textContent = fmt(v);
+    apply(v);
+  });
+}
+bindSlider("warmth", "warmthVal", v => v, v => { state.warmth = v; gradeCache.clear(); drawPanels(); });
+bindSlider("sat", "satVal", v => v + "%", v => { state.sat = v; gradeCache.clear(); drawPanels(); });
+bindSlider("vig", "vigVal", v => v, v => { state.vig = v; gradeCache.clear(); drawPanels(); });
+bindSlider("fx", "fxVal", v => v, v => {
+  const f = state.focus[state.selected] || (state.focus[state.selected] = { x: 50, y: 50 });
+  f.x = v; gradeCache.clear(); drawPanels();
+});
+bindSlider("fy", "fyVal", v => v, v => {
+  const f = state.focus[state.selected] || (state.focus[state.selected] = { x: 50, y: 50 });
+  f.y = v; gradeCache.clear(); drawPanels();
+});
+function bindWord(id, key, transform) {
+  const el = document.getElementById(id);
+  el.addEventListener("input", () => {
+    state[key] = transform ? transform(el.value) : el.value;
+    buildCover();
+  });
+}
+bindWord("wTitle", "title");
+bindWord("wScript", "script");
+bindWord("wQuote", "quote", v => v.toUpperCase());
+bindWord("wBy", "quotedBy", v => v.toUpperCase());
+bindWord("wTag", "tagline", v => v.toUpperCase());
+
+function buildTray() {
+  const tray = document.getElementById("tray");
+  tray.innerHTML = "";
+  PHOTOS.forEach((p, i) => {
+    const fig = document.createElement("figure");
+    if (state.armed === p.id) fig.classList.add("armed");
+    fig.innerHTML = "";
+    const img = document.createElement("img");
+    img.src = p.file; img.alt = p.label;
+    const num = document.createElement("span"); num.className = "num"; num.textContent = i + 1;
+    const cap = document.createElement("figcaption"); cap.textContent = p.label;
+    fig.append(img, num, cap);
+    fig.addEventListener("click", () => {
+      state.armed = state.armed === p.id ? null : p.id;
+      buildTray();
+    });
+    tray.appendChild(fig);
+  });
+}
+function updateStatus() {
+  document.getElementById("gradeMode").textContent = grader.mode;
+  document.getElementById("photoCount").textContent = loadedCount + "/8";
+}
+document.getElementById("upload").addEventListener("change", ev => {
+  const file = ev.target.files && ev.target.files[0];
+  if (!file) return;
+  const id = "custom-" + Date.now();
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = () => {
+    customPhotos[id] = { label: "YOUR PHOTO", img };
+    loadedCount++;
+    const slot = state.selected;
+    if (slot === "hero") state.slots.hero = id;
+    else if (slot.startsWith("p")) state.slots[slot] = id;
+    updateStatus(); buildCover();
   };
-  bindText("titleField", "title");
-  bindText("subField", "subtitle");
-  bindText("quoteField", "quote");
-  bindText("srcField", "source");
-  bindText("tagField", "tagline");
-  document.getElementById("warmSlider").addEventListener("input", (e) => {
-    studio.warmth = Number(e.target.value);
-    syncToneLabels();
-    renderCover();
-  });
-  document.getElementById("satSlider").addEventListener("input", (e) => {
-    studio.sat = Number(e.target.value);
-    syncToneLabels();
-    renderCover();
-  });
-  document.getElementById("vigSlider").addEventListener("input", (e) => {
-    studio.vig = Number(e.target.value);
-    syncToneLabels();
-    renderCover();
-  });
-  document.getElementById("fxField").addEventListener("input", (e) => {
-    studio.photos[studio.picked].fx = Number(e.target.value) / 100;
-    renderCover();
-  });
-  document.getElementById("fyField").addEventListener("input", (e) => {
-    studio.photos[studio.picked].fy = Number(e.target.value) / 100;
-    renderCover();
-  });
-  document.getElementById("labelField").addEventListener("input", (e) => {
-    studio.photos[studio.picked].tag = e.target.value.toUpperCase();
-    refreshRack();
-    refreshStrip();
-    renderCover();
-  });
-  document.getElementById("addPhotos").addEventListener("click", () => {
-    document.getElementById("filePick").click();
-  });
-  document.getElementById("filePick").addEventListener("change", (e) => {
-    Array.from(e.target.files || []).forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        const img = new Image();
-        img.onload = () => {
-          studio.photos.push({
-            src: ev.target.result, fx: 0.5, fy: 0.5,
-            tag: "YOU " + (studio.photos.length + 1), img, user: true
-          });
-          refreshRack();
-          refreshStrip();
-          renderCover();
-        };
-        img.src = ev.target.result;
-      };
-      reader.readAsDataURL(file);
-    });
-  });
-  document.getElementById("saveBtn").addEventListener("click", saveCover);
-  document.getElementById("saveAllBtn").addEventListener("click", saveAll);
-  sheet.addEventListener("click", (e) => {
-    const rect = sheet.getBoundingClientRect();
-    const mx = ((e.clientX - rect.left) / rect.width) * sheet.width;
-    const my = ((e.clientY - rect.top) / rect.height) * sheet.height;
-    cells.forEach((cell) => {
-      const x = cell.x * sheet.width, y = cell.y * sheet.height;
-      const w = cell.w * sheet.width, h = cell.h * sheet.height;
-      if (mx >= x && mx <= x + w && my >= y && my <= y + h) selectPanel(cell.index);
-    });
-  });
+  img.src = url;
+});
+document.getElementById("exportOne").addEventListener("click", () => {
+  downloadCanvas(drawCoverCanvas(state.size), "heat-wave-" + state.size + ".png");
+});
+document.getElementById("exportAll").addEventListener("click", () => {
+  for (const k of Object.keys(SIZES)) downloadCanvas(drawCoverCanvas(k), "heat-wave-" + k + ".png");
+});
+
+/* ---------- boot ---------- */
+const params = new URLSearchParams(location.search);
+if (params.get("size") && SIZES[params.get("size")]) state.size = params.get("size");
+if (params.get("layout") && LAYOUTS[params.get("layout")]) state.layout = params.get("layout");
+if (params.get("look") && LOOKS[params.get("look")]) state.look = params.get("look");
+if (params.get("grade") && GRADES[params.get("grade")]) {
+  state.grade = params.get("grade");
+  const g = GRADES[state.grade];
+  state.warmth = g.warmth; state.sat = g.sat; state.vig = g.vig;
 }
-
-/* ---------- deep links: ?shot=cover&size=landscape&layout=bleed-left ---------- */
-function applyQuery() {
-  const params = new URLSearchParams(location.search);
-  if (params.get("shot") === "cover") document.body.classList.add("cover-only");
-  const look = params.get("look");
-  if (look && PRESETS[look]) applyPreset(look);
-  const layout = params.get("layout");
-  if (layout) {
-    studio.layout = layout;
-    markActive(document.getElementById("layoutBar"), layout);
-  }
-  const size = params.get("size");
-  if (size && FORMATS[size]) {
-    studio.size = size;
-    markActive(document.getElementById("sizeBar"), size);
-  }
-  const grade = params.get("grade");
-  if (grade && TONES[grade]) applyTone(grade);
-  const title = params.get("title");
-  if (title) {
-    studio.title = title;
-    document.getElementById("titleField").value = title;
-  }
-  const subtitle = params.get("subtitle");
-  if (subtitle) {
-    studio.subtitle = subtitle;
-    document.getElementById("subField").value = subtitle;
-  }
-}
-
-window.__waveExport = saveCover;
-window.__waveDraw = renderCover;
-window.__waveLoaded = () => loadedPhotos() >= 8;
-
-loadRoster();
-wireControls();
-applyQuery();
-renderCover();
-refreshRack();
-refreshStrip();
+if (params.get("cover") === "1") document.body.classList.add("cover-only");
+window.__app = {
+  state, exportPNG, gradeMode: () => grader.mode,
+  photosLoaded: () => loadedCount,
+  redraw: () => drawPanels(),
+  ready: () => loadedCount >= 8 && !!coverEl.querySelector(".panel canvas"),
+};
+window.addEventListener("resize", () => { fitCoverUnit(); drawPanels(); });
+rebuildChoices();
+syncSliders();
+buildTray();
+buildCover();
+updateStatus();
 </script>
 </body>
 </html>

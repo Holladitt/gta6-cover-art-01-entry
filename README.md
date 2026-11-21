@@ -11,6 +11,10 @@ gradient title sitting on the photos, a pink script subtitle, press-quote top
 line, EST. 2026 / VOL. 06 badges, a red WANTED stamp, tagline strip and billing
 block — then exports it as a PNG.
 
+> v11 note: a fresh rebuild of the v10 "Heat Wave" design, rewritten from
+> scratch in a new recording so every file in the entry is witnessed by it.
+> The cover itself is unchanged: same panels, same title, same stamps.
+
 ## Try it
 
 ```sh
@@ -53,7 +57,7 @@ replace them with your own photos in the studio.
 
 ```sh
 MAKEFUN_OUTPUT_DIR=/tmp/heatwave-out node main.ts   # writes /tmp/heatwave-out/{app,screenshots,dossier.json}
-node ~/workspace/tools/makefun/gta6-cover-art-01-kit/cli/makefun.mjs check --kit ~/workspace/tools/makefun/gta6-cover-art-01-kit --repo .
+node ~/workspace/tools/makefun/gta6-cover-art-01-kit32/cli/makefun.mjs check --kit ~/workspace/tools/makefun/gta6-cover-art-01-kit32 --repo .
 ```
 
 ## License

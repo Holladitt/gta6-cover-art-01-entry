@@ -13,13 +13,18 @@ import { createServer } from 'node:http';
 import { extname, join, normalize, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const appRoot = resolve(fileURLToPath(new URL('./app', import.meta.url)));
-const argv = process.argv.slice(2);
-const portFlag = argv.indexOf('--port');
-const wanted = portFlag === -1 ? 8080 : Number(argv[portFlag + 1]);
-const port = Number.isInteger(wanted) && wanted > 0 && wanted < 65536 ? wanted : 8080;
+const APP_DIR = resolve(fileURLToPath(new URL('./app', import.meta.url)));
 
-const MIME_TYPES = {
+function pickPort(): number {
+  const args = process.argv.slice(2);
+  const at = args.indexOf('--port');
+  const raw = at === -1 ? 8080 : Number(args[at + 1]);
+  return Number.isInteger(raw) && raw > 0 && raw < 65536 ? raw : 8080;
+}
+
+const PORT = pickPort();
+
+const MEDIA: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
   '.mjs': 'text/javascript; charset=utf-8',
@@ -34,42 +39,52 @@ const MIME_TYPES = {
   '.txt': 'text/plain; charset=utf-8',
 };
 
-const server = createServer((request, response) => {
-  if (request.method !== 'GET' && request.method !== 'HEAD') {
-    response.writeHead(405).end('method not allowed');
+function mimeFor(path: string): string {
+  return MEDIA[extname(path).toLowerCase()] ?? 'application/octet-stream';
+}
+
+function insideApp(pathname: string): string | null {
+  const rel = pathname.endsWith('/') ? pathname + 'index.html' : pathname;
+  const target = resolve(join(APP_DIR, normalize(rel)));
+  if (target !== APP_DIR && !target.startsWith(APP_DIR + sep)) return null;
+  return target;
+}
+
+const server = createServer((req, res) => {
+  if (req.method !== 'GET' && req.method !== 'HEAD') {
+    res.writeHead(405).end('method not allowed');
     return;
   }
-  let pathname;
+  let pathname = '/';
   try {
-    pathname = decodeURIComponent(new URL(request.url ?? '/', 'http://localhost').pathname);
+    pathname = decodeURIComponent(new URL(req.url ?? '/', 'http://localhost').pathname);
   } catch {
-    response.writeHead(400).end('bad request');
+    res.writeHead(400).end('bad request');
     return;
   }
-  if (pathname.endsWith('/')) pathname += 'index.html';
-  const file = resolve(join(appRoot, normalize(pathname)));
-  if (file !== appRoot && !file.startsWith(appRoot + sep)) {
-    response.writeHead(403).end('forbidden');
+  const file = insideApp(pathname);
+  if (file === null) {
+    res.writeHead(403).end('forbidden');
     return;
   }
-  let size;
+  let bytes: number;
   try {
-    const stats = statSync(file);
-    if (!stats.isFile()) throw new Error('not a file');
-    size = stats.size;
+    const info = statSync(file);
+    if (!info.isFile()) throw new Error('not a file');
+    bytes = info.size;
   } catch {
-    response.writeHead(404).end('not found');
+    res.writeHead(404).end('not found');
     return;
   }
-  response.writeHead(200, {
-    'content-type': MIME_TYPES[extname(file).toLowerCase()] ?? 'application/octet-stream',
-    'content-length': size,
+  res.writeHead(200, {
+    'content-type': mimeFor(file),
+    'content-length': bytes,
     'cache-control': 'no-store',
   });
-  if (request.method === 'GET') createReadStream(file).pipe(response);
-  else response.end();
+  if (req.method === 'GET') createReadStream(file).pipe(res);
+  else res.end();
 });
 
-server.listen(port, '127.0.0.1', () => {
-  console.log('Sunset State studio: http://localhost:' + port);
+server.listen(PORT, '127.0.0.1', () => {
+  console.log('Sunset State studio: http://localhost:' + PORT);
 });

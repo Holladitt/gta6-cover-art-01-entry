@@ -1,905 +1,938 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Heat Wave — Cover Studio</title>
 <style>
-  :root{
-    --bg:#150826; --bg2:#1e0e33; --panel:#241640; --panel2:#2c1b4d;
-    --line:#3d2560; --gold:#ffc800; --pink:#ff2e88; --ink:#f5eefc;
-    --muted:#b9a3d6; --chip:#0d0518;
+  :root {
+    --bg: #170a2b;
+    --panel: #241040;
+    --panel2: #2e1450;
+    --ink: #f5eefc;
+    --muted: #b9a3d6;
+    --pink: #ff2e88;
+    --yellow: #ffc400;
+    --line: #4a2a72;
   }
-  *{box-sizing:border-box}
-  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
-    font-family:"Helvetica Neue",Arial,sans-serif}
-  body{min-height:100vh}
-  header{padding:14px 20px 10px;border-bottom:1px solid var(--line);
-    background:linear-gradient(180deg,#221040,#180a2c)}
-  header h1{margin:0;font-size:22px;letter-spacing:.06em}
-  header h1 .a{color:var(--gold)} header h1 .b{color:var(--pink)}
-  header p{margin:4px 0 0;color:var(--muted);font-size:13px}
-  main{display:flex;gap:16px;padding:16px 20px 20px;align-items:flex-start}
-  .stage{flex:1 1 auto;min-width:0}
-  .cover-shell{border:1px solid var(--line);border-radius:10px;overflow:hidden;
-    background:#000;box-shadow:0 10px 40px rgba(0,0,0,.55)}
-  .hint{margin:10px 2px 0;color:var(--muted);font-size:13px;line-height:1.5}
-  .tray{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-  .tray figure{margin:0;width:116px;cursor:pointer;border:2px solid transparent;
-    border-radius:8px;overflow:hidden;background:var(--panel);position:relative}
-  .tray figure.armed{border-color:var(--gold)}
-  .tray figure img{display:block;width:116px;height:76px;object-fit:cover}
-  .tray figcaption{font-size:10px;font-weight:700;letter-spacing:.04em;
-    padding:5px 6px;color:var(--ink);line-height:1.3}
-  .tray .num{position:absolute;top:4px;left:4px;background:var(--gold);color:#1a0b00;
-    font-size:11px;font-weight:900;border-radius:999px;padding:1px 7px}
-  aside{flex:0 0 348px;width:348px;background:var(--panel);border:1px solid var(--line);
-    border-radius:10px;padding:12px 16px 16px;position:sticky;top:16px;
-    max-height:calc(100vh - 32px);overflow-y:auto}
-  aside h2{margin:12px 0 7px;font-size:12px;letter-spacing:.22em;color:var(--gold)}
-  aside h2:first-child{margin-top:0}
-  .choices{display:flex;flex-wrap:wrap;gap:8px}
-  .choices button{border:1px solid #5a3d8f;background:var(--panel2);color:var(--ink);
-    border-radius:999px;padding:7px 12px;font-size:13px;cursor:pointer}
-  .choices button.on{background:var(--gold);border-color:var(--gold);color:#1a0b00;font-weight:700}
-  .slider-row{margin:8px 0}
-  .slider-row label{display:flex;justify-content:space-between;font-size:13px;color:var(--ink)}
-  .slider-row label b{color:var(--gold)}
-  input[type=range]{width:100%;accent-color:var(--gold)}
-  .words label{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px}
-  .words input,.words textarea{width:100%;background:#170b2b;border:1px solid #5a3d8f;
-    color:var(--ink);border-radius:8px;padding:9px 10px;font-size:14px;line-height:1.45;
-    font-family:inherit;resize:vertical}
-  .words input:focus,.words textarea:focus{outline:2px solid var(--gold);outline-offset:0}
-  .words textarea{min-height:52px}
-  .actions{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
-  .actions button{flex:1 1 auto;border:0;border-radius:8px;padding:11px 10px;font-size:14px;
-    font-weight:700;cursor:pointer;background:var(--gold);color:#1a0b00}
-  .actions button.ghost{background:var(--panel2);color:var(--ink);border:1px solid #5a3d8f}
-  .upload{margin-top:12px;font-size:13px;color:var(--muted)}
-  .upload input{margin-top:6px;color:var(--ink)}
-  .status{margin-top:12px;font-size:12px;color:var(--muted);line-height:1.5}
-  .status b{color:var(--gold)}
-
-  /* ---------- the cover ---------- */
-  .cover{position:relative;width:100%;height:100%;overflow:hidden;background:#0a0614;
-    container-type:size;--u:1px}
-  .cover .panel{position:absolute;overflow:hidden;background:#222}
-  .cover .panel canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-  .cover .panel.sel{outline:3px solid var(--gold);outline-offset:-3px;z-index:5}
-  .cover .panel .frame{position:absolute;inset:0;border:2px solid rgba(255,200,0,.85);
-    pointer-events:none}
-  .chip{position:absolute;z-index:4;background:rgba(8,3,18,.85);color:#fff;
-    border:2px solid var(--gold);font-weight:800;letter-spacing:.05em;
-    padding:calc(var(--u)*7) calc(var(--u)*12);font-size:calc(var(--u)*21);line-height:1;
-    white-space:nowrap}
-  .chip.tl{top:calc(var(--u)*14);left:calc(var(--u)*14)}
-  .chip.bl{bottom:calc(var(--u)*14);left:calc(var(--u)*14)}
-  .scrim-top{position:absolute;left:0;right:0;top:0;height:16%;z-index:3;pointer-events:none;
-    background:linear-gradient(180deg,rgba(5,2,12,.72),rgba(5,2,12,0))}
-  .scrim-bot{position:absolute;left:0;right:0;bottom:0;height:20%;z-index:3;pointer-events:none;
-    background:linear-gradient(0deg,rgba(5,2,12,.78),rgba(5,2,12,0))}
-  .topline{position:absolute;z-index:6;left:0;right:0;top:calc(var(--u)*16);
-    text-align:center;font-size:calc(var(--u)*18);font-weight:700;color:#fff;
-    text-shadow:0 2px 6px rgba(0,0,0,.7);padding:0 calc(var(--u)*185);line-height:1.25;
-    white-space:nowrap;overflow:hidden}
-  .topline .stars{color:var(--gold);letter-spacing:.08em}
-  .topline .by{color:var(--gold)}
-  .est,.vol{position:absolute;z-index:7;top:calc(var(--u)*12);font-weight:900;
-    font-size:calc(var(--u)*24);padding:calc(var(--u)*7) calc(var(--u)*13);letter-spacing:.04em}
-  .est{left:calc(var(--u)*14);background:var(--pink);color:#fff}
-  .vol{right:calc(var(--u)*14);background:var(--gold);color:#1a0b00}
-  .title{position:absolute;z-index:8;left:0;right:0;margin:0;text-align:center;
-    font-family:"Arial Black",Arial,sans-serif;font-weight:900;
-    font-size:calc(var(--u)*300);line-height:.95;letter-spacing:calc(var(--u)*2);
-    background:linear-gradient(180deg,#ffe45c 0%,#ff9d2e 42%,#ff4d8d 72%,#e83e8c 100%);
-    -webkit-background-clip:text;background-clip:text;
-    -webkit-text-fill-color:transparent;color:transparent;
-    -webkit-text-stroke:calc(var(--u)*5) #2a0a3d;
-    filter:drop-shadow(calc(var(--u)*10) calc(var(--u)*13) 0 #2a0a3d);
-    white-space:nowrap}
-  .script{position:absolute;z-index:9;left:10%;text-align:left;
-    font-family:"Brush Script MT","Segoe Script",cursive;font-style:italic;font-weight:700;
-    font-size:calc(var(--u)*96);color:#ff5da2;line-height:1;
-    text-shadow:calc(var(--u)*3) calc(var(--u)*4) 0 rgba(42,10,61,.9);
-    transform:rotate(-3deg);white-space:nowrap}
-  .strip{position:absolute;z-index:8;left:0;right:0;text-align:center;
-    background:linear-gradient(90deg,#ff2e88,#ff7a2e,#ff2e88);
-    color:#2a0a3d;font-weight:900;letter-spacing:.06em;
-    font-size:calc(var(--u)*30);padding:calc(var(--u)*10) 0;white-space:nowrap}
-  .bottombar{position:absolute;z-index:8;left:0;right:0;bottom:0;
-    display:flex;align-items:flex-end;justify-content:space-between;
-    padding:calc(var(--u)*16) calc(var(--u)*22) calc(var(--u)*18)}
-  .soon{color:var(--pink);font-weight:900;font-size:calc(var(--u)*30);letter-spacing:.05em}
-  .billing{text-align:center;color:#fff;font-size:calc(var(--u)*22);line-height:1.5;
-    text-shadow:0 2px 5px rgba(0,0,0,.8);letter-spacing:.05em}
-  .barcode{background:#fff;padding:calc(var(--u)*6) calc(var(--u)*8) calc(var(--u)*3);
-    text-align:center}
-  .barcode .bars{height:calc(var(--u)*44);
-    background:repeating-linear-gradient(90deg,#000 0 calc(var(--u)*3),#fff calc(var(--u)*3) calc(var(--u)*6),
-      #000 calc(var(--u)*6) calc(var(--u)*12),#fff calc(var(--u)*12) calc(var(--u)*15),
-      #000 calc(var(--u)*15) calc(var(--u)*18),#fff calc(var(--u)*18) calc(var(--u)*24))}
-  .barcode .num{color:#000;font-size:calc(var(--u)*15);font-weight:700;letter-spacing:.08em}
-  .stamp{position:absolute;z-index:9;color:#ff2b2b;border:calc(var(--u)*5) solid #ff2b2b;
-    border-radius:calc(var(--u)*8);padding:calc(var(--u)*8) calc(var(--u)*16);
-    font-weight:900;text-align:center;transform:rotate(-12deg);
-    font-size:calc(var(--u)*44);line-height:1;letter-spacing:.06em;opacity:.92;
-    box-shadow:inset 0 0 0 calc(var(--u)*2) #ff2b2b;white-space:nowrap}
-  .stamp small{display:block;font-size:calc(var(--u)*20);margin-top:calc(var(--u)*4);white-space:nowrap}
-  .cover.look-magazine .title{
-    background:linear-gradient(180deg,#ffffff 0%,#ffd9ec 70%,#ff9d2e 100%);
-    -webkit-background-clip:text;background-clip:text}
-  .cover.look-magazine .strip{background:#111;color:#fff}
-  .cover.look-magazine .chip{border-color:#fff}
-  .cover.look-wanted .title{
-    background:linear-gradient(180deg,#fff3c4 0%,#f7c873 55%,#c98a3d 100%);
-    -webkit-background-clip:text;background-clip:text}
-  .cover.look-wanted .stamp{font-size:calc(var(--u)*64)}
-  .cover.look-wanted .scrim-top{background:linear-gradient(180deg,rgba(60,35,5,.55),rgba(60,35,5,0))}
-
-  /* cover-only mode for clean cover screenshots (?cover=1) */
-  body.cover-only{margin:0}
-  body.cover-only header,body.cover-only main aside,body.cover-only .hint,
-  body.cover-only .tray{display:none}
-  body.cover-only main{padding:0;display:block}
-  body.cover-only .stage{width:100vw;height:100vh}
-  body.cover-only .cover-shell{border:0;border-radius:0;width:100%;height:100%;
-    box-shadow:none}
-  @media (max-width:900px){
-    main{flex-direction:column}
-    aside{flex:1 1 auto;width:100%}
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+    line-height: 1.45;
   }
+  header {
+    padding: 18px 24px 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  header h1 { margin: 0; font-size: 26px; letter-spacing: 1px; }
+  header h1 .heat { color: var(--yellow); }
+  header h1 .wave { color: var(--pink); }
+  header p { margin: 4px 0 0; color: var(--muted); max-width: 900px; }
+  main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 20px;
+    padding: 18px 24px 28px;
+    align-items: start;
+  }
+  .cover-wrap {
+    position: relative;
+    width: 100%;
+    background: #0d0618;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .cover-wrap canvas { display: block; width: 100%; height: auto; }
+  .zone {
+    position: absolute;
+    cursor: pointer;
+    border: 3px solid transparent;
+    border-radius: 4px;
+    background: transparent;
+    padding: 0;
+  }
+  .zone:hover { border-color: rgba(255, 196, 0, 0.75); }
+  .zone.selected { border-color: var(--yellow); box-shadow: 0 0 0 2px rgba(255, 46, 136, 0.9); }
+  .zone.armed { border-color: var(--pink); border-style: dashed; }
+  .hint { color: var(--muted); font-size: 13px; margin: 12px 2px 0; }
+  .tray {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .thumb {
+    border: 2px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--panel);
+    padding: 0;
+    text-align: left;
+    color: var(--ink);
+    font-family: inherit;
+  }
+  .thumb img { display: block; width: 100%; height: 74px; object-fit: cover; }
+  .thumb span {
+    display: block;
+    padding: 5px 7px;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    white-space: normal;
+  }
+  .thumb.armed { border-color: var(--pink); outline: 2px solid var(--pink); }
+  .thumb .num {
+    position: absolute;
+  }
+  aside.controls {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px 16px 18px;
+  }
+  aside.controls h2 {
+    margin: 16px 0 8px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--yellow);
+  }
+  aside.controls h2:first-child { margin-top: 0; }
+  .choices { display: flex; flex-wrap: wrap; gap: 8px; }
+  .choices button {
+    border: 1px solid var(--line);
+    background: var(--panel2);
+    color: var(--ink);
+    border-radius: 999px;
+    padding: 7px 13px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .choices button.active { background: var(--yellow); color: #23100a; border-color: var(--yellow); }
+  .slider-row { margin: 10px 0 4px; }
+  .slider-row label { display: flex; justify-content: space-between; font-size: 13px; color: var(--ink); }
+  .slider-row label output { color: var(--yellow); font-weight: bold; }
+  .slider-row input[type="range"] { width: 100%; accent-color: var(--yellow); }
+  .words label { display: block; font-size: 13px; color: var(--muted); margin: 10px 0 4px; }
+  .words input[type="text"],
+  .words textarea {
+    width: 100%;
+    background: #180b30;
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 9px 10px;
+    font-size: 14px;
+    font-family: inherit;
+    white-space: normal;
+    overflow-wrap: break-word;
+  }
+  .words textarea { min-height: 44px; resize: vertical; }
+  .upload-row { margin-top: 10px; font-size: 13px; color: var(--muted); }
+  .upload-row input { margin-top: 6px; color: var(--ink); }
+  .export-row { display: flex; gap: 10px; margin-top: 18px; }
+  .export-row button {
+    flex: 1;
+    border: none;
+    border-radius: 999px;
+    padding: 12px 10px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  #exportBtn { background: var(--yellow); color: #23100a; }
+  #exportAllBtn { background: var(--panel2); color: var(--ink); border: 1px solid var(--line); }
+  #status { margin-top: 12px; font-size: 13px; color: var(--muted); min-height: 18px; }
+  #status .ok { color: #7be495; }
+  /* Full-frame shot pages: only the cover, edge to edge. */
+  body.shot { background: #0d0618; }
+  body.shot header, body.shot .hint, body.shot .tray,
+  body.shot aside.controls { display: none; }
+  body.shot main { display: block; padding: 0; gap: 0; }
+  body.shot .cover-wrap { border: none; border-radius: 0; }
+  body.shot .cover-wrap canvas { width: 100vw; height: 100vh; object-fit: contain; }
+  body.shot .zone { display: none; }
 </style>
 </head>
 <body>
 <header>
-  <h1><span class="a">HEAT WAVE</span> — <span class="b">Cover Studio</span></h1>
+  <h1><span class="heat">HEAT WAVE</span> <span class="wave">— Cover Studio</span></h1>
   <p>Turn your golden-hour photos into a GTA-style poster. Full-bleed panels, a 3D title and a wanted stamp — then export a PNG in landscape, portrait or square.</p>
 </header>
 <main>
-  <section class="stage">
-    <div class="cover-shell"><div class="cover" id="cover"></div></div>
+  <section>
+    <div class="cover-wrap" id="coverWrap">
+      <canvas id="coverCanvas" width="1920" height="1080"></canvas>
+      <div id="zones"></div>
+    </div>
     <p class="hint">Click a photo in the tray to arm it, then click a panel on the cover to swap it in. Click a panel on its own to select it, then nudge its focus with the sliders. The title always sits on the photos, never in a band.</p>
     <div class="tray" id="tray"></div>
   </section>
-  <aside>
+  <aside class="controls">
     <h2>LOOKS</h2>
-    <div class="choices" id="looks"></div>
+    <div class="choices" id="lookChoices"></div>
     <h2>LAYOUT</h2>
-    <div class="choices" id="layouts"></div>
+    <div class="choices" id="layoutChoices"></div>
     <h2>SIZE</h2>
-    <div class="choices" id="sizes"></div>
+    <div class="choices" id="sizeChoices"></div>
     <h2>GRADE</h2>
-    <div class="choices" id="grades"></div>
-    <div class="slider-row"><label>Warmth <b id="warmthVal">55</b></label>
-      <input type="range" id="warmth" min="0" max="100" value="55"></div>
-    <div class="slider-row"><label>Saturation <b id="satVal">115%</b></label>
-      <input type="range" id="sat" min="50" max="200" value="115"></div>
-    <div class="slider-row"><label>Vignette <b id="vigVal">30</b></label>
-      <input type="range" id="vig" min="0" max="100" value="30"></div>
-    <div class="slider-row"><label>Focus X (selected panel) <b id="fxVal">50</b></label>
-      <input type="range" id="fx" min="0" max="100" value="50"></div>
-    <div class="slider-row"><label>Focus Y (selected panel) <b id="fyVal">50</b></label>
-      <input type="range" id="fy" min="0" max="100" value="50"></div>
-    <h2>WORDS</h2>
+    <div class="choices" id="gradeChoices"></div>
+    <div class="slider-row"><label>Warmth <output id="warmthOut">55</output></label><input type="range" id="warmth" min="0" max="100" value="55"></div>
+    <div class="slider-row"><label>Saturation <output id="satOut">115%</output></label><input type="range" id="sat" min="50" max="160" value="115"></div>
+    <div class="slider-row"><label>Vignette <output id="vigOut">30</output></label><input type="range" id="vig" min="0" max="100" value="30"></div>
+    <div class="slider-row"><label>Focus X (selected panel) <output id="fxOut">50</output></label><input type="range" id="fx" min="0" max="100" value="50"></div>
+    <div class="slider-row"><label>Focus Y (selected panel) <output id="fyOut">50</output></label><input type="range" id="fy" min="0" max="100" value="50"></div>
     <div class="words">
+      <h2>WORDS</h2>
       <label for="wTitle">Title</label>
-      <input id="wTitle" value="Heat Wave">
+      <input type="text" id="wTitle" value="Heat Wave">
       <label for="wScript">Script subtitle</label>
-      <input id="wScript" value="Golden Hour">
+      <input type="text" id="wScript" value="Golden Hour">
       <label for="wQuote">Press quote</label>
-      <textarea id="wQuote" rows="3">GOLDEN LIGHT, LOUD ENGINES, NO BRAKES</textarea>
-      <label for="wBy">Quoted by</label>
-      <input id="wBy" value="THE COASTAL GAZETTE">
+      <textarea id="wQuote" rows="2">GOLDEN LIGHT, LOUD ENGINES, NO BRAKES</textarea>
+      <label for="wQuotedBy">Quoted by</label>
+      <input type="text" id="wQuotedBy" value="THE COASTAL GAZETTE">
       <label for="wTag">Tagline strip</label>
-      <textarea id="wTag" rows="3">EIGHT LIVES · ONE HEAT WAVE · ZERO REGRETS</textarea>
+      <textarea id="wTag" rows="2">EIGHT LIVES · ONE HEAT WAVE · ZERO REGRETS</textarea>
     </div>
     <h2>PHOTOS</h2>
-    <div class="upload">
-      <label for="upload">Add your own photo to the selected panel:</label><br>
+    <div class="upload-row">Add your own photo to the selected panel:
       <input type="file" id="upload" accept="image/*">
     </div>
-    <div class="actions">
-      <button id="exportOne">Export PNG</button>
-      <button id="exportAll" class="ghost">Export all 3 sizes</button>
+    <div class="export-row">
+      <button id="exportBtn" type="button">Export PNG</button>
+      <button id="exportAllBtn" type="button">Export all 3 sizes</button>
     </div>
-    <p class="status" id="status">Grade: <b id="gradeMode">starting…</b> · Photos: <b id="photoCount">0/8</b> · Everything runs offline in this page; your photos never leave the machine.</p>
+    <div id="status"></div>
   </aside>
 </main>
-<script>
+<script type="module">
 "use strict";
-/* Heat Wave Cover Studio — single-file offline app.
-   Photos are graded through a small WebGL shader (2D canvas fallback),
-   the cover is drawn live as DOM panels and exported by a canvas renderer
-   that shares the same layout math. No network requests anywhere. */
+
+/* ---- Sample cast: eight photos, each with its place name on the cover. ---- */
 const PHOTOS = [
-  { id: "hero",      file: "samples/hero-woman.jpg", label: "CORAL ROW" },
-  { id: "boss",      file: "samples/boss.jpg",       label: "NEON MILE" },
-  { id: "captain",   file: "samples/captain.jpg",    label: "SUNSET KEYS" },
-  { id: "rider",     file: "samples/rider.jpg",      label: "TIDEWATCH" },
-  { id: "courier",   file: "samples/courier.jpg",    label: "REEF SIDE" },
-  { id: "lifeguard", file: "samples/lifeguard.jpg",  label: "HARBOUR LIGHTS" },
-  { id: "mechanic",  file: "samples/mechanic.jpg",   label: "PALM COURT" },
-  { id: "driver",    file: "samples/driver.jpg",     label: "DUNE ROAD" },
+  { id: "hero",      file: "samples/hero-woman.jpg", label: "CORAL ROW",      alt: "Curly-haired woman with round sunglasses leaning out of a convertible" },
+  { id: "boss",      file: "samples/boss.jpg",       label: "NEON MILE",      alt: "Grey-haired man in a white shirt on a rooftop at sunset" },
+  { id: "captain",   file: "samples/captain.jpg",    label: "SUNSET KEYS",    alt: "Woman boat captain smiling at the helm" },
+  { id: "rider",     file: "samples/rider.jpg",      label: "TIDEWATCH",      alt: "Motorcyclist in a helmet on a palm-lined road" },
+  { id: "driver",    file: "samples/driver.jpg",     label: "REEF SIDE",      alt: "Man driving a vintage convertible" },
+  { id: "lifeguard", file: "samples/lifeguard.jpg",  label: "HARBOUR LIGHTS", alt: "Lifeguard woman beside her tower on the beach" },
+  { id: "mechanic",  file: "samples/mechanic.jpg",   label: "PALM COURT",     alt: "Mechanic woman working on a red car" },
+  { id: "courier",   file: "samples/courier.jpg",    label: "DUNE ROAD",      alt: "Young man riding a scooter down a beach boulevard" },
 ];
-const PHOTO_BY_ID = Object.fromEntries(PHOTOS.map(p => [p.id, p]));
+
 const SIZES = {
   landscape: { w: 1920, h: 1080, label: "Landscape 1920×1080" },
   portrait:  { w: 1080, h: 1350, label: "Portrait 1080×1350" },
   square:    { w: 1080, h: 1080, label: "Square 1080×1080" },
 };
-const LOOKS = { poster: "Poster", magazine: "Magazine", wanted: "Wanted" };
-const LAYOUTS = {
-  "bleed-left": "Bleed left", "bleed-right": "Bleed right",
-  "tilt": "Postcard tilt", "nine": "Nine grid",
-};
+const LOOKS = [
+  { id: "poster",   label: "Poster" },
+  { id: "magazine", label: "Magazine" },
+  { id: "wanted",   label: "Wanted" },
+];
+const LAYOUTS = [
+  { id: "bleed-left",  label: "Bleed left" },
+  { id: "bleed-right", label: "Bleed right" },
+  { id: "postcard",    label: "Postcard tilt" },
+  { id: "nine-grid",   label: "Nine grid" },
+];
 const GRADES = {
-  golden: { label: "Golden hour", warmth: 55, sat: 115, vig: 30, tint: [1.0, 0.55, 0.20], tintAmt: 0.16 },
-  vice:   { label: "Vice pink",   warmth: 25, sat: 135, vig: 35, tint: [1.0, 0.36, 0.62], tintAmt: 0.20 },
-  dusk:   { label: "Dusk teal",   warmth: -15, sat: 105, vig: 45, tint: [0.16, 0.72, 0.68], tintAmt: 0.15 },
-  neon:   { label: "Neon night",  warmth: 5, sat: 150, vig: 55, tint: [0.45, 0.22, 1.0], tintAmt: 0.18 },
+  "golden": { label: "Golden hour", warmth: 55, sat: 115, vig: 30, tint: [1.0, 0.55, 0.15], tintAmt: 0.10 },
+  "vice":   { label: "Vice pink",   warmth: 35, sat: 135, vig: 35, tint: [1.0, 0.25, 0.60], tintAmt: 0.16 },
+  "dusk":   { label: "Dusk teal",   warmth: 25, sat: 105, vig: 45, tint: [0.10, 0.60, 0.70], tintAmt: 0.14 },
+  "neon":   { label: "Neon night",  warmth: 45, sat: 140, vig: 45, tint: [0.50, 0.20, 1.00], tintAmt: 0.18 },
 };
 
+/* Six small panels, in reading order; the hero is panel zero. */
+const SMALL_IDS = ["boss", "captain", "rider", "driver", "lifeguard", "mechanic"];
+
 const state = {
-  look: "poster", layout: "bleed-left", size: "landscape", grade: "golden",
-  warmth: 55, sat: 115, vig: 30,
-  title: "Heat Wave", script: "Golden Hour",
+  look: "poster",
+  layout: "bleed-left",
+  size: "landscape",
+  grade: "golden",
+  warmth: 55,
+  sat: 115,
+  vig: 30,
+  /* One photo id per panel slot, by panel index. */
+  slots: ["hero", "boss", "captain", "rider", "driver", "lifeguard", "mechanic"],
+  /* Focus per panel slot, 0..100, so a face can be kept in frame. */
+  focus: {},
+  selected: 0,
+  armed: null,
+  customPhotos: {},
+  title: "Heat Wave",
+  script: "Golden Hour",
   quote: "GOLDEN LIGHT, LOUD ENGINES, NO BRAKES",
   quotedBy: "THE COASTAL GAZETTE",
   tagline: "EIGHT LIVES · ONE HEAT WAVE · ZERO REGRETS",
-  slots: { hero: "hero", p1: "boss", p2: "captain", p3: "rider", p4: "courier", p5: "lifeguard", p6: "mechanic" },
-  focus: {}, selected: "hero", armed: null,
 };
-for (const k of ["hero", "p1", "p2", "p3", "p4", "p5", "p6"]) state.focus[k] = { x: 50, y: 50 };
-state.focus.hero = { x: 50, y: 42 };
+for (let i = 0; i < 9; i++) state.focus[i] = { x: 50, y: 50 };
 
-const images = {};          // photo id -> HTMLImageElement (loaded)
-const customPhotos = {};    // custom id -> {label, url}
-let loadedCount = 0;
-for (const p of PHOTOS) {
-  const img = new Image();
-  img.onload = () => { loadedCount++; updateStatus(); drawPanels(); if (loadedCount >= 8) setTimeout(drawPanels, 150); };
-  img.onerror = () => { updateStatus(); };
-  img.src = p.file;
-  images[p.id] = img;
+const images = new Map();   /* photo id -> loaded HTMLImageElement */
+const errors = [];
+window.addEventListener("error", (e) => { errors.push(String(e.message || e.error || "error")); });
+
+/* ---- Panel geometry: fractions of the cover, shared by preview and export. ---- */
+function gridRects(heroOnLeft) {
+  const rects = [];
+  const gx = heroOnLeft ? 0.5 : 0;
+  const gw = 0.25, gh = 1 / 3;
+  for (let r = 0; r < 3; r++) {
+    for (let c = 0; c < 2; c++) {
+      rects.push({ x: gx + c * gw, y: r * gh, w: gw, h: gh });
+    }
+  }
+  return rects;
+}
+/* Geometry only: one rect per panel, fractions of the cover. */
+function panelGeometry(sizeName, layoutName) {
+  if (layoutName === "nine-grid") {
+    const out = [];
+    for (let i = 0; i < 9; i++) {
+      out.push({ x: (i % 3) / 3, y: Math.floor(i / 3) / 3, w: 1 / 3, h: 1 / 3 });
+    }
+    return out;
+  }
+  const heroRight = layoutName === "bleed-right";
+  const hero = heroRight
+    ? { x: 0.5, y: 0, w: 0.5, h: 1 }
+    : { x: 0, y: 0, w: 0.5, h: 1 };
+  return [hero, ...gridRects(!heroRight)];
+}
+/* Default photo per panel slot, matching the geometry above. */
+function defaultSlots(layoutName) {
+  if (layoutName === "nine-grid") {
+    return ["hero", "boss", "captain", "lifeguard", "driver", "rider", "mechanic", "courier", "hero"];
+  }
+  return ["hero", "boss", "captain", "rider", "driver", "lifeguard", "mechanic"];
+}
+function ensureSlots() {
+  const want = defaultSlots(state.layout);
+  if (state.slots.length !== want.length) state.slots = want.slice();
 }
 function photoOf(id) {
-  if (customPhotos[id]) return { id, label: customPhotos[id].label, img: customPhotos[id].img };
-  const p = PHOTO_BY_ID[id];
-  return p ? { id, label: p.label, img: images[id] } : null;
-}
-function photoReady(id) {
-  const ph = photoOf(id);
-  return !!(ph && ph.img && ph.img.complete && ph.img.naturalWidth > 0);
+  if (state.customPhotos[id]) return state.customPhotos[id];
+  return PHOTOS.find((p) => p.id === id);
 }
 
-/* ---------- layout geometry (shared by DOM preview and canvas export) ---------- */
-function geometry() {
-  const { w: W, h: H } = SIZES[state.size];
-  const L = state.layout;
-  const cells = [];
-  if (L === "nine") {
-    const ids = ["hero", "boss", "captain", "lifeguard", "courier", "rider", "mechanic", "driver", "hero"];
-    const cw = W / 3, ch = H / 3;
-    ids.forEach((id, i) => {
-      const row = Math.floor(i / 3);
-      cells.push({ slot: "c" + i, photo: id, x: (i % 3) * cw, y: row * ch, w: cw, h: ch, rot: 0, chipAtBottom: row < 2 });
-    });
-    return { W, H, nine: true, cells, hero: cells[0], stampCell: cells[6], stampFrac: 0.38, titleY: H * 0.47, scriptY: H * 0.585 };
+/* ---- Colour grade: a small WebGL shader, with a 2D canvas fallback. ---- */
+const GradeEngine = (() => {
+  let gl = null, prog = null, mode = "2d", tried = false;
+  const VERT = "attribute vec2 aP; varying vec2 vUv; void main(){ vUv = vec2(aP.x * 0.5 + 0.5, 0.5 - aP.y * 0.5); gl_Position = vec4(aP, 0.0, 1.0); }";
+  const FRAG = [
+    "precision mediump float;",
+    "varying vec2 vUv;",
+    "uniform sampler2D uTex;",
+    "uniform float uWarm; uniform float uSat; uniform float uVig; uniform float uTintAmt;",
+    "uniform vec3 uTint;",
+    "void main(){",
+    "  vec4 c = texture2D(uTex, vUv);",
+    "  float l = dot(c.rgb, vec3(0.299, 0.587, 0.114));",
+    "  vec3 g = mix(vec3(l), c.rgb, uSat);",
+    "  g *= mix(vec3(1.0), vec3(1.10, 1.0, 0.86), uWarm);",
+    "  g += uTint * uTintAmt;",
+    "  vec2 d = vUv - vec2(0.5);",
+    "  float v = 1.0 - uVig * dot(d, d) * 2.4;",
+    "  g *= clamp(v, 0.30, 1.0);",
+    "  gl_FragColor = vec4(clamp(g, 0.0, 1.0), 1.0);",
+    "}",
+  ].join("\n");
+  function tryInit() {
+    if (tried) return;
+    tried = true;
+    try {
+      const cv = document.createElement("canvas");
+      gl = cv.getContext("webgl2") || cv.getContext("webgl");
+      if (!gl) return;
+      const vs = gl.createShader(gl.VERTEX_SHADER);
+      gl.shaderSource(vs, VERT); gl.compileShader(vs);
+      const fs = gl.createShader(gl.FRAGMENT_SHADER);
+      gl.shaderSource(fs, FRAG); gl.compileShader(fs);
+      if (!gl.getShaderParameter(vs, gl.COMPILE_STATUS) || !gl.getShaderParameter(fs, gl.COMPILE_STATUS)) return;
+      prog = gl.createProgram();
+      gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
+      if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return;
+      const buf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+      mode = "webgl";
+    } catch (e) { gl = null; prog = null; mode = "2d"; }
   }
-  const heroW = state.size === "portrait" ? W * 0.5 : W * 0.5;
-  const gridX = L === "bleed-right" ? 0 : W - heroW;
-  const heroX = L === "bleed-right" ? W - heroW : 0;
-  const gw = W - heroW, gh = H;
-  const cw = gw / 2, ch = gh / 3;
-  // small-panel order: rows of two. Portrait mirrors the reference: left column
-  // captain / courier / mechanic, right column boss / rider / lifeguard.
-  const order = state.size === "portrait"
-    ? ["captain", "boss", "courier", "rider", "mechanic", "lifeguard"]
-    : ["boss", "captain", "rider", "courier", "lifeguard", "mechanic"];
-  const slotKeys = ["p1", "p2", "p3", "p4", "p5", "p6"];
-  const tilt = L === "tilt";
-  const hero = { slot: "hero", photo: state.slots.hero, x: heroX, y: 0, w: heroW, h: H, rot: tilt ? 0.6 : 0 };
-  for (let i = 0; i < 6; i++) {
-    const col = i % 2, row = Math.floor(i / 2);
-    cells.push({
-      slot: slotKeys[i], photo: state.slots[slotKeys[i]],
-      x: gridX + col * cw, y: row * ch, w: cw, h: ch,
-      rot: tilt ? (i % 2 === 0 ? -1.4 : 1.4) : 0,
-      // chips sit at the bottom of a panel, except on the last row where the
-      // strip and billing live — there they sit at the top instead.
-      chipAtBottom: row < 2,
-    });
-  }
-  // stamp sits on the mechanic panel
-  const stampCell = cells.find(c => c.photo === "mechanic") || cells[5];
-  return { W, H, nine: false, hero, cells, stampCell, stampFrac: 0.42,
-    titleY: H * 0.46, scriptY: H * 0.585 };
-}
-
-/* ---------- WebGL grade engine (2D fallback) ---------- */
-const grader = (() => {
-  const c = document.createElement("canvas");
-  const gl = c.getContext("webgl2") || c.getContext("webgl");
-  if (!gl) {
-    return { mode: "2d", grade: grade2d };
-  }
-  const vs = `attribute vec2 aP; varying vec2 vU; void main(){ vU = vec2(aP.x*0.5+0.5, aP.y*0.5+0.5); gl_Position = vec4(aP,0.,1.); }`;
-  const fs = `precision mediump float; varying vec2 vU; uniform sampler2D uT;
-    uniform float uWarm, uSat, uVig, uTintAmt; uniform vec3 uTint;
-    void main(){
-      vec3 col = texture2D(uT, vU).rgb;
-      float l = dot(col, vec3(0.299, 0.587, 0.114));
-      col = mix(vec3(l), col, uSat);
-      col.r += uWarm * 0.10; col.g += uWarm * 0.02; col.b -= uWarm * 0.08;
-      col = mix(col, uTint, uTintAmt * clamp(1.0 - abs(l - 0.5) * 1.4, 0.0, 1.0));
-      col = col * col * (3.0 - 2.0 * col) * 0.22 + col * 0.78;
-      vec2 d = vU - 0.5;
-      col *= clamp(1.0 - uVig * dot(d, d) * 2.4, 0.0, 1.0);
-      gl_FragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
-    }`;
-  function shader(type, src) {
-    const s = gl.createShader(type);
-    gl.shaderSource(s, src); gl.compileShader(s);
-    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
-    return s;
-  }
-  const prog = gl.createProgram();
-  gl.attachShader(prog, shader(gl.VERTEX_SHADER, vs));
-  gl.attachShader(prog, shader(gl.FRAGMENT_SHADER, fs));
-  gl.linkProgram(prog); gl.useProgram(prog);
-  const buf = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
-  const loc = gl.getAttribLocation(prog, "aP");
-  gl.enableVertexAttribArray(loc);
-  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-  const tex = gl.createTexture();
-  function uni(name) { return gl.getUniformLocation(prog, name); }
-  const U = { t: uni("uT"), warm: uni("uWarm"), sat: uni("uSat"), vig: uni("uVig"), tint: uni("uTint"), amt: uni("uTintAmt") };
-  const out = document.createElement("canvas");
-  function grade(img, w, h, p) {
-    c.width = w; c.height = h;
+  function gradeWebGL(img, g) {
+    const w = Math.min(img.naturalWidth, 1600);
+    const h = Math.round((img.naturalHeight * w) / img.naturalWidth);
+    const cv = document.createElement("canvas");
+    cv.width = w; cv.height = h;
+    gl.canvas.width = w; gl.canvas.height = h;
     gl.viewport(0, 0, w, h);
+    gl.useProgram(prog);
+    const tex = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, tex);
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.uniform1i(U.t, 0);
-    gl.uniform1f(U.warm, p.warmth / 100);
-    gl.uniform1f(U.sat, p.sat / 100);
-    gl.uniform1f(U.vig, p.vig / 100);
-    gl.uniform3fv(U.tint, p.tint);
-    gl.uniform1f(U.amt, p.tintAmt);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+    const loc = (n) => gl.getUniformLocation(prog, n);
+    gl.uniform1f(loc("uWarm"), g.warmth / 100);
+    gl.uniform1f(loc("uSat"), g.sat / 100);
+    gl.uniform1f(loc("uVig"), g.vig / 100);
+    gl.uniform1f(loc("uTintAmt"), g.tintAmt);
+    gl.uniform3f(loc("uTint"), g.tint[0], g.tint[1], g.tint[2]);
+    const aP = gl.getAttribLocation(prog, "aP");
+    gl.enableVertexAttribArray(aP);
+    gl.vertexAttribPointer(aP, 2, gl.FLOAT, false, 0, 0);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-    out.width = w; out.height = h;
-    const octx = out.getContext("2d");
-    octx.drawImage(c, 0, 0);
-    return out;
-  }
-  return { mode: "webgl", grade };
-  function grade2d(img, w, h, p) {
-    out.width = w; out.height = h;
-    const octx = out.getContext("2d");
-    octx.filter = `saturate(${p.sat}%) sepia(${Math.max(0, p.warmth) * 0.35}%) brightness(1.03) contrast(1.05)`;
-    octx.drawImage(img, 0, 0, w, h);
-    octx.filter = "none";
-    const g = octx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.35, w / 2, h / 2, Math.max(w, h) * 0.75);
-    g.addColorStop(0, "rgba(0,0,0,0)");
-    g.addColorStop(1, `rgba(0,0,0,${p.vig / 100 * 0.55})`);
-    octx.fillStyle = g; octx.fillRect(0, 0, w, h);
-    return out;
-  }
-})();
-const gradeCache = new Map();
-function gradeParams() {
-  const g = GRADES[state.grade];
-  return { warmth: state.warmth, sat: state.sat, vig: state.vig, tint: g.tint, tintAmt: g.tintAmt };
-}
-/* Cover-fit crop of img into a w×h canvas, then grade it. Cached per photo+params+size. */
-function gradedPhoto(photoId, slotKey, w, h) {
-  const ph = photoOf(photoId);
-  if (!ph || !ph.img || !ph.img.naturalWidth) return null;
-  const p = gradeParams();
-  const f = (slotKey && state.focus[slotKey]) || { x: 50, y: 50 };
-  const key = [photoId, w, h, p.warmth, p.sat, p.vig, p.tintAmt, f.x, f.y].join("|");
-  const hit = gradeCache.get(key);
-  if (hit) return hit;
-  const iw = ph.img.naturalWidth, ih = ph.img.naturalHeight;
-  const scale = Math.max(w / iw, h / ih);
-  const sw = w / scale, sh = h / scale;
-  const sx = Math.max(0, Math.min(iw - sw, (f.x / 100) * iw - sw / 2));
-  const sy = Math.max(0, Math.min(ih - sh, (f.y / 100) * ih - sh / 2));
-  const crop = document.createElement("canvas");
-  crop.width = w; crop.height = h;
-  crop.getContext("2d").drawImage(ph.img, sx, sy, sw, sh, 0, 0, w, h);
-  const graded = grader.grade(crop, w, h, p);
-  const snap = document.createElement("canvas");
-  snap.width = w; snap.height = h;
-  snap.getContext("2d").drawImage(graded, 0, 0);
-  if (gradeCache.size > 60) gradeCache.clear();
-  gradeCache.set(key, snap);
-  return snap;
-}
-function slotKeyFor(photoId) {
-  for (const [k, v] of Object.entries(state.slots)) if (v === photoId) return k;
-  return "hero";
-}
-
-/* ---------- DOM preview ---------- */
-const coverEl = document.getElementById("cover");
-const shellEl = coverEl.parentElement;
-let ro = null;
-function fitCoverUnit() {
-  const g = geometry();
-  shellEl.style.aspectRatio = g.W + " / " + g.H;
-  coverEl.style.setProperty("--u", (coverEl.clientWidth / g.W) + "px");
-}
-function chipEl(label, pos) {
-  const s = document.createElement("span");
-  s.className = "chip " + pos;
-  s.textContent = label;
-  return s;
-}
-function buildCover() {
-  const g = geometry();
-  coverEl.className = "cover look-" + state.look;
-  coverEl.innerHTML = "";
-  fitCoverUnit();
-  const all = g.nine ? g.cells : [g.hero, ...g.cells];
-  for (const cell of all) {
-    const ph = photoOf(cell.photo);
-    const d = document.createElement("div");
-    d.className = "panel" + (cell.slot === state.selected ? " sel" : "");
-    d.dataset.slot = cell.slot;
-    d.style.left = (cell.x / g.W * 100) + "%";
-    d.style.top = (cell.y / g.H * 100) + "%";
-    d.style.width = (cell.w / g.W * 100) + "%";
-    d.style.height = (cell.h / g.H * 100) + "%";
-    if (cell.rot) d.style.transform = `rotate(${cell.rot}deg)`;
-    const cv = document.createElement("canvas");
-    d.appendChild(cv);
-    const frame = document.createElement("div");
-    frame.className = "frame";
-    d.appendChild(frame);
-    if (ph) {
-      const chip = chipEl(ph.label, cell.chipAtBottom ? "bl" : "tl");
-      if (cell.slot === "hero" && !g.nine) {
-        // hero chip sits below the press line, clear of EST. / VOL.
-        chip.className = "chip tl";
-        chip.style.top = "7.5%";
-      }
-      d.appendChild(chip);
-    }
-    d.addEventListener("click", () => onPanelClick(cell.slot));
-    coverEl.appendChild(d);
-  }
-  const scrimT = document.createElement("div"); scrimT.className = "scrim-top"; coverEl.appendChild(scrimT);
-  const scrimB = document.createElement("div"); scrimB.className = "scrim-bot"; coverEl.appendChild(scrimB);
-  const top = document.createElement("div"); top.className = "topline";
-  top.innerHTML = "";
-  const stars = document.createElement("span"); stars.className = "stars"; stars.textContent = "★★★★★ ";
-  const q = document.createElement("span"); q.textContent = "“" + state.quote + "” ";
-  const by = document.createElement("span"); by.className = "by"; by.textContent = "— " + state.quotedBy;
-  top.append(stars, q, by); coverEl.appendChild(top);
-  const est = document.createElement("div"); est.className = "est"; est.textContent = "EST. 2026"; coverEl.appendChild(est);
-  const vol = document.createElement("div"); vol.className = "vol"; vol.textContent = "VOL. 06"; coverEl.appendChild(vol);
-  const title = document.createElement("h1"); title.className = "title"; title.textContent = state.title.toUpperCase();
-  title.style.top = (g.titleY / g.H * 100) + "%";
-  title.style.transform = "translateY(-50%)";
-  coverEl.appendChild(title);
-  // shrink the title until it fits the cover width (portrait/square are narrower).
-  // measure the TEXT with a canvas: the h1 itself spans the full cover width,
-  // so its scrollWidth never reflects the text.
-  const fitCtx = document.createElement("canvas").getContext("2d");
-  let tfs = parseFloat(getComputedStyle(title).fontSize);
-  fitCtx.font = `900 ${tfs}px "Arial Black", Arial, sans-serif`;
-  while (fitCtx.measureText(title.textContent).width > coverEl.clientWidth * 0.96 && tfs > 30) {
-    tfs *= 0.94;
-    fitCtx.font = `900 ${tfs}px "Arial Black", Arial, sans-serif`;
-  }
-  title.style.fontSize = tfs + "px";
-  const script = document.createElement("div"); script.className = "script"; script.textContent = state.script;
-  script.style.top = (g.scriptY / g.H * 100) + "%";
-  script.style.transform = "translateY(-50%) rotate(-3deg)";
-  coverEl.appendChild(script);
-  const strip = document.createElement("div"); strip.className = "strip"; strip.textContent = state.tagline;
-  strip.style.bottom = (g.H * 0.085 / g.H * 100) + "%";
-  coverEl.appendChild(strip);
-  const bar = document.createElement("div"); bar.className = "bottombar";
-  const soon = document.createElement("span"); soon.className = "soon"; soon.textContent = "COMING SOON";
-  const bill = document.createElement("span"); bill.className = "billing";
-  bill.innerHTML = "A HEAT WAVE PICTURE &nbsp;·&nbsp; STARRING YOU<br>SHOT ON YOUR OWN CAMERA &nbsp;·&nbsp; GRADED BY HAND";
-  const bc = document.createElement("span"); bc.className = "barcode";
-  bc.innerHTML = '<span class="bars" style="display:block"></span><span class="num">8 92625 01107</span>';
-  bar.append(soon, bill, bc); coverEl.appendChild(bar);
-  const stamp = document.createElement("div"); stamp.className = "stamp";
-  stamp.innerHTML = "WANTED<small>FOR SUNSET CRIMES</small>";
-  const sc = g.stampCell;
-  stamp.style.left = ((sc.x + sc.w * 0.52) / g.W * 100) + "%";
-  stamp.style.top = ((sc.y + sc.h * (g.stampFrac || 0.55)) / g.H * 100) + "%";
-  stamp.style.transform = "translate(-50%,-50%) rotate(-12deg)";
-  coverEl.appendChild(stamp);
-  if (ro) ro.disconnect();
-  ro = new ResizeObserver(() => fitCoverUnit());
-  ro.observe(coverEl);
-  drawPanels();
-}
-function drawPanels() {
-  const g = geometry();
-  const all = g.nine ? g.cells : [g.hero, ...g.cells];
-  for (const cell of all) {
-    const panel = coverEl.querySelector(`[data-slot="${cell.slot}"]`);
-    if (!panel) continue;
-    const cv = panel.querySelector("canvas");
-    const pw = Math.max(2, Math.round(panel.clientWidth * 1.5));
-    const ph2 = Math.max(2, Math.round(panel.clientHeight * 1.5));
-    if (cv.width !== pw || cv.height !== ph2) { cv.width = pw; cv.height = ph2; }
     const ctx = cv.getContext("2d");
-    ctx.clearRect(0, 0, pw, ph2);
-    const graded = gradedPhoto(cell.photo, cell.slot, pw, ph2);
-    if (graded) ctx.drawImage(graded, 0, 0);
-    else { ctx.fillStyle = "#2a1745"; ctx.fillRect(0, 0, pw, ph2); }
+    ctx.drawImage(gl.canvas, 0, 0);
+    gl.deleteTexture(tex);
+    return cv;
   }
-}
-function onPanelClick(slot) {
-  if (state.armed) {
-    if (slot === "hero") state.slots.hero = state.armed;
-    else if (slot.startsWith("p")) state.slots[slot] = state.armed;
-    else return; // nine-grid cells are fixed; pick a bleed layout to swap
-    state.armed = null;
-    buildTray(); buildCover();
-    return;
+  function grade2D(img, g) {
+    const w = Math.min(img.naturalWidth, 1600);
+    const h = Math.round((img.naturalHeight * w) / img.naturalWidth);
+    const cv = document.createElement("canvas");
+    cv.width = w; cv.height = h;
+    const ctx = cv.getContext("2d");
+    ctx.filter = "saturate(" + g.sat + "%) sepia(" + Math.round(g.warmth * 0.4) + "%) brightness(1.03)";
+    ctx.drawImage(img, 0, 0, w, h);
+    ctx.filter = "none";
+    const grad = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.42, w / 2, h / 2, Math.max(w, h) * 0.72);
+    grad.addColorStop(0, "rgba(0,0,0,0)");
+    grad.addColorStop(1, "rgba(20,0,30," + (g.vig / 100 * 0.55) + ")");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+    return cv;
   }
-  state.selected = slot;
-  const f = state.focus[slot] || { x: 50, y: 50 };
-  document.getElementById("fx").value = f.x;
-  document.getElementById("fy").value = f.y;
-  document.getElementById("fxVal").textContent = f.x;
-  document.getElementById("fyVal").textContent = f.y;
-  coverEl.querySelectorAll(".panel").forEach(p => p.classList.toggle("sel", p.dataset.slot === slot));
+  const cache = new Map();
+  function grade(img, g) {
+    tryInit();
+    const key = img.src + "|" + g.warmth + "|" + g.sat + "|" + g.vig + "|" + g.tint.join(",") + "|" + g.tintAmt;
+    if (cache.has(key)) return cache.get(key);
+    const out = mode === "webgl" ? gradeWebGL(img, g) : grade2D(img, g);
+    if (cache.size > 24) cache.clear();
+    cache.set(key, out);
+    return out;
+  }
+  return { grade, mode: () => { tryInit(); return mode; } };
+})();
+
+function gradeSettings() {
+  const base = GRADES[state.grade] || GRADES.golden;
+  return {
+    warmth: state.warmth, sat: state.sat, vig: state.vig,
+    tint: base.tint, tintAmt: state.look === "wanted" ? base.tintAmt + 0.06 : base.tintAmt,
+  };
 }
 
-/* ---------- canvas export (same geometry, full resolution) ---------- */
-function drawCoverCanvas(sizeKey) {
-  const savedSize = state.size;
-  state.size = sizeKey;
-  const g = geometry();
-  state.size = savedSize;
-  const cv = document.createElement("canvas");
-  cv.width = g.W; cv.height = g.H;
-  const ctx = cv.getContext("2d");
-  ctx.fillStyle = "#0a0614"; ctx.fillRect(0, 0, g.W, g.H);
-  const all = g.nine ? g.cells : [g.hero, ...g.cells];
-  for (const cell of all) {
-    ctx.save();
-    if (cell.rot) {
-      ctx.translate(cell.x + cell.w / 2, cell.y + cell.h / 2);
-      ctx.rotate(cell.rot * Math.PI / 180);
-      ctx.translate(-cell.w / 2, -cell.h / 2);
-    } else ctx.translate(cell.x, cell.y);
-    const graded = gradedPhoto(cell.photo, cell.slot, Math.round(cell.w), Math.round(cell.h));
-    if (graded) ctx.drawImage(graded, 0, 0, cell.w, cell.h);
-    ctx.strokeStyle = "rgba(255,200,0,.85)"; ctx.lineWidth = Math.max(2, g.W * 0.0012);
-    ctx.strokeRect(0, 0, cell.w, cell.h);
-    ctx.restore();
-    const ph = photoOf(cell.photo);
-    if (ph) drawChip(ctx, ph.label, cell, g);
+/* ---- Cover drawing: one path for the preview, the export and the shots. ---- */
+function coverFit(srcW, srcH, dstW, dstH, fx, fy) {
+  const s = Math.max(dstW / srcW, dstH / srcH);
+  const w = srcW * s, h = srcH * s;
+  return { dx: (dstW - w) * (fx / 100), dy: (dstH - h) * (fy / 100), w, h };
+}
+function drawChip(ctx, x, y, text, fs) {
+  ctx.font = "bold " + fs + "px Arial, sans-serif";
+  const pad = fs * 0.55;
+  const w = ctx.measureText(text).width + pad * 2;
+  const h = fs * 1.9;
+  ctx.fillStyle = "rgba(8,4,14,0.92)";
+  ctx.strokeStyle = "#ffc400";
+  ctx.lineWidth = Math.max(2, fs * 0.12);
+  ctx.beginPath();
+  ctx.roundRect(x, y, w, h, 2);
+  ctx.fill(); ctx.stroke();
+  ctx.fillStyle = "#ffffff";
+  ctx.textAlign = "left"; ctx.textBaseline = "middle";
+  ctx.fillText(text, x + pad, y + h / 2 + fs * 0.04);
+}
+function drawBarcode(ctx, x, y, w, h) {
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(x, y, w, h);
+  const seed = [3, 1, 2, 1, 4, 2, 1, 3, 1, 1, 2, 4, 1, 2, 1, 3, 2, 1, 1, 4, 2, 1, 3, 1, 2, 1, 1, 3, 2, 4];
+  let bx = x + w * 0.06;
+  const barH = h * 0.68;
+  ctx.fillStyle = "#111111";
+  for (let i = 0; i < seed.length && bx < x + w * 0.94; i++) {
+    const bw = Math.max(2, seed[i] * w * 0.008);
+    ctx.fillRect(bx, y + h * 0.08, bw, barH);
+    bx += bw + w * 0.012;
   }
-  if (state.look === "wanted") {
-    ctx.fillStyle = "rgba(120,80,20,0.10)"; ctx.fillRect(0, 0, g.W, g.H);
-  }
-  // top scrim + press line
-  const tg = ctx.createLinearGradient(0, 0, 0, g.H * 0.16);
-  tg.addColorStop(0, "rgba(5,2,12,0.72)"); tg.addColorStop(1, "rgba(5,2,12,0)");
-  ctx.fillStyle = tg; ctx.fillRect(0, 0, g.W, g.H * 0.16);
-  const bg = ctx.createLinearGradient(0, g.H * 0.8, 0, g.H);
-  bg.addColorStop(0, "rgba(5,2,12,0)"); bg.addColorStop(1, "rgba(5,2,12,0.78)");
-  ctx.fillStyle = bg; ctx.fillRect(0, g.H * 0.8, g.W, g.H * 0.2);
+  ctx.fillStyle = "#111111";
+  ctx.font = "bold " + Math.round(h * 0.10) + "px Arial, sans-serif";
   ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  let qfs = Math.round(g.W * 0.0135);
-  ctx.font = `700 ${qfs}px Arial, sans-serif`;
-  const quoteText = "★★★★★  “" + state.quote + "”  — " + state.quotedBy;
-  while (ctx.measureText(quoteText).width > g.W * 0.70 && qfs > 8) {
-    qfs -= 1;
-    ctx.font = `700 ${qfs}px Arial, sans-serif`;
-  }
-  ctx.fillStyle = "#fff";
-  ctx.shadowColor = "rgba(0,0,0,0.7)"; ctx.shadowBlur = 6; ctx.shadowOffsetY = 2;
-  ctx.fillText(quoteText, g.W / 2, g.H * 0.028);
-  ctx.shadowColor = "transparent"; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
-  drawEstVol(ctx, g);
-  // title: one hard shadow, thick dark outline, chrome gradient fill
-  const tpx = Math.round(g.W * 0.156);
-  ctx.font = `900 ${tpx}px "Arial Black", Arial, sans-serif`;
-  try { ctx.letterSpacing = Math.round(tpx * 0.01) + "px"; } catch (e) {}
-  let tw = ctx.measureText(state.title.toUpperCase()).width;
-  if (tw > g.W * 0.97) {
-    const s = g.W * 0.97 / tw;
-    ctx.font = `900 ${Math.round(tpx * s)}px "Arial Black", Arial, sans-serif`;
-  }
-  const ty = g.titleY, tx = g.W / 2;
-  const fs = parseInt(ctx.font.match(/(\d+)px/)[1], 10);
-  ctx.fillStyle = "#2a0a3d";
-  ctx.fillText(state.title.toUpperCase(), tx + fs * 0.045, ty + fs * 0.055);
-  ctx.lineWidth = fs * 0.045; ctx.strokeStyle = "#2a0a3d"; ctx.lineJoin = "round";
-  ctx.strokeText(state.title.toUpperCase(), tx, ty);
-  const grad = ctx.createLinearGradient(0, ty - fs * 0.5, 0, ty + fs * 0.55);
-  if (state.look === "magazine") {
-    grad.addColorStop(0, "#ffffff"); grad.addColorStop(0.7, "#ffd9ec"); grad.addColorStop(1, "#ff9d2e");
-  } else if (state.look === "wanted") {
-    grad.addColorStop(0, "#fff3c4"); grad.addColorStop(0.55, "#f7c873"); grad.addColorStop(1, "#c98a3d");
-  } else {
-    grad.addColorStop(0, "#ffe45c"); grad.addColorStop(0.42, "#ff9d2e");
-    grad.addColorStop(0.72, "#ff4d8d"); grad.addColorStop(1, "#e83e8c");
-  }
-  ctx.fillStyle = grad;
-  ctx.fillText(state.title.toUpperCase(), tx, ty);
-  // script subtitle overlapping the lower title, left of centre
+  ctx.fillText("8 92625 01107", x + w / 2, y + h * 0.88);
+}
+function drawStamp(ctx, cx, cy, scale, alpha) {
   ctx.save();
-  ctx.translate(g.W * 0.10, g.scriptY);
-  ctx.rotate(-0.05);
-  ctx.textAlign = "left";
-  ctx.font = `italic 700 ${Math.round(g.W * 0.048)}px "Brush Script MT", "Segoe Script", cursive`;
-  ctx.fillStyle = "#ff5da2";
-  ctx.shadowColor = "rgba(42,10,61,0.9)"; ctx.shadowBlur = 0;
-  ctx.shadowOffsetX = g.W * 0.002; ctx.shadowOffsetY = g.W * 0.0025;
+  ctx.translate(cx, cy);
+  ctx.rotate(-0.21);
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = "#ff2233";
+  ctx.fillStyle = "#ff2233";
+  ctx.lineWidth = 5 * scale;
+  const w = 340 * scale, h = 132 * scale;
+  ctx.strokeRect(-w / 2, -h / 2, w, h);
+  ctx.lineWidth = 2 * scale;
+  ctx.strokeRect(-w / 2 + 8 * scale, -h / 2 + 8 * scale, w - 16 * scale, h - 16 * scale);
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.font = "900 " + Math.round(58 * scale) + "px Arial, sans-serif";
+  ctx.fillText("WANTED", 0, -h * 0.18);
+  ctx.font = "bold " + Math.round(24 * scale) + "px Arial, sans-serif";
+  ctx.fillText("FOR SUNSET CRIMES", 0, h * 0.28);
+  ctx.restore();
+}
+function fitTitleFont(ctx, text, maxW, startPx) {
+  let fs = startPx;
+  ctx.font = "900 " + fs + "px 'Arial Black', Arial, sans-serif";
+  while (fs > 40 && ctx.measureText(text).width > maxW) {
+    fs -= 4;
+    ctx.font = "900 " + fs + "px 'Arial Black', Arial, sans-serif";
+  }
+  return fs;
+}
+
+/* Renders the cover at full export resolution and returns the canvas. */
+function renderCoverToCanvas(sizeName, layoutName, lookName) {
+  const size = SIZES[sizeName];
+  const W = size.w, H = size.h;
+  ensureSlots();
+  const work = document.createElement("canvas");
+  work.width = W; work.height = H;
+  const ctx = work.getContext("2d");
+  const g = gradeSettings();
+  const geo = panelGeometry(sizeName, layoutName);
+
+  /* Backdrop for the magazine look. */
+  if (lookName === "magazine") { ctx.fillStyle = "#fdf6e9"; ctx.fillRect(0, 0, W, H); }
+  else { ctx.fillStyle = "#14081f"; ctx.fillRect(0, 0, W, H); }
+
+  const inset = lookName === "magazine" ? Math.round(W * 0.012) : 0;
+  const gold = "#ffc400";
+  geo.forEach((r, i) => {
+    const photoId = state.slots[i];
+    const photo = photoOf(photoId);
+    const img = images.get(photoId);
+    const px = inset + r.x * (W - inset * 2);
+    const py = inset + r.y * (H - inset * 2);
+    const pw = r.w * (W - inset * 2);
+    const ph = r.h * (H - inset * 2);
+    if (img) {
+      const graded = GradeEngine.grade(img, g);
+      const f = state.focus[i] || { x: 50, y: 50 };
+      const fit = coverFit(graded.width, graded.height, pw, ph, f.x, f.y);
+      ctx.save();
+      ctx.beginPath(); ctx.rect(px, py, pw, ph); ctx.clip();
+      ctx.drawImage(graded, px + fit.dx, py + fit.dy, fit.w, fit.h);
+      ctx.restore();
+    } else {
+      ctx.fillStyle = "#3a1c5e"; ctx.fillRect(px, py, pw, ph);
+    }
+    /* Thin gold panel seams, like the poster grid. */
+    ctx.strokeStyle = gold; ctx.lineWidth = Math.max(2, W * 0.002);
+    ctx.strokeRect(px, py, pw, ph);
+    const chipFs = Math.max(13, Math.round(W * 0.0135));
+    /* Chips sit at a panel's foot, except on the bottom row — where the
+       billing line runs — and on the hero, where they move up clear of the
+       corner chips and the billing line. */
+    let chipY;
+    if (r.h > 0.9) chipY = H * 0.075;
+    else if (r.y + r.h > 0.98) chipY = py + ph * 0.04;
+    else chipY = py + ph - chipFs * 2.6;
+    drawChip(ctx, px + pw * 0.03, chipY, photo ? photo.label : "", chipFs);
+  });
+
+  /* Top line: stars, press quote, paper name — shrunk to fit between the corner chips. */
+  let topFs = Math.round(W * 0.0165);
+  const quoteText = "“" + state.quote + "” — " + state.quotedBy;
+  const stars = "★★★★★  ";
+  let totalW = Infinity;
+  while (topFs > 10) {
+    ctx.font = "bold " + topFs + "px Arial, sans-serif";
+    totalW = ctx.measureText(stars).width + ctx.measureText(quoteText).width;
+    if (totalW <= W * 0.78) break;
+    topFs -= 1;
+  }
+  ctx.font = "bold " + topFs + "px Arial, sans-serif";
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.shadowColor = "rgba(0,0,0,0.85)"; ctx.shadowBlur = 6; ctx.shadowOffsetY = 2;
+  const topY = H * 0.032;
+  ctx.fillStyle = "#ffc400";
+  const starsW = ctx.measureText(stars).width;
+  ctx.fillText(stars, W / 2 - totalW / 2 + starsW / 2, topY);
+  ctx.fillStyle = "#ffffff";
+  ctx.fillText(quoteText, W / 2 - totalW / 2 + starsW + ctx.measureText(quoteText).width / 2, topY);
+  ctx.shadowColor = "transparent"; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+
+  /* Corner chips. */
+  const cornerFs = Math.round(W * 0.017);
+  ctx.font = "bold " + cornerFs + "px Arial, sans-serif";
+  const est = "EST. 2026";
+  const estW = ctx.measureText(est).width + cornerFs * 1.6;
+  ctx.fillStyle = "#ff2e88";
+  ctx.fillRect(0, 0, estW, cornerFs * 2.1);
+  ctx.fillStyle = "#ffffff"; ctx.textAlign = "left"; ctx.textBaseline = "middle";
+  ctx.fillText(est, cornerFs * 0.8, cornerFs * 1.05);
+  const vol = "VOL. 06";
+  const volW = ctx.measureText(vol).width + cornerFs * 1.6;
+  ctx.fillStyle = "#ffc400";
+  ctx.fillRect(W - volW, 0, volW, cornerFs * 2.1);
+  ctx.fillStyle = "#23100a"; ctx.textAlign = "left";
+  ctx.fillText(vol, W - volW + cornerFs * 0.8, cornerFs * 1.05);
+
+  /* Title: striped chrome letters with a hard outline and one hard shadow. */
+  const title = state.title.toUpperCase();
+  const titleGrad = ctx.createLinearGradient(0, H * 0.30, 0, H * 0.52);
+  titleGrad.addColorStop(0, "#ffe45e");
+  titleGrad.addColorStop(0.38, "#ffb52e");
+  titleGrad.addColorStop(0.58, "#ff7a3d");
+  titleGrad.addColorStop(1, "#ff3d7f");
+  const titleFs = fitTitleFont(ctx, title, W * 0.97, Math.round(W * 0.185));
+  const titleY = H * 0.44;
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  try { ctx.letterSpacing = Math.round(W * 0.004) + "px"; } catch (e) {}
+  ctx.font = "900 " + titleFs + "px 'Arial Black', Arial, sans-serif";
+  ctx.fillStyle = "#2a0a4a";
+  ctx.fillText(title, W / 2 + titleFs * 0.025, titleY + titleFs * 0.028);
+  ctx.strokeStyle = "#2a0a4a";
+  ctx.lineWidth = Math.max(4, titleFs * 0.045);
+  ctx.lineJoin = "round";
+  ctx.strokeText(title, W / 2, titleY);
+  ctx.fillStyle = titleGrad;
+  ctx.fillText(title, W / 2, titleY);
+  try { ctx.letterSpacing = "0px"; } catch (e) {}
+
+  /* Pink script subtitle overlapping the title's foot. */
+  const scriptFs = Math.round(W * 0.062);
+  ctx.save();
+  ctx.translate(W * 0.30, H * 0.545);
+  ctx.rotate(-0.045);
+  ctx.font = "italic 900 " + scriptFs + "px Georgia, 'Times New Roman', serif";
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.lineWidth = Math.max(3, scriptFs * 0.06);
+  ctx.strokeStyle = "#2a0a4a";
+  ctx.strokeText(state.script, 0, 0);
+  ctx.fillStyle = "#ff4da6";
   ctx.fillText(state.script, 0, 0);
   ctx.restore();
-  // tagline strip
-  const stripH = g.H * 0.038, stripY = g.H * 0.877;
-  const sg = ctx.createLinearGradient(0, 0, g.W, 0);
-  if (state.look === "magazine") { sg.addColorStop(0, "#111"); sg.addColorStop(1, "#111"); }
-  else { sg.addColorStop(0, "#ff2e88"); sg.addColorStop(0.5, "#ff7a2e"); sg.addColorStop(1, "#ff2e88"); }
-  ctx.fillStyle = sg; ctx.fillRect(0, stripY, g.W, stripH);
-  ctx.fillStyle = state.look === "magazine" ? "#fff" : "#2a0a3d";
-  ctx.font = `900 ${Math.round(g.W * 0.0155)}px Arial, sans-serif`;
-  ctx.fillText(state.tagline, g.W / 2, stripY + stripH / 2);
-  // bottom bar
-  ctx.textAlign = "left";
-  ctx.fillStyle = "#ff2e88";
-  ctx.font = `900 ${Math.round(g.W * 0.0155)}px Arial, sans-serif`;
-  ctx.fillText("COMING SOON", g.W * 0.012, g.H * 0.962);
+
+  /* Tagline strip. */
+  const stripY = H * 0.855, stripH = H * 0.052;
+  const stripGrad = ctx.createLinearGradient(0, stripY, W, stripY);
+  stripGrad.addColorStop(0, "#ff2e88");
+  stripGrad.addColorStop(0.55, "#ff7a3d");
+  stripGrad.addColorStop(1, "#ff2e88");
+  ctx.fillStyle = stripGrad;
+  ctx.fillRect(0, stripY, W, stripH);
+  const stripFs = Math.round(H * 0.028);
+  ctx.font = "bold " + stripFs + "px Arial, sans-serif";
+  ctx.fillStyle = "#2a0a4a";
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  try { ctx.letterSpacing = Math.round(W * 0.0015) + "px"; } catch (e) {}
+  ctx.fillText(state.tagline.toUpperCase(), W / 2, stripY + stripH / 2 + stripFs * 0.05);
+  try { ctx.letterSpacing = "0px"; } catch (e) {}
+
+  /* Bottom row: coming soon, billing, barcode — shadowed so they read over photos. */
+  const botY = stripY + stripH + (H - stripY - stripH) * 0.42;
+  const botFs = Math.round(W * 0.0155);
+  ctx.shadowColor = "rgba(0,0,0,0.8)"; ctx.shadowBlur = 5; ctx.shadowOffsetY = 2;
+  ctx.font = "bold " + botFs + "px Arial, sans-serif";
+  ctx.textAlign = "left"; ctx.textBaseline = "middle";
+  ctx.fillStyle = "#ff4da6";
+  ctx.fillText("COMING SOON", W * 0.012, botY + botFs * 0.1);
   ctx.textAlign = "center";
-  ctx.fillStyle = "#fff";
-  ctx.font = `400 ${Math.round(g.W * 0.0115)}px Arial, sans-serif`;
-  ctx.fillText("A HEAT WAVE PICTURE  ·  STARRING YOU", g.W / 2, g.H * 0.945);
-  ctx.fillText("SHOT ON YOUR OWN CAMERA  ·  GRADED BY HAND", g.W / 2, g.H * 0.972);
-  drawBarcode(ctx, g);
-  drawStamp(ctx, g);
-  return cv;
-}
-function drawChip(ctx, label, cell, g) {
-  const fs = Math.round(g.W * 0.011);
-  ctx.font = `800 ${fs}px Arial, sans-serif`;
-  const tw = ctx.measureText(label).width;
-  const padX = g.W * 0.006, padY = g.W * 0.0035;
-  const bw = tw + padX * 2, bh = fs + padY * 2;
-  const x = cell.x + g.W * 0.007;
-  let y;
-  if (cell.slot === "hero" && !g.nine) y = cell.y + g.H * 0.075;
-  else if (cell.chipAtBottom) y = cell.y + cell.h - bh - g.W * 0.007;
-  else y = cell.y + g.W * 0.007;
-  ctx.fillStyle = "rgba(8,3,18,0.85)";
-  ctx.fillRect(x, y, bw, bh);
-  ctx.strokeStyle = "#ffc800"; ctx.lineWidth = Math.max(2, g.W * 0.001);
-  ctx.strokeRect(x, y, bw, bh);
-  ctx.fillStyle = "#fff"; ctx.textAlign = "left"; ctx.textBaseline = "middle";
-  ctx.fillText(label, x + padX, y + bh / 2);
-  ctx.textAlign = "center";
-}
-function drawEstVol(ctx, g) {
-  const fs = Math.round(g.W * 0.0125);
-  ctx.font = `900 ${fs}px Arial, sans-serif`;
-  ctx.textBaseline = "middle";
-  const padX = g.W * 0.007, padY = g.W * 0.0035;
-  ctx.textAlign = "left";
-  const ew = ctx.measureText("EST. 2026").width + padX * 2;
-  ctx.fillStyle = "#ff2e88";
-  ctx.fillRect(g.W * 0.007, g.H * 0.012, ew, fs + padY * 2);
-  ctx.fillStyle = "#fff";
-  ctx.fillText("EST. 2026", g.W * 0.007 + padX, g.H * 0.012 + (fs + padY * 2) / 2);
-  ctx.textAlign = "right";
-  const vw = ctx.measureText("VOL. 06").width + padX * 2;
-  ctx.fillStyle = "#ffc800";
-  ctx.fillRect(g.W - g.W * 0.007 - vw, g.H * 0.012, vw, fs + padY * 2);
-  ctx.fillStyle = "#1a0b00";
-  ctx.fillText("VOL. 06", g.W - g.W * 0.007 - padX, g.H * 0.012 + (fs + padY * 2) / 2);
-  ctx.textAlign = "center";
-}
-function drawBarcode(ctx, g) {
-  const bw = g.W * 0.075, bh = g.H * 0.052;
-  const x = g.W - g.W * 0.012 - bw, y = g.H - g.H * 0.012 - bh;
-  ctx.fillStyle = "#fff"; ctx.fillRect(x, y, bw, bh);
-  ctx.fillStyle = "#000";
-  const bars = [3, 1, 2, 1, 1, 3, 1, 2, 4, 1, 1, 2, 1, 3, 2, 1, 1, 1, 2, 3];
-  let bx = x + bw * 0.08;
-  const bwMax = bw * 0.84, unit = bwMax / bars.reduce((a, b) => a + b, 0);
-  const barH = bh * 0.62;
-  for (let i = 0; i < bars.length; i += 2) {
-    ctx.fillRect(bx, y + bh * 0.08, bars[i] * unit, barH);
-    bx += (bars[i] + bars[i + 1]) * unit;
+  ctx.fillStyle = "#ffffff";
+  ctx.font = Math.round(W * 0.0135) + "px Arial, sans-serif";
+  ctx.fillText("A HEAT WAVE PICTURE  ·  STARRING YOU", W / 2, botY - botFs * 0.45);
+  ctx.fillText("SHOT ON YOUR OWN CAMERA  ·  GRADED BY HAND", W / 2, botY + botFs * 0.75);
+  ctx.shadowColor = "transparent"; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+  const barW = W * 0.08, barH = (H - stripY - stripH) * 0.84;
+  drawBarcode(ctx, W - barW - W * 0.008, stripY + stripH + (H - stripY - stripH) * 0.08, barW, barH);
+
+  /* Wanted stamp on the mechanic panel, and a big one for the Wanted look. */
+  const mechIdx = state.slots.indexOf("mechanic");
+  if (mechIdx >= 0 && geo[mechIdx]) {
+    const r = geo[mechIdx];
+    const s = Math.min(r.w * W, r.h * H) / 480;
+    drawStamp(ctx, (r.x + r.w * 0.5) * W, (r.y + r.h * 0.38) * H, Math.max(0.6, s), 0.95);
   }
-  ctx.font = `700 ${Math.round(g.W * 0.008)}px Arial, sans-serif`;
-  ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  ctx.fillText("8 92625 01107", x + bw / 2, y + bh * 0.86);
-}
-function drawStamp(ctx, g) {
-  const sc = g.stampCell;
-  const cx = sc.x + sc.w * 0.52, cy = sc.y + sc.h * (g.stampFrac || 0.55);
-  const big = state.look === "wanted" ? g.W * 0.033 : g.W * 0.023;
-  ctx.save();
-  ctx.translate(cx, cy); ctx.rotate(-0.21);
-  ctx.globalAlpha = 0.92;
-  ctx.strokeStyle = "#ff2b2b"; ctx.fillStyle = "#ff2b2b";
-  ctx.lineWidth = Math.max(3, g.W * 0.0025);
-  ctx.font = `900 ${Math.round(big)}px Arial, sans-serif`;
-  const w1 = ctx.measureText("WANTED").width;
-  ctx.font = `900 ${Math.round(big * 0.45)}px Arial, sans-serif`;
-  const w2 = ctx.measureText("FOR SUNSET CRIMES").width;
-  const bw = Math.max(w1, w2) + big * 0.7, bh = big * 1.9;
-  ctx.strokeRect(-bw / 2, -bh / 2, bw, bh);
-  ctx.strokeRect(-bw / 2 + big * 0.08, -bh / 2 + big * 0.08, bw - big * 0.16, bh - big * 0.16);
-  ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  ctx.font = `900 ${Math.round(big)}px Arial, sans-serif`;
-  ctx.fillText("WANTED", 0, -big * 0.32);
-  ctx.font = `900 ${Math.round(big * 0.45)}px Arial, sans-serif`;
-  ctx.fillText("FOR SUNSET CRIMES", 0, big * 0.42);
-  ctx.restore();
-}
-function downloadCanvas(cv, name) {
-  cv.toBlob(b => {
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(b);
-    a.download = name;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
-  }, "image/png");
-}
-async function exportPNG(sizeKey) {
-  const cv = drawCoverCanvas(sizeKey);
-  return cv.toDataURL("image/png");
+  if (lookName === "wanted") {
+    drawStamp(ctx, W * 0.5, H * 0.44, W / 1500, 0.55);
+  }
+  if (lookName === "magazine") {
+    ctx.fillStyle = "#fdf6e9";
+    ctx.fillRect(0, 0, W, Math.round(H * 0.012));
+  }
+
+  /* Postcard tilt: render the finished cover tilted on a dark card. */
+  if (layoutName === "postcard") {
+    const flat = document.createElement("canvas");
+    flat.width = W; flat.height = H;
+    const fctx = flat.getContext("2d");
+    fctx.fillStyle = "#0d0618"; fctx.fillRect(0, 0, W, H);
+    fctx.save();
+    fctx.translate(W / 2, H / 2);
+    fctx.rotate(-0.02);
+    fctx.shadowColor = "rgba(0,0,0,0.6)"; fctx.shadowBlur = 40; fctx.shadowOffsetY = 18;
+    fctx.drawImage(work, -W * 0.47, -H * 0.47, W * 0.94, H * 0.94);
+    fctx.restore();
+    return flat;
+  }
+  return work;
 }
 
-/* ---------- controls ---------- */
-function choiceGroup(elId, values, current, onPick) {
-  const el = document.getElementById(elId);
-  el.innerHTML = "";
-  for (const [key, label] of Object.entries(values)) {
-    const b = document.createElement("button");
-    b.textContent = label;
-    if (key === current) b.classList.add("on");
-    b.addEventListener("click", () => {
-      onPick(key);
-      el.querySelectorAll("button").forEach(x => x.classList.remove("on"));
-      b.classList.add("on");
-    });
-    el.appendChild(b);
-  }
+/* ---- Editor preview, tray and controls. ---- */
+const coverCanvas = document.getElementById("coverCanvas");
+const zonesEl = document.getElementById("zones");
+const trayEl = document.getElementById("tray");
+const statusEl = document.getElementById("status");
+
+function currentGradeLabel() {
+  return (GRADES[state.grade] || GRADES.golden).label;
 }
-function rebuildChoices() {
-  choiceGroup("looks", LOOKS, state.look, k => { state.look = k; buildCover(); });
-  choiceGroup("layouts", LAYOUTS, state.layout, k => { state.layout = k; buildCover(); });
-  choiceGroup("sizes", Object.fromEntries(Object.entries(SIZES).map(([k, v]) => [k, v.label])), state.size, k => { state.size = k; buildCover(); });
-  choiceGroup("grades", Object.fromEntries(Object.entries(GRADES).map(([k, v]) => [k, v.label])), state.grade, k => {
-    state.grade = k;
-    const g = GRADES[k];
-    state.warmth = g.warmth; state.sat = g.sat; state.vig = g.vig;
-    syncSliders(); gradeCache.clear(); drawPanels();
+function renderPreview() {
+  ensureSlots();
+  const size = SIZES[state.size];
+  const art = renderCoverToCanvas(state.size, state.layout, state.look);
+  coverCanvas.width = size.w;
+  coverCanvas.height = size.h;
+  const ctx = coverCanvas.getContext("2d");
+  ctx.drawImage(art, 0, 0);
+  /* Click zones over each panel. */
+  zonesEl.innerHTML = "";
+  const geo = panelGeometry(state.size, state.layout);
+  geo.forEach((r, i) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "zone" + (state.selected === i ? " selected" : "") + (state.armed !== null ? " armed" : "");
+    b.style.left = (r.x * 100) + "%";
+    b.style.top = (r.y * 100) + "%";
+    b.style.width = (r.w * 100) + "%";
+    b.style.height = (r.h * 100) + "%";
+    const photo = photoOf(state.slots[i]);
+    b.title = (photo ? photo.label : "Panel") + " — click to select, or arm a tray photo first to swap";
+    b.setAttribute("aria-label", b.title);
+    b.addEventListener("click", () => {
+      if (state.armed !== null) {
+        state.slots[i] = state.armed;
+        state.armed = null;
+        state.selected = i;
+        buildTray();
+        renderPreview();
+      } else {
+        state.selected = i;
+        syncFocusSliders();
+        renderPreview();
+      }
+    });
+    zonesEl.appendChild(b);
+  });
+  statusEl.innerHTML = "Grade: <span class=\"ok\">" + GradeEngine.mode() + "</span> · " +
+    images.size + "/" + PHOTOS.length + " photos loaded · " + currentGradeLabel();
+}
+function buildTray() {
+  trayEl.innerHTML = "";
+  PHOTOS.forEach((p, idx) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "thumb" + (state.armed === p.id ? " armed" : "");
+    const img = document.createElement("img");
+    img.src = p.file;
+    img.alt = p.alt;
+    const cap = document.createElement("span");
+    cap.textContent = (idx + 1) + " · " + p.label;
+    b.appendChild(img);
+    b.appendChild(cap);
+    b.addEventListener("click", () => {
+      state.armed = state.armed === p.id ? null : p.id;
+      buildTray();
+      renderPreview();
+    });
+    trayEl.appendChild(b);
   });
 }
-function syncSliders() {
+function choiceRow(el, items, current, onPick) {
+  el.innerHTML = "";
+  items.forEach((it) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = it.label;
+    if (it.id === current) b.classList.add("active");
+    b.addEventListener("click", () => { onPick(it.id); });
+    el.appendChild(b);
+  });
+}
+function buildChoices() {
+  choiceRow(document.getElementById("lookChoices"), LOOKS, state.look, (id) => { state.look = id; buildChoices(); renderPreview(); });
+  choiceRow(document.getElementById("layoutChoices"), LAYOUTS, state.layout, (id) => {
+    state.layout = id; ensureSlots(); state.selected = 0; syncFocusSliders(); buildChoices(); renderPreview();
+  });
+  choiceRow(document.getElementById("sizeChoices"),
+    Object.entries(SIZES).map(([id, s]) => ({ id, label: s.label })),
+    state.size, (id) => { state.size = id; buildChoices(); renderPreview(); });
+  choiceRow(document.getElementById("gradeChoices"),
+    Object.entries(GRADES).map(([id, g]) => ({ id, label: g.label })),
+    state.grade, (id) => {
+      state.grade = id;
+      const g = GRADES[id];
+      state.warmth = g.warmth; state.sat = g.sat; state.vig = g.vig;
+      syncGradeSliders(); buildChoices(); renderPreview();
+    });
+}
+function syncGradeSliders() {
   document.getElementById("warmth").value = state.warmth;
   document.getElementById("sat").value = state.sat;
   document.getElementById("vig").value = state.vig;
-  document.getElementById("warmthVal").textContent = state.warmth;
-  document.getElementById("satVal").textContent = state.sat + "%";
-  document.getElementById("vigVal").textContent = state.vig;
+  document.getElementById("warmthOut").textContent = state.warmth;
+  document.getElementById("satOut").textContent = state.sat + "%";
+  document.getElementById("vigOut").textContent = state.vig;
 }
-function bindSlider(id, valId, fmt, apply) {
+function syncFocusSliders() {
+  const f = state.focus[state.selected] || { x: 50, y: 50 };
+  document.getElementById("fx").value = f.x;
+  document.getElementById("fy").value = f.y;
+  document.getElementById("fxOut").textContent = f.x;
+  document.getElementById("fyOut").textContent = f.y;
+}
+function bindSlider(id, outId, fn, fmt) {
   const el = document.getElementById(id);
   el.addEventListener("input", () => {
-    const v = parseInt(el.value, 10);
-    document.getElementById(valId).textContent = fmt(v);
-    apply(v);
+    const v = Number(el.value);
+    document.getElementById(outId).textContent = fmt ? fmt(v) : String(v);
+    fn(v);
+    renderPreview();
   });
 }
-bindSlider("warmth", "warmthVal", v => v, v => { state.warmth = v; gradeCache.clear(); drawPanels(); });
-bindSlider("sat", "satVal", v => v + "%", v => { state.sat = v; gradeCache.clear(); drawPanels(); });
-bindSlider("vig", "vigVal", v => v, v => { state.vig = v; gradeCache.clear(); drawPanels(); });
-bindSlider("fx", "fxVal", v => v, v => {
-  const f = state.focus[state.selected] || (state.focus[state.selected] = { x: 50, y: 50 });
-  f.x = v; gradeCache.clear(); drawPanels();
-});
-bindSlider("fy", "fyVal", v => v, v => {
-  const f = state.focus[state.selected] || (state.focus[state.selected] = { x: 50, y: 50 });
-  f.y = v; gradeCache.clear(); drawPanels();
-});
-function bindWord(id, key, transform) {
-  const el = document.getElementById(id);
-  el.addEventListener("input", () => {
-    state[key] = transform ? transform(el.value) : el.value;
-    buildCover();
-  });
-}
-bindWord("wTitle", "title");
-bindWord("wScript", "script");
-bindWord("wQuote", "quote", v => v.toUpperCase());
-bindWord("wBy", "quotedBy", v => v.toUpperCase());
-bindWord("wTag", "tagline", v => v.toUpperCase());
-
-function buildTray() {
-  const tray = document.getElementById("tray");
-  tray.innerHTML = "";
-  PHOTOS.forEach((p, i) => {
-    const fig = document.createElement("figure");
-    if (state.armed === p.id) fig.classList.add("armed");
-    fig.innerHTML = "";
-    const img = document.createElement("img");
-    img.src = p.file; img.alt = p.label;
-    const num = document.createElement("span"); num.className = "num"; num.textContent = i + 1;
-    const cap = document.createElement("figcaption"); cap.textContent = p.label;
-    fig.append(img, num, cap);
-    fig.addEventListener("click", () => {
-      state.armed = state.armed === p.id ? null : p.id;
-      buildTray();
+function bindControls() {
+  bindSlider("warmth", "warmthOut", (v) => { state.warmth = v; });
+  bindSlider("sat", "satOut", (v) => { state.sat = v; }, (v) => v + "%");
+  bindSlider("vig", "vigOut", (v) => { state.vig = v; });
+  bindSlider("fx", "fxOut", (v) => { state.focus[state.selected].x = v; });
+  bindSlider("fy", "fyOut", (v) => { state.focus[state.selected].y = v; });
+  const words = [
+    ["wTitle", "title"], ["wScript", "script"],
+    ["wQuote", "quote"], ["wQuotedBy", "quotedBy"], ["wTag", "tagline"],
+  ];
+  words.forEach(([id, key]) => {
+    document.getElementById(id).addEventListener("input", (e) => {
+      state[key] = e.target.value;
+      renderPreview();
     });
-    tray.appendChild(fig);
+  });
+  document.getElementById("upload").addEventListener("change", (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const id = "custom-" + Date.now();
+        images.set(id, img);
+        state.customPhotos[id] = { id, file: "", label: "YOUR PHOTO", alt: "Uploaded photo" };
+        state.slots[state.selected] = id;
+        state.armed = null;
+        statusEl.textContent = "Your photo is in panel " + (state.selected + 1) + ".";
+        renderPreview();
+      };
+      img.src = String(reader.result);
+    };
+    reader.readAsDataURL(file);
+  });
+  document.getElementById("exportBtn").addEventListener("click", () => exportPNG(state.size));
+  document.getElementById("exportAllBtn").addEventListener("click", async () => {
+    for (const name of Object.keys(SIZES)) await exportPNG(name);
   });
 }
-function updateStatus() {
-  document.getElementById("gradeMode").textContent = grader.mode;
-  document.getElementById("photoCount").textContent = loadedCount + "/8";
+function downloadCanvas(canvas, filename) {
+  return new Promise((resolve) => {
+    canvas.toBlob((blob) => {
+      if (!blob) { resolve(false); return; }
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      resolve(true);
+    }, "image/png");
+  });
 }
-document.getElementById("upload").addEventListener("change", ev => {
-  const file = ev.target.files && ev.target.files[0];
-  if (!file) return;
-  const id = "custom-" + Date.now();
-  const url = URL.createObjectURL(file);
-  const img = new Image();
-  img.onload = () => {
-    customPhotos[id] = { label: "YOUR PHOTO", img };
-    loadedCount++;
-    const slot = state.selected;
-    if (slot === "hero") state.slots.hero = id;
-    else if (slot.startsWith("p")) state.slots[slot] = id;
-    updateStatus(); buildCover();
-  };
-  img.src = url;
-});
-document.getElementById("exportOne").addEventListener("click", () => {
-  downloadCanvas(drawCoverCanvas(state.size), "heat-wave-" + state.size + ".png");
-});
-document.getElementById("exportAll").addEventListener("click", () => {
-  for (const k of Object.keys(SIZES)) downloadCanvas(drawCoverCanvas(k), "heat-wave-" + k + ".png");
-});
+async function exportPNG(sizeName) {
+  const canvas = renderCoverToCanvas(sizeName, state.layout, state.look);
+  const size = SIZES[sizeName];
+  const ok = await downloadCanvas(canvas, "heat-wave-" + sizeName + "-" + size.w + "x" + size.h + ".png");
+  statusEl.innerHTML = ok
+    ? "<span class=\"ok\">Exported heat-wave-" + sizeName + " " + size.w + "×" + size.h + " PNG.</span>"
+    : "Export failed in this browser.";
+  return ok;
+}
 
-/* ---------- boot ---------- */
-const params = new URLSearchParams(location.search);
-if (params.get("size") && SIZES[params.get("size")]) state.size = params.get("size");
-if (params.get("layout") && LAYOUTS[params.get("layout")]) state.layout = params.get("layout");
-if (params.get("look") && LOOKS[params.get("look")]) state.look = params.get("look");
-if (params.get("grade") && GRADES[params.get("grade")]) {
-  state.grade = params.get("grade");
-  const g = GRADES[state.grade];
-  state.warmth = g.warmth; state.sat = g.sat; state.vig = g.vig;
+/* ---- Shot pages: the exported cover itself, full frame. ---- */
+function shotMode() {
+  const q = new URLSearchParams(location.search);
+  const shot = q.get("shot");
+  if (!shot) return null;
+  if (shot === "cover") return { size: "landscape", layout: "bleed-left" };
+  if (shot === "portrait") return { size: "portrait", layout: "bleed-right" };
+  if (shot === "square") return { size: "square", layout: "nine-grid" };
+  return null;
 }
-if (params.get("cover") === "1") document.body.classList.add("cover-only");
-window.__app = {
-  state, exportPNG, gradeMode: () => grader.mode,
-  photosLoaded: () => loadedCount,
-  redraw: () => drawPanels(),
-  ready: () => loadedCount >= 8 && !!coverEl.querySelector(".panel canvas"),
+
+/* ---- Boot: load the eight photos, then draw. ---- */
+function loadPhoto(p) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => { images.set(p.id, img); resolve(true); };
+    img.onerror = () => { errors.push("failed to load " + p.file); resolve(false); };
+    img.src = p.file;
+  });
+}
+const ready = (async () => {
+  await Promise.all(PHOTOS.map(loadPhoto));
+  const shot = shotMode();
+  if (shot) {
+    document.body.classList.add("shot");
+    state.size = shot.size;
+    state.layout = shot.layout;
+    ensureSlots();
+    const size = SIZES[state.size];
+    const art = renderCoverToCanvas(state.size, state.layout, state.look);
+    coverCanvas.width = size.w;
+    coverCanvas.height = size.h;
+    coverCanvas.getContext("2d").drawImage(art, 0, 0);
+    document.title = "Heat Wave — " + state.size + " cover";
+  } else {
+    buildChoices();
+    buildTray();
+    bindControls();
+    syncGradeSliders();
+    syncFocusSliders();
+    renderPreview();
+  }
+  return true;
+})();
+
+window.__heatwave = {
+  ready,
+  state,
+  errors,
+  photosLoaded: () => images.size,
+  gradeMode: () => GradeEngine.mode(),
+  renderCoverToCanvas,
+  exportPNGDataURL: async (sizeName) => {
+    const canvas = renderCoverToCanvas(sizeName || state.size, state.layout, state.look);
+    return canvas.toDataURL("image/png");
+  },
 };
-window.addEventListener("resize", () => { fitCoverUnit(); drawPanels(); });
-rebuildChoices();
-syncSliders();
-buildTray();
-buildCover();
-updateStatus();
 </script>
 </body>
 </html>

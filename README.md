@@ -1,61 +1,51 @@
-# Heat Wave — Cover Studio
-
 [![make.fun · gta6-cover-art-01](https://make.fun/badge/gta6-cover-art-01.svg)](https://make.fun/bounty/gta6-cover-art-01?utm_source=github&utm_medium=readme&utm_campaign=gta6-cover-art-01)
 [![rank](https://make.fun/badge/gta6-cover-art-01/Holladitt/gta6-cover-art-01-entry/rank.svg)](https://make.fun/bounty/gta6-cover-art-01/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=gta6-cover-art-01)
 [![reward](https://make.fun/badge/gta6-cover-art-01/Holladitt/gta6-cover-art-01-entry/reward.svg)](https://make.fun/bounty/gta6-cover-art-01?utm_source=github&utm_medium=readme&utm_campaign=gta6-cover-art-01)
 
-Built for the [GTA 6 cover art bounty on make.fun](https://make.fun/bounty/gta6-cover-art-01).
+# Heat Wave — Cover Studio
 
-An offline web app that turns your photos plus captions into GTA 6-style
-cover art and exports it as a PNG.
+A free offline web app that turns your own golden-hour photos into GTA-style cover art: a multi-panel poster with a giant striped-chrome title, a pink script subtitle, a press quote, a tagline strip and a wanted stamp — exported as a PNG you can post anywhere.
+
+This is an entry for the [gta6-cover-art-01 bounty](https://make.fun/bounty/gta6-cover-art-01) on make.fun. All of the art, lettering and code here is original; it uses no Rockstar Games logo, artwork or fonts.
 
 ## What it does
 
-- **Multi-panel cover** — a giant hero photo with six smaller panels (or a
-  3×3 nine-grid), each carrying a short location chip: Coral Row, Neon Mile,
-  Sunset Keys, Tidewatch, Reef Side, Harbour Lights, Palm Court, Dune Road.
-- **Chrome title** — HEAT WAVE in huge retro-chrome letters with a thick dark
-  outline and one hard shadow, plus the pink script subtitle *Golden Hour*.
-- **Press line, strip, billing** — five gold stars and a press quote up top
-  (EST. 2026 / VOL. 06 chips), the pink-to-orange tagline strip
-  *EIGHT LIVES · ONE HEAT WAVE · ZERO REGRETS*, COMING SOON, the billing
-  line and a barcode at the bottom, and a red slanted WANTED stamp
-  (*FOR SUNSET CRIMES*) across the mechanic panel.
-- **Looks, layouts, sizes** — Poster / Magazine / Wanted looks; Bleed left /
-  Bleed right / Postcard tilt / Nine grid layouts; Landscape 1920×1080,
-  Portrait 1080×1350 and Square 1080×1080 sizes.
-- **Grade** — Golden hour / Vice pink / Dusk teal / Neon night presets plus
-  Warmth, Saturation and Vignette sliders, rendered through a WebGL shader
-  (with a 2D canvas fallback when WebGL is unavailable), one unified warm
-  grade across every panel.
-- **Words** — title, script subtitle, press quote, quoted-by and tagline
-  fields. Every field shows its full text; nothing is cut off.
-- **Photos** — eight built-in golden-hour sample photos in the tray. Click a
-  tray photo to arm it, then click a cover panel to swap it in; click a panel
-  on its own to select it and nudge its focus with the Focus X / Focus Y
-  sliders. You can also upload your own photo into the selected panel.
-- **Export** — *Export PNG* saves the current size; *Export all 3 sizes*
-  saves landscape, portrait and square in one go.
+- **Eight-panel covers.** A hero photo plus six smaller panels, each with its own place name (Coral Row, Neon Mile, Sunset Keys, Tidewatch, Reef Side, Harbour Lights, Palm Court, Dune Road).
+- **Any photo.** Load your own pictures from your machine, crop and position each panel with the Focus sliders, or swap any panel from the photo tray. Photos never leave your machine — the app makes no network request at all.
+- **Three looks.** Poster, Magazine and Wanted.
+- **Four layouts.** Bleed left, Bleed right, Postcard tilt and a nine-panel grid.
+- **Three post sizes.** Landscape 1920×1080, Portrait 1080×1350 and Square 1080×1080, all exported in one click.
+- **A real colour grade.** A WebGL shader grades every photo (warmth, saturation, vignette, plus a Golden hour / Vice pink / Dusk teal / Neon night preset); if WebGL is unavailable it falls back to a 2D canvas grade.
+- **Your words.** Title, script subtitle, press quote, quoted-by line and tagline strip are all editable, and long text wraps onto two lines instead of being cut off.
 
-## Run it
+## How to run it
+
+The app is plain static files under `app/` — no build step, no install.
 
 ```sh
-node serve.ts 8131
-# open http://localhost:8131/
+node serve.ts
 ```
 
-Everything runs offline in the page: no network requests, no uploads, no
-accounts. Your photos never leave the machine.
+Then open http://localhost:8123/ in a desktop browser. Or serve `app/` with any static file server and open `app/index.html`.
 
-## Entrypoint
+Node 22.18 or later is enough; the entry program `main.ts` runs on the same Node.
 
-```sh
-MAKEFUN_OUTPUT_DIR=/output node main.ts
-```
+## How to export
 
-Copies `app/` and `screenshots/` into the output directory and writes
-`dossier.json` there. It refuses to run if the output directory is inside
-the repository.
+1. Pick a look, a layout and a size.
+2. Click a photo in the tray, then click a panel to put it there. Click a panel on its own to select it and nudge its focus.
+3. Edit the words until the cover reads the way you want.
+4. **Export PNG** downloads the current size; **Export all 3 sizes** downloads landscape, portrait and square in one go.
+
+## Layout of this repo
+
+- `app/index.html` — the whole studio: editor UI, cover renderer and WebGL grade, in one file.
+- `app/samples/` — eight sample photos made for this entry (no real people).
+- `screenshots/` — the cover and the editor, taken from the running app.
+- `shots.json` — what each screenshot shows.
+- `main.ts` — the entry program: copies `app/` and `screenshots/` to the output directory and writes `dossier.json`.
+- `serve.ts` — a small static server for local development.
+- `vendor/makefun-app.ts` — the kit's dossier library, copied unchanged.
 
 ## License
 
